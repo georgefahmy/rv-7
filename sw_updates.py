@@ -1,11 +1,11 @@
 import requests
 import os
 import zipfile
-from bs4 import BeautifulSoup, SoupStrainer
+from bs4 import BeautifulSoup as bs, SoupStrainer as ss
 
 
 dynon_url = "https://www.dynonavionics.com/skyview-hdx-software-updates-us-packages.php"
-garmin_url = "https://www8.garmin.com/support/download_details.jsp?id=10354#Instruct"
+garmin_url = "https://www8.garmin.com/support/download_details.jsp?id=10354"
 
 
 def archive_old_sw_updates():
@@ -29,18 +29,12 @@ def generate_download_url(download_href):
     return (dn, fn)
 
 
-soup = BeautifulSoup(requests.get(dynon_url).content, "html.parser")
-
-for link in BeautifulSoup(
-    requests.get(garmin_url).content, "html.parser", parse_only=SoupStrainer("a")
-):
+for link in bs(requests.get(garmin_url).content, "html.parser", parse_only=ss("a")):
     if link.has_attr("href"):
         if ".zip" in link["href"]:
             garmin_software = link["href"]
 
-for link in BeautifulSoup(
-    requests.get(dynon_url).content, "html.parser", parse_only=SoupStrainer("a")
-):
+for link in bs(requests.get(dynon_url).content, "html.parser", parse_only=ss("a")):
     if link.has_attr("href"):
         if ".duc" in link["href"] and "HDX1100" in link["href"]:
             if "hw4" in link["href"]:
