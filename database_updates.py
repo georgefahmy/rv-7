@@ -1,10 +1,13 @@
 import requests
 import re
 import os
+import sys
 from bs4 import BeautifulSoup
 
 
 check_url = "https://dynonavionics.com/us-aviation-obstacle-data.php"
+
+DYNON_USB = "/Volumes/DYNON/"
 
 
 def archive_old_sw_databases():
@@ -12,6 +15,13 @@ def archive_old_sw_databases():
     archive_folder = (
         "/Users/GFahmy/Desktop/RV-7_Plans/SkyView/sotware_updates/databases/archived_databases/"
     )
+
+    if os.path.isdir(DYNON_USB):
+        os.listdir(DYNON_USB)
+        usb_existing_db_files = [file for file in os.listdir(DYNON_USB) if file.startswith("FAA")]
+        for file in usb_existing_db_files:
+            os.remove(DYNON_USB + file)
+
     existing_db_files = [file for file in os.listdir(databases_folder) if file.startswith("FAA")]
     if not existing_db_files:
         print("No databases to archive")
@@ -24,11 +34,15 @@ def archive_old_sw_databases():
 
 def generate_download_url(cycles):
     av_cycle, ob_cycle = [
-        cycles[0].replace(")", "").split("Cycle:")[-1].strip(),
-        cycles[1].replace(")", "").split("Cycle:")[-1].strip(),
+        re.findall(r"[0-9]{4}", cycles[0].replace(")", ""))[0],
+        re.findall(r"[0-9]{4}", cycles[1].replace(")", ""))[0],
     ]
+    print([av_cycle, ob_cycle])
     dn = f"https://dynonavionics.com/downloads/Software/Us-av-ob/FAA_av{av_cycle}_ob{ob_cycle}.duc"
-    fn = f"/Users/GFahmy/Desktop/RV-7_Plans/SkyView/sotware_updates/databases/FAA_av{av_cycle}_ob{ob_cycle}.duc"
+    if os.path.isdir(DYNON_USB):
+        fn = DYNON_USB + f"FAA_av{av_cycle}_ob{ob_cycle}.duc"
+    else:
+        fn = f"/Users/GFahmy/Desktop/RV-7_Plans/SkyView/sotware_updates/databases/FAA_av{av_cycle}_ob{ob_cycle}.duc"
     return (dn, fn)
 
 
@@ -37,19 +51,9 @@ soup = BeautifulSoup(requests.get(check_url).content, "html.parser")
 current_data = soup.find_all(string=re.compile("Current Data", flags=re.I))[0]
 cur_av_cycle, cur_ob_cycle = current_data.parent.parent.find_all(string=re.compile("Cycle:"))
 
-new_data = soup.find_all(string=re.compile("Upcoming Data", flags=re.I))[0]
-new_av_cycle, new_ob_cycle = new_data.parent.parent.find_all(string=re.compile("Cycle:"))
+download_url, filename = generate_download_url((cur_av_cycle, cur_ob_cycle))
 
-download_url_current, cur_filename = generate_download_url((cur_av_cycle, cur_ob_cycle))
-download_url_new, new_filename = generate_download_url((new_av_cycle, new_ob_cycle))
-
-
-flag = input("Download upcoming databases (no will download current databases) Y/n: ")
-database_choice = "Upcomming" if flag == "Y" else "Current"
-
-print(f"\nDownloading {database_choice} database...")
-download_url = download_url_new if database_choice == "Upcomming" else download_url_current
-filename = new_filename if database_choice == "Upcomming" else cur_filename
+print(f"\nDownloading Current database...")
 
 archive_old_sw_databases()
 
