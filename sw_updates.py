@@ -1,10 +1,11 @@
 import requests
-import re
 import os
-from bs4 import BeautifulSoup
+import zipfile
+from bs4 import BeautifulSoup, SoupStrainer
 
 
-check_url = "https://www.dynonavionics.com/skyview-hdx-software-updates-us-packages.php"
+dynon_url = "https://www.dynonavionics.com/skyview-hdx-software-updates-us-packages.php"
+garmin_url = "https://www8.garmin.com/support/download_details.jsp?id=10354#Instruct"
 
 
 def archive_old_sw_updates():
@@ -28,17 +29,24 @@ def generate_download_url(download_href):
     return (dn, fn)
 
 
-soup = BeautifulSoup(requests.get(check_url).content, "html.parser")
+soup = BeautifulSoup(requests.get(dynon_url).content, "html.parser")
 
-non_hw4_section = soup.find_all(string=re.compile("Hardware Revisions 1/2/3", flags=re.I))[0]
-non_hw4_download_url = non_hw4_section.parent.parent.parent.find_all(string=re.compile("HDX1100"))[
-    0
-].parent.parent.get("href")
+for link in BeautifulSoup(
+    requests.get(garmin_url).content, "html.parser", parse_only=SoupStrainer("a")
+):
+    if link.has_attr("href"):
+        if ".zip" in link["href"]:
+            garmin_software = link["href"]
 
-hw4_section = soup.find_all(string=re.compile("Hardware Revision 4", flags=re.I))[0]
-hw4_download_url = hw4_section.parent.parent.parent.find_all(string=re.compile("HDX1100"))[
-    0
-].parent.parent.get("href")
+for link in BeautifulSoup(
+    requests.get(dynon_url).content, "html.parser", parse_only=SoupStrainer("a")
+):
+    if link.has_attr("href"):
+        if ".duc" in link["href"] and "HDX1100" in link["href"]:
+            if "hw4" in link["href"]:
+                hw4_download_url = link["href"]
+            else:
+                non_hw4_download_url = link["href"]
 
 download_non_hw4_url, non_hw4_filename = generate_download_url(non_hw4_download_url)
 download_hw4_url, hw4_filename = generate_download_url(hw4_download_url)
@@ -47,7 +55,6 @@ download_hw4_url, hw4_filename = generate_download_url(hw4_download_url)
 archive_old_sw_updates()
 
 print(f"\nDownloading {non_hw4_filename.split('/')[-1]}")
-
 with open(non_hw4_filename, "wb+") as out_file:
     content = requests.get(download_non_hw4_url, stream=True).content
     out_file.write(content)
@@ -58,3 +65,19 @@ with open(hw4_filename, "wb+") as out_file:
     content = requests.get(download_hw4_url, stream=True).content
     out_file.write(content)
     print(f"Success!\nFile saved to {hw4_filename}")
+
+print(f"\nDownloading latest Garmin G5 software")
+with open(
+    "/Users/GFahmy/Desktop/RV-7_Plans/garmin/" + garmin_software.split("/")[-1], "wb+"
+) as out_file:
+    content = requests.get(garmin_software, stream=True).content
+    out_file.write(content)
+    with zipfile.ZipFile(
+        "/Users/GFahmy/Desktop/RV-7_Plans/garmin/" + garmin_software.split("/")[-1], "r"
+    ) as zip_ref:
+        zip_ref.extractall("/Users/GFahmy/Desktop/RV-7_Plans/garmin/")
+    print(
+        f"Success!\nFile saved to "
+        + "/Users/GFahmy/Desktop/RV-7_Plans/garmin/"
+        + garmin_software.split("/")[-1]
+    )
