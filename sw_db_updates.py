@@ -70,11 +70,11 @@ def download_garmin(garmin_url, drive):
         print(f"{file} already exists...skipping")
     else:
         print(f"\nDownloading files to {drive} ...")
-        with open(drive + file, "wb+") as out_file:
+        with open("/Users/GFahmy/Desktop/RV-7_Plans/garmin/" + file, "wb+") as out_file:
             content = requests.get(garmin_software, stream=True).content
             out_file.write(content)
-            with zipfile.ZipFile(drive + file, "r") as zip_ref:
-                zip_ref.extractall("/Users/GFahmy/Desktop/RV-7_Plans/garmin/")
+            with zipfile.ZipFile("/Users/GFahmy/Desktop/RV-7_Plans/garmin/" + file, "r") as zip_ref:
+                zip_ref.extractall(drive)
 
             print(f"File saved to " + drive + file)
 
