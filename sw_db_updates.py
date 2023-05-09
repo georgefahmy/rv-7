@@ -1,6 +1,7 @@
 import requests
 import os
 import zipfile
+import PySimpleGUI as pg
 from bs4 import BeautifulSoup as bs, SoupStrainer as ss
 
 
@@ -70,10 +71,10 @@ def download_garmin(garmin_url, drive):
         print(f"{file} already exists...skipping")
     else:
         print(f"\nDownloading files to {drive} ...")
-        with open("/Users/GFahmy/Desktop/RV-7_Plans/garmin/" + file, "wb+") as out_file:
+        with open(drive + file, "wb+") as out_file:
             content = requests.get(garmin_software, stream=True).content
             out_file.write(content)
-            with zipfile.ZipFile("/Users/GFahmy/Desktop/RV-7_Plans/garmin/" + file, "r") as zip_ref:
+            with zipfile.ZipFile(drive + file, "r") as zip_ref:
                 zip_ref.extractall(drive)
 
             print(f"File saved to " + drive + file)
@@ -95,7 +96,12 @@ GARMIN_GPS_175_URL = (
 volumes = ["/Volumes/" + drive + "/" for drive in os.listdir("/Volumes/") if "DYNON" in drive]
 if not volumes:
     print("No Dynon drives inserted, saving to internal drive")
-    volumes = ["/Users/GFahmy/Desktop/RV-7_Plans/SkyView/sotware_updates/"]
+    folder = pg.popup_get_folder("Select SkyView SW folder", no_window=True, history=True)
+    print(folder)
+    if folder:
+        volumes = [folder + "/"]
+    else:
+        volumes = ["/Users/GFahmy/Desktop/RV-7_Plans/SkyView/sotware_updates/"]
 
 for drive in volumes:
     success = download_dynon(CHECK_URL, SW_URL, drive)
@@ -104,7 +110,11 @@ for drive in volumes:
 volumes = ["/Volumes/" + drive + "/" for drive in os.listdir("/Volumes/") if "GARMIN_G5" in drive]
 if not volumes:
     print("No Garmin drives inserted, saving to internal drive")
-    volumes = ["/Users/GFahmy/Desktop/RV-7_Plans/garmin/"]
+    folder = pg.popup_get_folder("Select Garmin SW Folder", no_window=True)
+    if folder:
+        volumes = [folder + "/"]
+    else:
+        volumes = ["/Users/GFahmy/Desktop/RV-7_Plans/garmin/"]
 
 for drive in volumes:
     success = download_garmin(GARMIN_G5_URL, drive)
