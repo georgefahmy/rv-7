@@ -96,12 +96,16 @@ GARMIN_GPS_175_URL = (
 volumes = ["/Volumes/" + drive + "/" for drive in os.listdir("/Volumes/") if "DYNON" in drive]
 if not volumes:
     print("No Dynon drives inserted, saving to internal drive")
-    folder = pg.popup_get_folder("Select SkyView SW folder", no_window=True, history=True)
-    print(folder)
+    folder = pg.popup_get_folder(
+        "Select SkyView SW folder",
+        initial_folder="/Users/GFahmy/Desktop/RV-7_Plans/SkyView/sotware_updates/",
+        no_window=True,
+        history=True,
+    )
     if folder:
         volumes = [folder + "/"]
     else:
-        volumes = ["/Users/GFahmy/Desktop/RV-7_Plans/SkyView/sotware_updates/"]
+        volumes = []
 
 for drive in volumes:
     success = download_dynon(CHECK_URL, SW_URL, drive)
@@ -110,11 +114,16 @@ for drive in volumes:
 volumes = ["/Volumes/" + drive + "/" for drive in os.listdir("/Volumes/") if "GARMIN_G5" in drive]
 if not volumes:
     print("No Garmin drives inserted, saving to internal drive")
-    folder = pg.popup_get_folder("Select Garmin SW Folder", no_window=True)
+    folder = pg.popup_get_folder(
+        "Select Garmin SW Folder",
+        initial_folder="/Users/GFahmy/Desktop/RV-7_Plans/garmin/",
+        no_window=True,
+        history=True,
+    )
     if folder:
         volumes = [folder + "/"]
     else:
-        volumes = ["/Users/GFahmy/Desktop/RV-7_Plans/garmin/"]
+        volumes = []
 
 for drive in volumes:
     success = download_garmin(GARMIN_G5_URL, drive)
