@@ -56,6 +56,36 @@ def download_dynon(database_url, software_update_url, drive):
     return True
 
 
+def download_skyview_docs(documentation_url):
+    documentation_links = [
+        link["href"]
+        for link in bs(requests.get(documentation_url).content, "html.parser", parse_only=ss("a"))
+        if ".pdf" in link.get("href")
+        and "guide" in link.get("href")
+        and not "Changes" in link.get("href")
+        and not "Classic" in link.get("href")
+        and not "SkyView_SE" in link.get("href")
+        and not "D10_D100" in link.get("href")
+    ]
+    drive = "/Users/GFahmy/Desktop/RV-7_Plans/SkyView/PDFs/"
+
+    existing_files = [file for file in os.listdir(drive)]
+
+    for link in documentation_links:
+        file = link.split("/")[-1]
+        filename = drive + file
+        download_url = "https://dynonavionics.com/" + link
+        if file in existing_files:
+            existing_files.remove(file)
+            print(f"{file} already exists...skipping")
+        else:
+            print(f"\nDownloading files to {drive} ...")
+            with open(filename, "wb+") as out_file:
+                content = requests.get(download_url, stream=True).content
+                out_file.write(content)
+                print(f"Saved {file}")
+
+
 def download_garmin(garmin_url, drive):
     garmin_software = [
         link["href"]
@@ -88,6 +118,7 @@ def download_garmin(garmin_url, drive):
 
 CHECK_URL = "https://dynonavionics.com/us-aviation-obstacle-data.php"
 SW_URL = "https://www.dynonavionics.com/skyview-hdx-software-updates-us-packages.php"
+DOCUMENTATION_URL = "https://www.dynonavionics.com/skyview-documentation.php"
 GARMIN_G5_URL = "https://www8.garmin.com/support/download_details.jsp?id=10354"
 GARMIN_GPS_175_URL = (
     "https://www8.garmin.com/support/download_details.jsp?id=15281"  # Needs Windows
@@ -109,6 +140,8 @@ if not volumes:
 
 for drive in volumes:
     success = download_dynon(CHECK_URL, SW_URL, drive)
+
+download_skyview_docs(DOCUMENTATION_URL)
 
 # Garmin stuff
 volumes = ["/Volumes/" + drive + "/" for drive in os.listdir("/Volumes/") if "GARMIN_G5" in drive]
