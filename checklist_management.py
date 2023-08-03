@@ -1,53 +1,38 @@
 import os
+import gspread
+import datetime
+
 from dotmap import DotMap
 
 
-def read_checklist(checklist):
-    checklist_dict = DotMap()
-    with open(checklist_folder + checklist, mode="r", encoding="utf-8") as fp:
-        checklist_dict.filename = checklist
-        checklist_dict.raw = fp.read()
-        initial_list = checklist_dict.raw.split("\n\n")
-        for section in initial_list:
-            lines = section.split("\n")
-            for i, line in enumerate(lines):
-                if line.startswith("#"):
-                    checklist_dict.comments[f"line{i}"] = line
-                else:
-                    if "TITLE" in line:
-                        checklist_dict.sections[section.split(".")[0]].TITLE = line.split(", ")[-1]
-                    if "LINE" in line:
-                        value = line.split(", ")[-1].strip() if len(line.split(",")[-1]) > 1 else ""
-                        checklist_dict.sections[section.split(".")[0]][f"LINE{i}"] = value
-    return checklist_dict
-
-
-def create_checklist(checklist_dict):
+def make_checklist(worksheets, chklist):
     i = 0
-    while True:
-        if checklist_dict.sections[f"CHKLST{i}"].TITLE:
-            print(checklist_dict.sections[f"CHKLST{i}"].TITLE)
-        else:
-            section_title = input("New Section Title: ")
-            if section_title == "":
-                break
-            checklist_dict.sections[f"CHKLST{i}"].TITLE = section_title
-        j = 1
-        while True:
-            checklist_item = input("New Checklist Item: ")
-            if checklist_item == "":
-                break
-            checklist_dict.sections[f"CHKLST{i}"][f"LINE{j}"] = checklist_item
-            j += 1
-        i += 1
+    for sheet in worksheets[:-1]:
+        checklist_titles = sheet.get("B1:1")[0]
+        all_records = sheet.get_all_records()
+        for checklist in checklist_titles:
+            blank = 0
+            # print(f"CHKLST{i}.TITLE,", checklist)
+            chklist.sections[f"CHKLST{i}"].TITLE = checklist.upper()
+            for j, row in enumerate(all_records):
+                if not row[checklist]:
+                    blank += 1
+                if blank > 1:
+                    continue
+                # print(f"CHKLST{i}.LINE{j+1},", row[checklist])
+                chklist.sections[f"CHKLST{i}"][f"LINE{j+1}"] = row[checklist]
+            i += 1
+    chklist.sections[f"CHKLST{i}"].TITLE = "CHECKLIST INFO"
+    chklist.sections[f"CHKLST{i}"][f"LINE1"] = ""
+    chklist.sections[f"CHKLST{i}"][f"LINE2"] = "Last Updated: " + chklist.date.split("T")[0]
+    chklist.sections.pprint("json")
+    return chklist
 
-    return checklist_dict
 
-
-def write_checklist(filename):
-    with open(checklist_folder + filename, "w", encoding="utf-8") as fp:
+def write_checklist(chklist):
+    with open(chklist.folder + chklist.filename, "w", encoding="utf-8") as fp:
         lines = []
-        for key, value in checklist_dict.sections.items():
+        for key, value in chklist.sections.items():
             lines.append("")
             for key2, line in value.items():
                 if type(line) == DotMap:
@@ -56,20 +41,25 @@ def write_checklist(filename):
         fp.write("\n".join(lines))
 
 
-checklist_folder = "/Users/GFahmy/Desktop/RV-7_Plans/SkyView/checklists/"
+SHEET_ID = "1-EtvM-MdQwJ0Wk8CXvsHwmCrYk3bptP8fpDFwMWMDkc"
+DYNON_SHEET = gspread.service_account().open_by_key(SHEET_ID)
 
-if not os.path.isdir(checklist_folder):
-    os.mkdir(checklist_folder)
+filename = input("Enter Filename for Checklist: ")
+if not filename.endswith(".txt"):
+    filename = filename.split(".")[0] + ".txt"
 
+chklist = DotMap(
+    sections=DotMap(),
+    filename=filename,
+    date=datetime.datetime.now().isoformat(),
+    folder="/Users/GFahmy/Desktop/RV-7_Plans/SkyView/checklists/",
+)
 
-checklists = os.listdir(checklist_folder)
+if not os.path.isdir(chklist.folder):
+    os.mkdir(chklist.folder)
 
-checklist = checklists[0]
-checklist_dict = read_checklist(checklist)
+chklist = make_checklist(DYNON_SHEET.worksheets(), chklist)
+write_checklist(chklist)
 
-checklist_dict = create_checklist(checklist_dict)
-
-checklist_dict.sections.pprint("json")
-
-filename = "checklist2.txt"
-write_checklist(filename)
+print("Done")
+os.system(f"Open {chklist.folder}")
