@@ -1,13 +1,17 @@
-import requests
 import os
 import zipfile
+
 import PySimpleGUI as pg
-from bs4 import BeautifulSoup as bs, SoupStrainer as ss
+import requests
+from bs4 import BeautifulSoup as bs
+from bs4 import SoupStrainer as ss
 
 
 def archive_old_sw_databases(drive):
     existing_files = [
-        file for file in os.listdir(drive) if file.startswith("FAA") or file.startswith("SkyView")
+        file
+        for file in os.listdir(drive)
+        if file.startswith("FAA") or file.startswith("SkyView")
     ]
     if not existing_files:
         print("No databases to archive")
@@ -20,19 +24,25 @@ def archive_old_sw_databases(drive):
 def download_dynon(database_url, software_update_url, drive):
     database_link = [
         link["href"]
-        for link in bs(requests.get(database_url).content, "html.parser", parse_only=ss("a"))
+        for link in bs(
+            requests.get(database_url).content, "html.parser", parse_only=ss("a")
+        )
         if ".duc" in link.get("href")
     ]
 
     download_urls = [
         link["href"]
-        for link in bs(requests.get(software_update_url).content, "html.parser", parse_only=ss("a"))
+        for link in bs(
+            requests.get(software_update_url).content, "html.parser", parse_only=ss("a")
+        )
         if ".duc" in link.get("href") and "HDX1100" in link.get("href")
     ]
     download_urls.extend(database_link)
 
     existing_files = [
-        file for file in os.listdir(drive) if file.startswith("FAA") or file.startswith("SkyView")
+        file
+        for file in os.listdir(drive)
+        if file.startswith("FAA") or file.startswith("SkyView")
     ]
 
     for link in download_urls:
@@ -59,13 +69,15 @@ def download_dynon(database_url, software_update_url, drive):
 def download_skyview_docs(documentation_url):
     documentation_links = [
         link["href"]
-        for link in bs(requests.get(documentation_url).content, "html.parser", parse_only=ss("a"))
+        for link in bs(
+            requests.get(documentation_url).content, "html.parser", parse_only=ss("a")
+        )
         if ".pdf" in link.get("href")
         and "guide" in link.get("href")
-        and not "Changes" in link.get("href")
-        and not "Classic" in link.get("href")
-        and not "SkyView_SE" in link.get("href")
-        and not "D10_D100" in link.get("href")
+        and "Changes" not in link.get("href")
+        and "Classic" not in link.get("href")
+        and "SkyView_SE" not in link.get("href")
+        and "D10_D100" not in link.get("href")
     ]
     drive = "/Users/GFahmy/Desktop/RV-7_Plans/SkyView/PDFs/"
 
@@ -89,7 +101,9 @@ def download_skyview_docs(documentation_url):
 def download_garmin(garmin_url, drive):
     garmin_software = [
         link["href"]
-        for link in bs(requests.get(garmin_url).content, "html.parser", parse_only=ss("a"))
+        for link in bs(
+            requests.get(garmin_url).content, "html.parser", parse_only=ss("a")
+        )
         if link.has_attr("href") and ".zip" in link["href"]
     ][0]
     file = garmin_software.split("/")[-1]
@@ -107,7 +121,7 @@ def download_garmin(garmin_url, drive):
             with zipfile.ZipFile(drive + file, "r") as zip_ref:
                 zip_ref.extractall(drive)
 
-            print(f"File saved to " + drive + file)
+            print(f"File saved to {drive} {file}")
 
     for file in existing_files:
         os.remove(drive + file)
@@ -124,7 +138,9 @@ GARMIN_GPS_175_URL = (
     "https://www8.garmin.com/support/download_details.jsp?id=15281"  # Needs Windows
 )
 
-volumes = ["/Volumes/" + drive + "/" for drive in os.listdir("/Volumes/") if "DYNON" in drive]
+volumes = [
+    "/Volumes/" + drive + "/" for drive in os.listdir("/Volumes/") if "DYNON" in drive
+]
 if not volumes:
     print("No Dynon drives inserted, saving to internal drive")
     folder = pg.popup_get_folder(
@@ -144,7 +160,11 @@ for drive in volumes:
 download_skyview_docs(DOCUMENTATION_URL)
 
 # Garmin stuff
-volumes = ["/Volumes/" + drive + "/" for drive in os.listdir("/Volumes/") if "GARMIN_G5" in drive]
+volumes = [
+    "/Volumes/" + drive + "/"
+    for drive in os.listdir("/Volumes/")
+    if "GARMIN_G5" in drive
+]
 if not volumes:
     print("No Garmin drives inserted, saving to internal drive")
     folder = pg.popup_get_folder(

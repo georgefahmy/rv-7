@@ -1,7 +1,7 @@
-import requests
 import re
-from bs4 import BeautifulSoup as bs
 
+import requests
+from bs4 import BeautifulSoup as bs
 
 thread_num = 535
 url = f"https://vansairforce.net/community/archive/index.php/t-{thread_num}.html"

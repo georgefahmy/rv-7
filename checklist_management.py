@@ -1,7 +1,7 @@
-import os
-import gspread
 import datetime
+import os
 
+import gspread
 from dotmap import DotMap
 
 
@@ -23,8 +23,10 @@ def make_checklist(worksheets, chklist):
                 chklist.sections[f"CHKLST{i}"][f"LINE{j+1}"] = row[checklist]
             i += 1
     chklist.sections[f"CHKLST{i}"].TITLE = "CHECKLIST INFO"
-    chklist.sections[f"CHKLST{i}"][f"LINE1"] = ""
-    chklist.sections[f"CHKLST{i}"][f"LINE2"] = "Last Updated: " + chklist.date.split("T")[0]
+    chklist.sections[f"CHKLST{i}"]["LINE1"] = ""
+    chklist.sections[f"CHKLST{i}"]["LINE2"] = (
+        "Last Updated: " + chklist.date.split("T")[0]
+    )
     chklist.sections.pprint("json")
     return chklist
 
