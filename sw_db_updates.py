@@ -6,6 +6,9 @@ import requests
 from bs4 import BeautifulSoup as bs
 from bs4 import SoupStrainer as ss
 
+# TODO update script so that it doesnt download things twice. download once,
+# then move files to approrpriate drives
+
 
 def archive_old_sw_databases(drive):
     existing_files = [

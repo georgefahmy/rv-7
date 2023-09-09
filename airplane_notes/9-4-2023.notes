@@ -1,0 +1,20 @@
+# Update for 9/4/2023
+
+[√] updated skyview software and databases
+[√] installed under-screen lighting for switches
+[√] installed boost pump connector
+[√] installed boost pump cover mounting hardware
+[√] organized ground wires
+[√] re-configure VPX for lighting switches - always-on
+[√] wire up bluetooth for music-in to Dynon intercom
+make bus bar for following:
+    [x] - hobbs meter
+    [x] - Double usb port
+    [√] - Avionics panel dimmer
+    [√] - interior lighting dimmer
+    [√] - USB power recepticle
+    [√] - CO Monitor
+    [√] - Music Bluetooth
+
+Next Time:
+    [ ] CO Monitor sensor wire to EMS

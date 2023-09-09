@@ -4,6 +4,8 @@ import os
 import gspread
 from dotmap import DotMap
 
+# TODO add ability to move the checklist to the appropriate drives (DYNON 1 & 2)
+
 
 def make_checklist(worksheets, chklist):
     i = 0
