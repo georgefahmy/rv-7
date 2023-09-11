@@ -1,0 +1,37 @@
+Future task list:
+    ☐ Fix paint chip on panel @high
+    ☐ Update Bus Bar to the new Fused bar @low
+    ☐ Install forward center cover @low
+    ☐ Secure Pilot's stick wiring connector with Zipties @critical
+    ☐ Adjust Rudder Trim spring connections @high
+    ☐ Final Install of Rudder Pedal mounting brackets @critical
+
+
+# Update for 9/9/2023:
+    ✔ Finished installation of Aithre CO monitor signal wire @done(23-09-11 12:26)
+    ✔ Updated Dynon EMS Config files to support Aithre CO monitor sensor type @done(23-09-11 12:26)
+    ✔ Updated different EMS pages on dynon screens to have the new CO monitor widget @done(23-09-11 12:26)
+    ✔ Fabricated the Air Vent mounting brackets @done(23-09-11 12:26)
+    ✔ Installed Air Vents to panel @done(23-09-11 12:26)
+        Note: Chipped paint on panel - need to update
+    ☐ Update Blog
+
+
+# Update for 9/4/2023:
+
+    ✔ updated skyview software and databases @done(23-09-11 12:27)
+    ✔ installed under-screen lighting for switches @done(23-09-11 12:27)
+    ✔ installed boost pump connector @done(23-09-11 12:27)
+    ✔ installed boost pump cover mounting hardware @done(23-09-11 12:27)
+    ✔ organized ground wires @done(23-09-11 12:27)
+    ✔ re-configure VPX for lighting switches - always-on @done(23-09-11 12:27)
+    ✔ wire up bluetooth for music-in to Dynon intercom @done(23-09-11 12:27)
+    ☐ Update Blog
+    make bus bar for following:
+        ✘ - hobbs meter @cancelled(23-09-11 12:27)
+        ✘ - Double usb port @cancelled(23-09-11 12:27)
+        ✔ - Avionics panel dimmer @done(23-09-11 12:27)
+        ✔ - interior lighting dimmer @done(23-09-11 12:27)
+        ✔ - USB power recepticle @done(23-09-11 12:27)
+        ✔ - CO Monitor @done(23-09-11 12:27)
+        ✔ - Music Bluetooth @done(23-09-11 12:27)
