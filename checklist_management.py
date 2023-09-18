@@ -6,6 +6,8 @@ from dotmap import DotMap
 
 # TODO add ability to move the checklist to the appropriate drives (DYNON 1 & 2)
 
+# https://docs.google.com/spreadsheets/d/1-EtvM-MdQwJ0Wk8CXvsHwmCrYk3bptP8fpDFwMWMDkc/edit#gid=0
+
 
 def make_checklist(worksheets, chklist):
     i = 0
@@ -43,6 +45,10 @@ def write_checklist(chklist):
                     continue
                 lines.append(key + "." + key2 + ", " + str(line))
         fp.write("\n".join(lines))
+
+
+def add_checklist_to_drives():
+    pass
 
 
 SHEET_ID = "1-EtvM-MdQwJ0Wk8CXvsHwmCrYk3bptP8fpDFwMWMDkc"
