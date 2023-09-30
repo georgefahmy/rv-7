@@ -1,40 +1,43 @@
 # Archive items after updating blog
 
-Future task list:
-    next:
-        ☐ Finish Aft Top skin riveting
-        ☐ Trim rear window aft edge for fit
-        ☐ Build jig to hold rear window in place during glue curing
-        ☐ Secure Pilot's stick wiring connector with Zipties @critical
-
+Backlog list:
+    ☐ Trim rear window aft edge for fit
+    ☐ Build jig to hold rear window in place during glue curing
+    Fabricate canopy brace connector pieces: @critical
+        ☐ Fabricate pieces according to instructions
+        ☐ Match drill #30
+        ☐ Paint
+        ☐ Pop rivet
 
     ☐ Fix paint chip on panel @high
     ☐ Install forward center cover @low
     ☐ Adjust Rudder Trim spring connections @high
     ☐ Final Install of Rudder Pedal mounting brackets @critical
     ☐ Install double usb power supply @medium
-    ☐ Change avionics lighting  to be through an 'always-on' pin on the vpx instead of aux bus @medium
+    ☐ Change avionics dimmer lighting  to be through an 'always-on' pin on the vpx instead of aux bus @medium
+
+
+On Deck:
+    ☐ Secure Pilot's stick wiring connector with Zipties @critical
 
     Rear Window:
+        ☐ Finish Aft Top skin riveting
+        ☐ Finish riveting aft fuse skin
         ☐ Final prep for bonding
         ☐ Build jig to hold window
 
-    Install sideskirt sikaflex:
-        ☐ Surface prep skirts and canopy for sikaflex
+    Install sideskirts:
         ☐ Ensure alignment of canopy skirts with side skin and aft skin
-        ☐ Sika flex the side skirts
-
-Next Time:
-    ☐ Secure Pilot's stick wiring connector with Zipties @critical
-    ☐ Finish riveting aft fuse skin
-    Rear Window:
-        ☐ Trim rear window aft edge for fit
-        ☐ Surface prep aluminum skin and plexi
-
-        Install sideskirts:
-        ☐ Align and and drill holes
+        ☐ Align skirt and and drill holes
         ☐ Counter sink canopy frame
         ☐ Dimple side skirts
+        ☐ Surface prep skirts and canopy for sikaflex
+        ☐ Sika flex the side skirts
+
+Update for 9/29/2023:
+    ✔ Trim rear window aft edge for fit @done(23-09-29)
+    ✔ Surface prep aluminum skin and plexi @done(23-09-29)
+    ✔ minor adjustments to canopy latch fit @done(23-09-29)
 
 Update for 9/17/2023:
     ✔ Rivet top fuse skin  @done(23-09-17)

@@ -8,6 +8,8 @@ from bs4 import SoupStrainer as ss
 
 # TODO update script so that it doesnt download things twice. download once,
 # then move files to approrpriate drives (download to HD then move?)
+# TODO update so only aviation databases are downloaded/updated if sw version is the same
+# URL: https://dynonavionics.com/us-aviation-obstacle-data.php
 
 
 def archive_old_sw_databases(drive):
