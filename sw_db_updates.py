@@ -1,4 +1,5 @@
 import os
+import re
 import zipfile
 
 import PySimpleGUI as pg
@@ -8,8 +9,6 @@ from bs4 import SoupStrainer as ss
 
 # TODO update script so that it doesnt download things twice. download once,
 # then move files to approrpriate drives (download to HD then move?)
-# TODO update so only aviation databases are downloaded/updated if sw version is the same
-# URL: https://dynonavionics.com/us-aviation-obstacle-data.php
 
 
 def archive_old_sw_databases(drive):
@@ -26,7 +25,21 @@ def archive_old_sw_databases(drive):
     return
 
 
-def download_dynon(database_url, software_update_url, drive):
+def download_dynon(database_url, software_update_url, drive, full=False):
+    print("\nDownloading Dynon Software and Databases")
+    if full:
+        download_urls = [
+            link["href"]
+            for link in bs(
+                requests.get(software_update_url).content,
+                "html.parser",
+                parse_only=ss("a"),
+            )
+            if ".duc" in link.get("href") and "HDX1100" in link.get("href")
+        ]
+    else:
+        download_urls = []
+
     database_link = [
         link["href"]
         for link in bs(
@@ -34,16 +47,7 @@ def download_dynon(database_url, software_update_url, drive):
         )
         if ".duc" in link.get("href")
     ]
-
-    download_urls = [
-        link["href"]
-        for link in bs(
-            requests.get(software_update_url).content, "html.parser", parse_only=ss("a")
-        )
-        if ".duc" in link.get("href") and "HDX1100" in link.get("href")
-    ]
     download_urls.extend(database_link)
-
     existing_files = [
         file
         for file in os.listdir(drive)
@@ -54,9 +58,21 @@ def download_dynon(database_url, software_update_url, drive):
         file = link.split("/")[-1]
         filename = drive + file
         download_url = "https://dynonavionics.com" + link
-        if file in existing_files:
+
+        if file.startswith("SkyView"):
+            version = "".join(re.split("(_)", file)[1:-3])
+
+            skip = any(
+                [
+                    True if version in existing_file else False
+                    for existing_file in existing_files
+                ]
+            )
+
+        if file in existing_files or skip:
             existing_files.remove(file)
             print(f"{file} already exists...skipping")
+
         else:
             print(f"\nDownloading files to {drive} ...")
             with open(filename, "wb+") as out_file:
@@ -72,6 +88,7 @@ def download_dynon(database_url, software_update_url, drive):
 
 
 def download_skyview_docs(documentation_url):
+    print("\nDownloading Skyview Documentation\n")
     documentation_links = [
         link["href"]
         for link in bs(
@@ -104,6 +121,7 @@ def download_skyview_docs(documentation_url):
 
 
 def download_garmin(garmin_url, drive):
+    print("\nDownloading Garming SW\n")
     garmin_software = [
         link["href"]
         for link in bs(
