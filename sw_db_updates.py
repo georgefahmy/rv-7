@@ -1,14 +1,108 @@
 import os
-import re
+import shutil
+import tempfile
 import zipfile
 
-import PySimpleGUI as pg
+# import PySimpleGUI as pg
 import requests
 from bs4 import BeautifulSoup as bs
 from bs4 import SoupStrainer as ss
+from dotmap import DotMap
 
-# TODO update script so that it doesnt download things twice. download once,
-# then move files to approrpriate drives (download to HD then move?)
+CHECK_URL = "https://dynonavionics.com/us-aviation-obstacle-data.php"
+SW_URL = "https://www.dynonavionics.com/skyview-hdx-software-updates-us-packages.php"
+DOCUMENTATION_URL = "https://www.dynonavionics.com/skyview-documentation.php"
+GARMIN_G5_URL = "https://www8.garmin.com/support/download_details.jsp?id=10354"
+GARMIN_GPS_175_URL = (
+    "https://www8.garmin.com/support/download_details.jsp?id=15281"  # Needs Windows
+)
+
+
+def get_available_versions():
+    return DotMap(
+        available_sw_versions=[
+            link["href"].split("/")[-1]
+            for link in bs(
+                requests.get(SW_URL).content,
+                "html.parser",
+                parse_only=ss("a"),
+            )
+            if ".duc" in link.get("href") and "HDX1100" in link.get("href")
+        ],
+        available_database_versions=[
+            link["href"].split("/")[-1]
+            for link in bs(
+                requests.get(CHECK_URL).content, "html.parser", parse_only=ss("a")
+            )
+            if ".duc" in link.get("href")
+        ],
+        available_g5_sw_version=[
+            link["href"].split("/")[-1]
+            for link in bs(
+                requests.get(GARMIN_G5_URL).content, "html.parser", parse_only=ss("a")
+            )
+            if link.has_attr("href") and ".zip" in link["href"]
+        ],
+    )
+
+
+def get_existing_versions():
+    return DotMap(
+        dynon_sw=DotMap(
+            files=[
+                file
+                for file in os.listdir(
+                    "/Users/GFahmy/Desktop/RV-7_Plans/SkyView/sotware_updates/"
+                )
+                if file.startswith("SkyView")
+            ],
+            current=False,
+        ),
+        dynon_db=DotMap(
+            files=[
+                file
+                for file in os.listdir(
+                    "/Users/GFahmy/Desktop/RV-7_Plans/SkyView/sotware_updates/"
+                )
+                if file.startswith("FAA")
+            ],
+            current=False,
+        ),
+        garming_g5=DotMap(
+            files=[
+                file
+                for file in os.listdir("/Users/GFahmy/Desktop/RV-7_Plans/garmin/")
+                if file.startswith("G5")
+            ],
+            current=False,
+        ),
+    )
+
+
+def compare_version(existing_versions, current_versions):
+    for file in existing_versions.dynon_sw.files:
+        if file in current_versions.available_sw_versions:
+            print("Existing Dynon SW is latest version")
+            existing_versions.dynon_sw.current = True
+        else:
+            existing_versions.dynon_sw.current = False
+    for file in existing_versions.dynon_db.files:
+        if file in current_versions.available_database_versions:
+            print("Existing Database is latest version")
+            existing_versions.dynon_db.current = True
+        else:
+            existing_versions.dynon_db.current = False
+    for file in existing_versions.garming_g5.files:
+        if file in current_versions.available_g5_sw_version:
+            print("Existing G5 SW is latest version")
+            existing_versions.garming_g5.current = True
+        else:
+            existing_versions.garming_g5.current = False
+    existing_versions.need_to_update = DotMap(
+        files=[key for key, values in existing_versions.items() if not values.current],
+        current=True,
+    )
+    return existing_versions
 
 
 def archive_old_sw_databases(drive):
@@ -25,10 +119,10 @@ def archive_old_sw_databases(drive):
     return
 
 
-def download_dynon(database_url, software_update_url, drive, full=False):
+def download_dynon(database_url, software_update_url, drive, sw=False, db=False):
     print("\nDownloading Dynon Software and Databases")
-    if full:
-        download_urls = [
+    if sw:
+        sw_urls = [
             link["href"]
             for link in bs(
                 requests.get(software_update_url).content,
@@ -38,53 +132,27 @@ def download_dynon(database_url, software_update_url, drive, full=False):
             if ".duc" in link.get("href") and "HDX1100" in link.get("href")
         ]
     else:
-        download_urls = []
-
-    database_link = [
-        link["href"]
-        for link in bs(
-            requests.get(database_url).content, "html.parser", parse_only=ss("a")
-        )
-        if ".duc" in link.get("href")
-    ]
-    download_urls.extend(database_link)
-    existing_files = [
-        file
-        for file in os.listdir(drive)
-        if file.startswith("FAA") or file.startswith("SkyView")
-    ]
-
+        sw_urls = []
+    if db:
+        db_urls = [
+            link["href"]
+            for link in bs(
+                requests.get(database_url).content, "html.parser", parse_only=ss("a")
+            )
+            if ".duc" in link.get("href")
+        ]
+    else:
+        db_urls = []
+    download_urls = sw_urls + db_urls
     for link in download_urls:
         file = link.split("/")[-1]
         filename = drive + file
         download_url = "https://dynonavionics.com" + link
-
-        if file.startswith("SkyView"):
-            version = "".join(re.split("(_)", file)[1:-3])
-
-            skip = any(
-                [
-                    True if version in existing_file else False
-                    for existing_file in existing_files
-                ]
-            )
-
-        if file in existing_files or skip:
-            existing_files.remove(file)
-            print(f"{file} already exists...skipping")
-
-        else:
-            print(f"\nDownloading files to {drive} ...")
-            with open(filename, "wb+") as out_file:
-                content = requests.get(download_url, stream=True).content
-                out_file.write(content)
-                print(f"Saved {file}")
-
-    for file in existing_files:
-        os.remove(drive + file)
-        print(f"Archived {file}")
-
-    return True
+        print(f"\nDownloading {file} to {drive} ...")
+        with open(filename, "wb+") as out_file:
+            content = requests.get(download_url, stream=True).content
+            out_file.write(content)
+            print(f"Saved {file}")
 
 
 def download_skyview_docs(documentation_url):
@@ -102,9 +170,7 @@ def download_skyview_docs(documentation_url):
         and "D10_D100" not in link.get("href")
     ]
     drive = "/Users/GFahmy/Desktop/RV-7_Plans/SkyView/PDFs/"
-
     existing_files = [file for file in os.listdir(drive)]
-
     for link in documentation_links:
         file = link.split("/")[-1]
         filename = drive + file
@@ -113,7 +179,7 @@ def download_skyview_docs(documentation_url):
             existing_files.remove(file)
             print(f"{file} already exists...skipping")
         else:
-            print(f"\nDownloading files to {drive} ...")
+            print(f"\nDownloading {file} to {drive} ...")
             with open(filename, "wb+") as out_file:
                 content = requests.get(download_url, stream=True).content
                 out_file.write(content)
@@ -130,76 +196,64 @@ def download_garmin(garmin_url, drive):
         if link.has_attr("href") and ".zip" in link["href"]
     ][0]
     file = garmin_software.split("/")[-1]
-
-    existing_files = [file for file in os.listdir(drive) if file.startswith("G5")]
-
-    if file in existing_files:
-        existing_files.remove(file)
-        print(f"{file} already exists...skipping")
-    else:
-        print(f"\nDownloading files to {drive} ...")
-        with open(drive + file, "wb+") as out_file:
-            content = requests.get(garmin_software, stream=True).content
-            out_file.write(content)
-            with zipfile.ZipFile(drive + file, "r") as zip_ref:
-                zip_ref.extractall(drive)
-
-            print(f"File saved to {drive} {file}")
-
-    for file in existing_files:
-        os.remove(drive + file)
-        print(f"Archived {file}")
-
-    return True
+    print(f"\nDownloading {file} to {drive} ...")
+    with open(drive + file, "wb+") as out_file:
+        content = requests.get(garmin_software, stream=True).content
+        out_file.write(content)
+        with zipfile.ZipFile(drive + file, "r") as zip_ref:
+            zip_ref.extractall(drive)
+        print(f"File saved to {drive} {file}")
 
 
-CHECK_URL = "https://dynonavionics.com/us-aviation-obstacle-data.php"
-SW_URL = "https://www.dynonavionics.com/skyview-hdx-software-updates-us-packages.php"
-DOCUMENTATION_URL = "https://www.dynonavionics.com/skyview-documentation.php"
-GARMIN_G5_URL = "https://www8.garmin.com/support/download_details.jsp?id=10354"
-GARMIN_GPS_175_URL = (
-    "https://www8.garmin.com/support/download_details.jsp?id=15281"  # Needs Windows
-)
+if __name__ == "__main__":
+    dynon_volumes = [
+        "/Volumes/" + drive + "/"
+        for drive in os.listdir("/Volumes/")
+        if "DYNON" in drive
+    ]
+    garmin_volumes = [
+        "/Volumes/" + drive + "/"
+        for drive in os.listdir("/Volumes/")
+        if "GARMIN_G5" in drive
+    ]
+    current_versions = get_available_versions()
+    existing_versions = get_existing_versions()
 
-volumes = [
-    "/Volumes/" + drive + "/" for drive in os.listdir("/Volumes/") if "DYNON" in drive
-]
-if not volumes:
-    print("No Dynon drives inserted, saving to internal drive")
-    folder = pg.popup_get_folder(
-        "Select SkyView SW folder",
-        initial_folder="/Users/GFahmy/Desktop/RV-7_Plans/SkyView/sotware_updates/",
-        no_window=True,
-        history=True,
-    )
-    if folder:
-        volumes = [folder + "/"]
-    else:
-        volumes = []
+    existing_versions = compare_version(existing_versions, current_versions)
 
-for drive in volumes:
-    success = download_dynon(CHECK_URL, SW_URL, drive)
+    with tempfile.TemporaryDirectory() as tmp:
+        tmp = tmp + "/"
+        for sw_category in existing_versions.need_to_update.files:
+            if sw_category == "dynon_sw":
+                download_dynon(CHECK_URL, SW_URL, tmp, sw=True)
+                # If we're updating software we're checking for new documentation and saving to HD
+                download_skyview_docs(DOCUMENTATION_URL)
+                for file in os.listdir(tmp):
+                    shutil.copyfile(
+                        tmp + file,
+                        f"/Users/GFahmy/Desktop/RV-7_Plans/SkyView/sotware_updates/{file}",
+                    )
+                    for vol in dynon_volumes:
+                        shutil.copyfile(tmp + file, f"{vol}/{file}")
+                        print(f"Saved {file} to {vol}")
 
-download_skyview_docs(DOCUMENTATION_URL)
+            if sw_category == "dynon_db":
+                download_dynon(CHECK_URL, SW_URL, tmp, db=True)
+                for file in os.listdir(tmp):
+                    shutil.copyfile(
+                        tmp + file,
+                        f"/Users/GFahmy/Desktop/RV-7_Plans/SkyView/sotware_updates/{file}",
+                    )
+                    for vol in dynon_volumes:
+                        shutil.copyfile(tmp + file, f"{vol}/{file}")
+                        print(f"Saved {file} to {vol}")
 
-# Garmin stuff
-volumes = [
-    "/Volumes/" + drive + "/"
-    for drive in os.listdir("/Volumes/")
-    if "GARMIN_G5" in drive
-]
-if not volumes:
-    print("No Garmin drives inserted, saving to internal drive")
-    folder = pg.popup_get_folder(
-        "Select Garmin SW Folder",
-        initial_folder="/Users/GFahmy/Desktop/RV-7_Plans/garmin/",
-        no_window=True,
-        history=True,
-    )
-    if folder:
-        volumes = [folder + "/"]
-    else:
-        volumes = []
-
-for drive in volumes:
-    success = download_garmin(GARMIN_G5_URL, drive)
+            if sw_category == "garmin_g5":
+                download_garmin(GARMIN_G5_URL, tmp)
+                for file in os.listdir(tmp):
+                    shutil.copyfile(
+                        tmp + file, f"/Users/GFahmy/Desktop/RV-7_Plans/garmin/{file}"
+                    )
+                    for vol in garmin_volumes:
+                        shutil.copyfile(tmp + file, f"{vol}/{file}")
+                        print(f"Saved {file} to {vol}")
