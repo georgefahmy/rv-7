@@ -46,34 +46,25 @@ def get_available_versions():
     )
 
 
-def get_existing_versions():
+def get_existing_versions(dynon_folder=None, garmin_folder=None):
+    if not dynon_folder:
+        dynon_folder = "/Users/GFahmy/Desktop/RV-7_Plans/SkyView/sotware_updates/"
+    if not garmin_folder:
+        garmin_folder = "/Users/GFahmy/Desktop/RV-7_Plans/garmin/"
+
     return DotMap(
         dynon_sw=DotMap(
             files=[
-                file
-                for file in os.listdir(
-                    "/Users/GFahmy/Desktop/RV-7_Plans/SkyView/sotware_updates/"
-                )
-                if file.startswith("SkyView")
+                file for file in os.listdir(dynon_folder) if file.startswith("SkyView")
             ],
             current=False,
         ),
         dynon_db=DotMap(
-            files=[
-                file
-                for file in os.listdir(
-                    "/Users/GFahmy/Desktop/RV-7_Plans/SkyView/sotware_updates/"
-                )
-                if file.startswith("FAA")
-            ],
+            files=[file for file in os.listdir(dynon_folder) if file.startswith("FAA")],
             current=False,
         ),
         garming_g5=DotMap(
-            files=[
-                file
-                for file in os.listdir("/Users/GFahmy/Desktop/RV-7_Plans/garmin/")
-                if file.startswith("G5")
-            ],
+            files=[file for file in os.listdir(garmin_folder) if file.startswith("G5")],
             current=False,
         ),
     )
@@ -170,6 +161,8 @@ def download_skyview_docs(documentation_url):
         and "D10_D100" not in link.get("href")
     ]
     drive = "/Users/GFahmy/Desktop/RV-7_Plans/SkyView/PDFs/"
+    if not os.path.isdir(drive):
+        drive = "/Users/gfahmy/Documents/projects/dynon/testing/documentation/"
     existing_files = [file for file in os.listdir(drive)]
     for link in documentation_links:
         file = link.split("/")[-1]
@@ -216,8 +209,16 @@ if __name__ == "__main__":
         for drive in os.listdir("/Volumes/")
         if "GARMIN_G5" in drive
     ]
+    dynon_folder = input("Path to Dynon SW: ")
+    garmin_folder = input("Path to Garmin SW: ")
+    # dynon_folder = "/Users/gfahmy/Documents/projects/dynon/testing/"
+    # garmin_folder = "/Users/gfahmy/Documents/projects/dynon/testing/"
+
     current_versions = get_available_versions()
-    existing_versions = get_existing_versions()
+    existing_versions = get_existing_versions(
+        dynon_folder=dynon_folder,
+        garmin_folder=garmin_folder,
+    )
 
     existing_versions = compare_version(existing_versions, current_versions)
 
@@ -231,7 +232,7 @@ if __name__ == "__main__":
                 for file in os.listdir(tmp):
                     shutil.copyfile(
                         tmp + file,
-                        f"/Users/GFahmy/Desktop/RV-7_Plans/SkyView/sotware_updates/{file}",
+                        dynon_folder + file,
                     )
                     for vol in dynon_volumes:
                         shutil.copyfile(tmp + file, f"{vol}/{file}")
@@ -242,7 +243,7 @@ if __name__ == "__main__":
                 for file in os.listdir(tmp):
                     shutil.copyfile(
                         tmp + file,
-                        f"/Users/GFahmy/Desktop/RV-7_Plans/SkyView/sotware_updates/{file}",
+                        dynon_folder + file,
                     )
                     for vol in dynon_volumes:
                         shutil.copyfile(tmp + file, f"{vol}/{file}")
@@ -252,7 +253,8 @@ if __name__ == "__main__":
                 download_garmin(GARMIN_G5_URL, tmp)
                 for file in os.listdir(tmp):
                     shutil.copyfile(
-                        tmp + file, f"/Users/GFahmy/Desktop/RV-7_Plans/garmin/{file}"
+                        tmp + file,
+                        garmin_folder + file,
                     )
                     for vol in garmin_volumes:
                         shutil.copyfile(tmp + file, f"{vol}/{file}")
