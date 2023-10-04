@@ -73,19 +73,19 @@ def get_existing_versions(dynon_folder=None, garmin_folder=None):
 def compare_version(existing_versions, current_versions):
     for file in existing_versions.dynon_sw.files:
         if file in current_versions.available_sw_versions:
-            print("Existing Dynon SW is latest version")
+            print(f"Existing {file} is latest version")
             existing_versions.dynon_sw.current = True
         else:
             existing_versions.dynon_sw.current = False
     for file in existing_versions.dynon_db.files:
         if file in current_versions.available_database_versions:
-            print("Existing Database is latest version")
+            print(f"Existing {file} Database is latest version")
             existing_versions.dynon_db.current = True
         else:
             existing_versions.dynon_db.current = False
     for file in existing_versions.garming_g5.files:
         if file in current_versions.available_g5_sw_version:
-            print("Existing G5 SW is latest version")
+            print(f"Existing {file} is latest version")
             existing_versions.garming_g5.current = True
         else:
             existing_versions.garming_g5.current = False
@@ -146,7 +146,7 @@ def download_dynon(database_url, software_update_url, drive, sw=False, db=False)
             print(f"Saved {file}")
 
 
-def download_skyview_docs(documentation_url):
+def download_skyview_docs(documentation_url, drive=None):
     print("\nDownloading Skyview Documentation\n")
     documentation_links = [
         link["href"]
@@ -160,7 +160,8 @@ def download_skyview_docs(documentation_url):
         and "SkyView_SE" not in link.get("href")
         and "D10_D100" not in link.get("href")
     ]
-    drive = "/Users/GFahmy/Desktop/RV-7_Plans/SkyView/PDFs/"
+    if not drive:
+        drive = "/Users/GFahmy/Desktop/RV-7_Plans/SkyView/PDFs/"
     if not os.path.isdir(drive):
         drive = "/Users/gfahmy/Documents/projects/dynon/testing/documentation/"
     existing_files = [file for file in os.listdir(drive)]
@@ -228,7 +229,8 @@ if __name__ == "__main__":
             if sw_category == "dynon_sw":
                 download_dynon(CHECK_URL, SW_URL, tmp, sw=True)
                 # If we're updating software we're checking for new documentation and saving to HD
-                download_skyview_docs(DOCUMENTATION_URL)
+                dynon_documentation_folder = input("Path to Documentation Folder: ")
+                download_skyview_docs(DOCUMENTATION_URL, dynon_documentation_folder)
                 for file in os.listdir(tmp):
                     shutil.copyfile(
                         tmp + file,
