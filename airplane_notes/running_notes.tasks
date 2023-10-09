@@ -1,12 +1,13 @@
 # Archive items after updating blog
 
-Backlog list:
+Backlog:
     Fabricate canopy brace connector pieces: @critical
         ☐ Fabricate pieces according to instructions
         ☐ Match drill #30
         ☐ Paint
         ☐ Pop rivet
 
+    ☐ Adjust fuse block position to account for top skin access panels in forward fuselage
     ☐ Fix paint chip on panel @high
     ☐ Install forward center cover @low
     ☐ Adjust Rudder Trim spring connections @high
@@ -16,7 +17,8 @@ Backlog list:
 
 
 On Deck:
-    ☐ Secure Pilot's stick wiring connector with Zipties @critical
+    Misc:
+        ☐ Secure Pilot's stick wiring connector with Zipties @critical
 
     Rear Window:
         ☐ Build jig to hold window
@@ -40,18 +42,18 @@ Update for 9/29/2023:
     ✔ minor adjustments to canopy latch fit @done(23-09-29)
 
 Update for 9/17/2023:
-    ✔ Rivet top fuse skin  @done(23-09-17)
+    ✔ Rivet aft top fuse skin  @done(23-09-17)
     ✔ Reinstall Canopy @done(23-09-17)
     ✔ Fabricate canopy panel light connector @done(23-09-17)
 
 
  Update for 9/14/2023:
     ✔ Cleco the top skin onto the fuselage in prepartion for riveting @done(23-09-14)
-    ✔ Update Bus Bar to the new Fused bar @high @done(23-09-14)
-    ✔ Write up Wing Installation Procedure for initial wing fitment @medium @done(23-09-13)
+    ✔ Update Bus Bar to the new Fused bar @done(23-09-14)
+    ✔ Write up Wing Installation Procedure for initial wing fitment @done(23-09-13)
     ✔ Check VPX Config to see which switch assignment pin is available @done(23-09-14)
         ans: Switch 2
-    ✔ Update wiring diagram for Auxillary bus (and accessories) and update pinout of VPX @critical @done(23-09-14)
+    ✔ Update wiring diagram for Auxillary bus (and accessories) and update pinout of VPX @done(23-09-14)
     ✔ test fit the rear window and marked the top skin 1.25" back from the edge for trimming the window @done(23-09-14)
 
 # Update for 9/9/2023:
