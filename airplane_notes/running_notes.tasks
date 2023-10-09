@@ -1,8 +1,6 @@
 # Archive items after updating blog
 
 Backlog list:
-    ☐ Trim rear window aft edge for fit
-    ☐ Build jig to hold rear window in place during glue curing
     Fabricate canopy brace connector pieces: @critical
         ☐ Fabricate pieces according to instructions
         ☐ Match drill #30
@@ -13,7 +11,6 @@ Backlog list:
     ☐ Install forward center cover @low
     ☐ Adjust Rudder Trim spring connections @high
     ☐ Final Install of Rudder Pedal mounting brackets @critical
-    ☐ Add Roll autopilot disconnect wire from pilots stick to harness for left wing @critical
     ☐ Install double usb power supply @medium
     ☐ Change avionics dimmer lighting  to be through an 'always-on' pin on the vpx instead of aux bus @medium
 
@@ -22,9 +19,6 @@ On Deck:
     ☐ Secure Pilot's stick wiring connector with Zipties @critical
 
     Rear Window:
-        ☐ Finish Aft Top skin riveting
-        ☐ Finish riveting aft fuse skin
-        ☐ Final prep for bonding
         ☐ Build jig to hold window
 
     Install sideskirts:
@@ -34,6 +28,11 @@ On Deck:
         ☐ Dimple side skirts
         ☐ Surface prep skirts and canopy for sikaflex
         ☐ Sika flex the side skirts
+
+Update for 10/8/2023:
+    ✔ Trim rear window aft edge for fit @done(23-10-08)
+    ✔ Finish riveting aft fuse skin @done(23-10-08)
+    ✔ Final prep for bonding @done(23-10-08)
 
 Update for 9/29/2023:
     ✔ Trim rear window aft edge for fit @done(23-09-29)
@@ -54,7 +53,6 @@ Update for 9/17/2023:
         ans: Switch 2
     ✔ Update wiring diagram for Auxillary bus (and accessories) and update pinout of VPX @critical @done(23-09-14)
     ✔ test fit the rear window and marked the top skin 1.25" back from the edge for trimming the window @done(23-09-14)
-    ☐ Update Blog
 
 # Update for 9/9/2023:
     ✔ Finished installation of Aithre CO monitor signal wire @done(23-09-13)
@@ -63,7 +61,6 @@ Update for 9/17/2023:
     ✔ Fabricated the Air Vent mounting brackets @done(23-09-11)
     ✔ Installed Air Vents to panel @done(23-09-11)
         Note: Chipped paint on panel - need to update
-    ✘ Update Blog @cancelled(23-09-14)
 
 
 # Update for 9/4/2023:
@@ -75,7 +72,6 @@ Update for 9/17/2023:
     ✔ organized ground wires @done(23-09-11)
     ✔ re-configure VPX for lighting switches - always-on @done(23-09-11)
     ✔ wire up bluetooth for music-in to Dynon intercom @done(23-09-11)
-    ✘ Update Blog @cancelled(23-09-13)
     ✔ - hobbs meter @done(23-09-13)
     ✔ - Avionics panel dimmer @done(23-09-14)
     ✔ - interior lighting dimmer @done(23-09-11)
