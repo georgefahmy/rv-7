@@ -15,13 +15,13 @@ Backlog:
     ☐ Install double usb power supply @medium
     ☐ Change avionics dimmer lighting  to be through an 'always-on' pin on the vpx instead of aux bus @medium
 
-
 On Deck:
     Misc:
         ☐ Secure Pilot's stick wiring connector with Zipties @critical
 
     Rear Window:
         ☐ Build jig to hold window
+        ☐ SikaFlex rear window
 
     Install sideskirts:
         ☐ Ensure alignment of canopy skirts with side skin and aft skin
@@ -31,54 +31,39 @@ On Deck:
         ☐ Surface prep skirts and canopy for sikaflex
         ☐ Sika flex the side skirts
 
-Update for 10/8/2023:
-    ✔ Trim rear window aft edge for fit @done(23-10-08)
-    ✔ Finish riveting aft fuse skin @done(23-10-08)
-    ✔ Final prep for bonding @done(23-10-08)
-
-Update for 9/29/2023:
-    ✔ Trim rear window aft edge for fit @done(23-09-29)
-    ✔ Surface prep aluminum skin and plexi @done(23-09-29)
-    ✔ minor adjustments to canopy latch fit @done(23-09-29)
-
-Update for 9/17/2023:
-    ✔ Rivet aft top fuse skin  @done(23-09-17)
-    ✔ Reinstall Canopy @done(23-09-17)
-    ✔ Fabricate canopy panel light connector @done(23-09-17)
-
-
- Update for 9/14/2023:
-    ✔ Cleco the top skin onto the fuselage in prepartion for riveting @done(23-09-14)
-    ✔ Update Bus Bar to the new Fused bar @done(23-09-14)
-    ✔ Write up Wing Installation Procedure for initial wing fitment @done(23-09-13)
-    ✔ Check VPX Config to see which switch assignment pin is available @done(23-09-14)
-        ans: Switch 2
-    ✔ Update wiring diagram for Auxillary bus (and accessories) and update pinout of VPX @done(23-09-14)
-    ✔ test fit the rear window and marked the top skin 1.25" back from the edge for trimming the window @done(23-09-14)
-
-# Update for 9/9/2023:
-    ✔ Finished installation of Aithre CO monitor signal wire @done(23-09-13)
-    ✔ Updated Dynon EMS Config files to support Aithre CO monitor sensor type @done(23-09-11)
-    ✔ Updated different EMS pages on dynon screens to have the new CO monitor widget @done(23-09-11)
-    ✔ Fabricated the Air Vent mounting brackets @done(23-09-11)
-    ✔ Installed Air Vents to panel @done(23-09-11)
-        Note: Chipped paint on panel - need to update
-
-
-# Update for 9/4/2023:
-
-    ✔ updated skyview software and databases @done(23-09-11)
-    ✔ installed under-screen lighting for switches @done(23-09-11)
-    ✔ installed boost pump connector @done(23-09-11)
-    ✔ installed boost pump cover mounting hardware @done(23-09-11)
-    ✔ organized ground wires @done(23-09-11)
-    ✔ re-configure VPX for lighting switches - always-on @done(23-09-11)
-    ✔ wire up bluetooth for music-in to Dynon intercom @done(23-09-11)
-    ✔ - hobbs meter @done(23-09-13)
-    ✔ - Avionics panel dimmer @done(23-09-14)
-    ✔ - interior lighting dimmer @done(23-09-11)
-    ✔ - USB power recepticle @done(23-09-11)
-    ✔ - CO Monitor @done(23-09-11)
-    ✔ - Music Bluetooth @done(23-09-11)
-
 Archive:
+    ✔ Trim rear window aft edge for fit @done(23-10-08) @project(Update for 10/8/2023)
+    ✔ Finish riveting aft fuse skin @done(23-10-08) @project(Update for 10/8/2023)
+    ✔ Final prep for bonding @done(23-10-08) @project(Update for 10/8/2023)
+    ✔ Trim rear window aft edge for fit @done(23-09-29) @project(Update for 9/29/2023)
+    ✔ Surface prep aluminum skin and plexi @done(23-09-29) @project(Update for 9/29/2023)
+    ✔ minor adjustments to canopy latch fit @done(23-09-29) @project(Update for 9/29/2023)
+    ✔ Rivet aft top fuse skin  @done(23-09-17) @project(Update for 9/17/2023)
+    ✔ Reinstall Canopy @done(23-09-17) @project(Update for 9/17/2023)
+    ✔ Fabricate canopy panel light connector @done(23-09-17) @project(Update for 9/17/2023)
+    ✔ Cleco the top skin onto the fuselage in prepartion for riveting @done(23-09-14) @project(Update for 9/14/2023)
+    ✔ Update Bus Bar to the new Fused bar @done(23-09-14) @project(Update for 9/14/2023)
+    ✔ Write up Wing Installation Procedure for initial wing fitment @done(23-09-13) @project(Update for 9/14/2023)
+    ✔ Check VPX Config to see which switch assignment pin is available @done(23-09-14) @project(Update for 9/14/2023)
+        ans: Switch 2
+    ✔ Update wiring diagram for Auxillary bus (and accessories) and update pinout of VPX @done(23-09-14) @project(Update for 9/14/2023)
+    ✔ test fit the rear window and marked the top skin 1.25" back from the edge for trimming the window @done(23-09-14) @project(Update for 9/14/2023)
+    ✔ Finished installation of Aithre CO monitor signal wire @done(23-09-13) @project(# Update for 9/9/2023)
+    ✔ Updated Dynon EMS Config files to support Aithre CO monitor sensor type @done(23-09-11) @project(# Update for 9/9/2023)
+    ✔ Updated different EMS pages on dynon screens to have the new CO monitor widget @done(23-09-11) @project(# Update for 9/9/2023)
+    ✔ Fabricated the Air Vent mounting brackets @done(23-09-11) @project(# Update for 9/9/2023)
+    ✔ Installed Air Vents to panel @done(23-09-11) @project(# Update for 9/9/2023)
+        Note: Chipped paint on panel - need to update
+    ✔ updated skyview software and databases @done(23-09-11) @project(# Update for 9/4/2023)
+    ✔ installed under-screen lighting for switches @done(23-09-11) @project(# Update for 9/4/2023)
+    ✔ installed boost pump connector @done(23-09-11) @project(# Update for 9/4/2023)
+    ✔ installed boost pump cover mounting hardware @done(23-09-11) @project(# Update for 9/4/2023)
+    ✔ organized ground wires @done(23-09-11) @project(# Update for 9/4/2023)
+    ✔ re-configure VPX for lighting switches - always-on @done(23-09-11) @project(# Update for 9/4/2023)
+    ✔ wire up bluetooth for music-in to Dynon intercom @done(23-09-11) @project(# Update for 9/4/2023)
+    ✔ - hobbs meter @done(23-09-13) @project(# Update for 9/4/2023)
+    ✔ - Avionics panel dimmer @done(23-09-14) @project(# Update for 9/4/2023)
+    ✔ - interior lighting dimmer @done(23-09-11) @project(# Update for 9/4/2023)
+    ✔ - USB power recepticle @done(23-09-11) @project(# Update for 9/4/2023)
+    ✔ - CO Monitor @done(23-09-11) @project(# Update for 9/4/2023)
+    ✔ - Music Bluetooth @done(23-09-11) @project(# Update for 9/4/2023)
