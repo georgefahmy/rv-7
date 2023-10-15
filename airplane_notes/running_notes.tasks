@@ -7,25 +7,35 @@ Backlog:
         ☐ Paint
         ☐ Pop rivet
 
-    ☐ Adjust fuse block position to account for top skin access panels in forward fuselage
+    ☐ Adjust fuse block position lower to account for top skin access panels in forward fuselage
     ☐ Fix paint chip on panel @high
     ☐ Install forward center cover @low
-    ☐ Adjust Rudder Trim spring connections @high
-    ☐ Final Install of Rudder Pedal mounting brackets @critical
     ☐ Install double usb power supply @medium
-    ☐ Change avionics dimmer lighting  to be through an 'always-on' pin on the vpx instead of aux bus @medium
+    ☐ Change avionics dimmer lighting  to be through an "always-on" pin on the vpx instead of aux bus @medium
+    ☐ Account for Aileron autopilot servo disconnect wire (yellow) @critical
+
+    Rudder:
+        ☐ Final Install of Rudder Pedal mounting brackets @critical
+        ☐ Adjust Rudder Trim spring connections @high
+
 
 On Deck:
     Misc:
         ☐ Secure Pilot's stick wiring connector with Zipties @critical
 
     Rear Window:
+        ☐ Measure the distance between longerons under rear-window - <x">
         ☐ Build jig to hold window
+        ☐ Get a 8" by <x"> piece of plywood and 2" strips of flexible wood and some foam (may already have)
         ☐ SikaFlex rear window
 
     Install sideskirts:
         ☐ Surface prep skirts and canopy for sikaflex (prime other parts)
-        ☐ Sika flex the side skirts
+        ☐ Sika aktivator both window and side skirts
+        ☐ Sika primer both window and side skirts
+        ☐ Sika 295 bead on window
+        ☐ Spread out bead and clamp side skirts
+        ☐ Clean up - remove tape
 
 Update 10/13/2023:
     ✔ Alignment of canopy skirts with side skin and aft skin @done(23-10-13)
