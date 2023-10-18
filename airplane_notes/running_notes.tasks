@@ -27,90 +27,106 @@ Backlog:
         ☐ Scuff surfaces
         ☐ Mix epoxy and microballoons and begin filling
         ☐ Use dacron peel ply
+        ☐ Iterate until perfect
+        ☐ Primer
 
 On Deck:
     Misc:
         ☐ Secure Pilot's stick wiring connector with Zipties @critical
 
 
-Update 10/17/2023:
-    Rear Window:
-        ✔ Fillet the rollbar<>rear window interface - aktivator, primer, sika bead, squeegee @done(23-10-17)
-        ✔ Removed plastic from canopy and rear window @done(23-10-17)
-
-    Fabricated canopy brace connector pieces:
-        ✔ Fabricate pieces according to instructions @done(23-10-17)
-        ✔ Match drill #30 @done(23-10-17)
-        ✔ Paint @done(23-10-17)
-        ✔ Pop rivet @done(23-10-17)
-
-
-Update 10/16/2023:
-    Rear Window:
-        ✔ Got an 8" by 48" piece of plywood and 2" strips of flexible wood - cut the board to size. @done(23-10-16)
-        ✔ Measure the distance between longerons under rear-window - <36"-39"> @done(23-10-16)
-        ✔ Build jig to hold window - glued 2x4 pieces to the plywood @done(23-10-16)
-        ✔ Aktivator the rear skin and rear window @done(23-10-16)
-        ✔ Sika primer rear window and rear skin @done(23-10-16)
-        ✔ Sika UV295 rear window and rear skin @done(23-10-16)
-    ✔ Riveted Side Skirts - completetly done @done(23-10-16)
-    ✔ Fabricated Canopy brace reinforcement clips @done(23-10-16)
-
-
-Update 10/15/2023:
-    Installed sideskirts:
-        ✔ Surface prep skirts and canopy for sikaflex (prime other parts) @done(23-10-15)
-        ✔ Sika aktivator both window and side skirts - wait 10 minutes @done(23-10-15)
-        ✔ Sika primer both window and side skirts - wait 30 minutes @done(23-10-15)
-        ✔ Sika UV295 bead on window - apply within 2 hours @done(23-10-15)
-        ✔ Spread out bead and clamp side skirts @done(23-10-15)
-        ✔ Clean up - remove tape @done(23-10-15)
-    ✔ Wired up tail-mounted 'taxi' camera @done(23-10-15)
-
-
-Update 10/13/2023:
-    ✔ Alignment of canopy skirts with side skin and aft skin @done(23-10-13)
-    ✔ Trim aft of sideskirts to align with aft top skin @done(23-10-13)
-    ✔ Align skirt and and drill holes @done(23-10-13)
-    ✔ Counter sink canopy frame @done(23-10-13)
-    ✔ Dimple side skirts @done(23-10-13)
-
-
 Below items have been updated in the blog
-
 Archive:
-    ✔ Trim rear window aft edge for fit @done(23-10-08) @project(Update for 10/8/2023)
-    ✔ Finish riveting aft fuse skin @done(23-10-08) @project(Update for 10/8/2023)
-    ✔ Final prep for bonding @done(23-10-08) @project(Update for 10/8/2023)
-    ✔ Trim rear window aft edge for fit @done(23-09-29) @project(Update for 9/29/2023)
-    ✔ Surface prep aluminum skin and plexi @done(23-09-29) @project(Update for 9/29/2023)
-    ✔ minor adjustments to canopy latch fit @done(23-09-29) @project(Update for 9/29/2023)
-    ✔ Rivet aft top fuse skin  @done(23-09-17) @project(Update for 9/17/2023)
-    ✔ Reinstall Canopy @done(23-09-17) @project(Update for 9/17/2023)
-    ✔ Fabricate canopy panel light connector @done(23-09-17) @project(Update for 9/17/2023)
-    ✔ Cleco the top skin onto the fuselage in prepartion for riveting @done(23-09-14) @project(Update for 9/14/2023)
-    ✔ Update Bus Bar to the new Fused bar @done(23-09-14) @project(Update for 9/14/2023)
-    ✔ Write up Wing Installation Procedure for initial wing fitment @done(23-09-13) @project(Update for 9/14/2023)
-    ✔ Check VPX Config to see which switch assignment pin is available @done(23-09-14) @project(Update for 9/14/2023)
-        ans: Switch 2
-    ✔ Update wiring diagram for Auxillary bus (and accessories) and update pinout of VPX @done(23-09-14) @project(Update for 9/14/2023)
-    ✔ test fit the rear window and marked the top skin 1.25" back from the edge for trimming the window @done(23-09-14) @project(Update for 9/14/2023)
-    ✔ Finished installation of Aithre CO monitor signal wire @done(23-09-13) @project(# Update for 9/9/2023)
-    ✔ Updated Dynon EMS Config files to support Aithre CO monitor sensor type @done(23-09-11) @project(# Update for 9/9/2023)
-    ✔ Updated different EMS pages on dynon screens to have the new CO monitor widget @done(23-09-11) @project(# Update for 9/9/2023)
-    ✔ Fabricated the Air Vent mounting brackets @done(23-09-11) @project(# Update for 9/9/2023)
-    ✔ Installed Air Vents to panel @done(23-09-11) @project(# Update for 9/9/2023)
-        Note: Chipped paint on panel - need to update
-    ✔ updated skyview software and databases @done(23-09-11) @project(# Update for 9/4/2023)
-    ✔ installed under-screen lighting for switches @done(23-09-11) @project(# Update for 9/4/2023)
-    ✔ installed boost pump connector @done(23-09-11) @project(# Update for 9/4/2023)
-    ✔ installed boost pump cover mounting hardware @done(23-09-11) @project(# Update for 9/4/2023)
-    ✔ organized ground wires @done(23-09-11) @project(# Update for 9/4/2023)
-    ✔ re-configure VPX for lighting switches - always-on @done(23-09-11) @project(# Update for 9/4/2023)
-    ✔ wire up bluetooth for music-in to Dynon intercom @done(23-09-11) @project(# Update for 9/4/2023)
-    ✔ - hobbs meter @done(23-09-13) @project(# Update for 9/4/2023)
-    ✔ - Avionics panel dimmer @done(23-09-14) @project(# Update for 9/4/2023)
-    ✔ - interior lighting dimmer @done(23-09-11) @project(# Update for 9/4/2023)
-    ✔ - USB power recepticle @done(23-09-11) @project(# Update for 9/4/2023)
-    ✔ - CO Monitor @done(23-09-11) @project(# Update for 9/4/2023)
-    ✔ - Music Bluetooth @done(23-09-11) @project(# Update for 9/4/2023)
+
+    Update 10/17/2023:
+        Rear Window:
+            ✔ Fillet the rollbar<>rear window interface - aktivator, primer, sika bead, squeegee @done(23-10-17)
+            ✔ Removed plastic from canopy and rear window @done(23-10-17)
+
+        Fabricated canopy brace connector pieces:
+            ✔ Fabricate pieces according to instructions @done(23-10-17)
+            ✔ Match drill #30 @done(23-10-17)
+            ✔ Paint @done(23-10-17)
+            ✔ Pop rivet @done(23-10-17)
+
+
+    Update 10/16/2023:
+        Rear Window:
+            ✔ Got an 8" by 48" piece of plywood and 2" strips of flexible wood - cut the board to size. @done(23-10-16)
+            ✔ Measure the distance between longerons under rear-window - <36"-39"> @done(23-10-16)
+            ✔ Build jig to hold window - glued 2x4 pieces to the plywood @done(23-10-16)
+            ✔ Aktivator the rear skin and rear window @done(23-10-16)
+            ✔ Sika primer rear window and rear skin @done(23-10-16)
+            ✔ Sika UV295 rear window and rear skin @done(23-10-16)
+        ✔ Riveted Side Skirts - completetly done @done(23-10-16)
+        ✔ Fabricated Canopy brace reinforcement clips @done(23-10-16)
+
+
+    Update 10/15/2023:
+        Installed sideskirts:
+            ✔ Surface prep skirts and canopy for sikaflex (prime other parts) @done(23-10-15)
+            ✔ Sika aktivator both window and side skirts - wait 10 minutes @done(23-10-15)
+            ✔ Sika primer both window and side skirts - wait 30 minutes @done(23-10-15)
+            ✔ Sika UV295 bead on window - apply within 2 hours @done(23-10-15)
+            ✔ Spread out bead and clamp side skirts @done(23-10-15)
+            ✔ Clean up - remove tape @done(23-10-15)
+        ✔ Wired up tail-mounted 'taxi' camera @done(23-10-15)
+
+
+    Update 10/13/2023:
+        ✔ Alignment of canopy skirts with side skin and aft skin @done(23-10-13)
+        ✔ Trim aft of sideskirts to align with aft top skin @done(23-10-13)
+        ✔ Align skirt and and drill holes @done(23-10-13)
+        ✔ Counter sink canopy frame @done(23-10-13)
+        ✔ Dimple side skirts @done(23-10-13)
+
+
+    Update for 10/8/2023:
+        ✔ Trim rear window aft edge for fit @done(23-10-08)
+        ✔ Finish riveting aft fuse skin @done(23-10-08)
+        ✔ Final prep for bonding @done(23-10-08)
+
+
+    Update for 9/29/2023:
+        ✔ Trim rear window aft edge for fit @done(23-09-29)
+        ✔ Surface prep aluminum skin and plexi @done(23-09-29)
+        ✔ minor adjustments to canopy latch fit @done(23-09-29)
+
+
+    Update for 9/17/2023:
+        ✔ Rivet aft top fuse skin  @done(23-09-17)
+        ✔ Reinstall Canopy @done(23-09-17)
+        ✔ Fabricate canopy panel light connector @done(23-09-17)
+
+    Update for 9/14/2023:
+
+        ✔ Cleco the top skin onto the fuselage in prepartion for riveting @done(23-09-14)
+        ✔ Update Bus Bar to the new Fused bar @done(23-09-14)
+        ✔ Write up Wing Installation Procedure for initial wing fitment @done(23-09-13)
+        ✔ Check VPX Config to see which switch assignment pin is available @done(23-09-14)
+            ans: Switch 2
+        ✔ Update wiring diagram for Auxillary bus (and accessories) and update pinout of VPX @done(23-09-14)
+        ✔ test fit the rear window and marked the top skin 1.25" back from the edge for trimming the window @done(23-09-14)
+
+    Update for 9/9/2023:
+        ✔ Finished installation of Aithre CO monitor signal wire @done(23-09-13)
+        ✔ Updated Dynon EMS Config files to support Aithre CO monitor sensor type @done(23-09-11)
+        ✔ Updated different EMS pages on dynon screens to have the new CO monitor widget @done(23-09-11)
+        ✔ Fabricated the Air Vent mounting brackets @done(23-09-11)
+        ✔ Installed Air Vents to panel @done(23-09-11)
+            Note: Chipped paint on panel - need to update
+
+    Update for 9/4/2023:
+        ✔ updated skyview software and databases @done(23-09-11)
+        ✔ installed under-screen lighting for switches @done(23-09-11)
+        ✔ installed boost pump connector @done(23-09-11)
+        ✔ installed boost pump cover mounting hardware @done(23-09-11)
+        ✔ organized ground wires @done(23-09-11)
+        ✔ re-configure VPX for lighting switches - always-on @done(23-09-11)
+        ✔ wire up bluetooth for music-in to Dynon intercom @done(23-09-11)
+        ✔ - hobbs meter @done(23-09-13)
+        ✔ - Avionics panel dimmer @done(23-09-14)
+        ✔ - interior lighting dimmer @done(23-09-11)
+        ✔ - USB power recepticle @done(23-09-11)
+        ✔ - CO Monitor @done(23-09-11)
+        ✔ - Music Bluetooth @done(23-09-11)
