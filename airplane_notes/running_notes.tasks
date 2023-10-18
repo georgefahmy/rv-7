@@ -1,34 +1,48 @@
 # Archive items after updating blog
 
 Backlog:
-    Fabricate canopy brace connector pieces: @critical
-        ☐ Fabricate pieces according to instructions
-        ☐ Match drill #30
-        ☐ Paint
-        ☐ Pop rivet
-
-    ☐ Adjust fuse block position lower to account for top skin access panels in forward fuselage
+    ☐ Adjust fuse block position lower to account for top skin access panels in forward fuselage @critical
     ☐ Fix paint chip on panel @high
     ☐ Install forward center cover @low
     ☐ Install double usb power supply @medium
     ☐ Change avionics dimmer lighting  to be through an "always-on" pin on the vpx instead of aux bus @medium
     ☐ Account for Aileron autopilot servo disconnect wire (yellow) @critical
+    ☐ Order Canopy cover - lightweight dust cover for hangar use @high
+    ☐ Add Ram mount to rear of roll bar for go pro? @low
 
     Rudder:
         ☐ Final Install of Rudder Pedal mounting brackets @critical
         ☐ Adjust Rudder Trim spring connections @high
         ☐ Adjust brake pedals.
 
+    Interior:
+        ☐ Install popriveted velcro
+        ☐ Install seat belts
+        ☐ Install carpeting
+        ☐ Install side panels
+
+    Canopy Fiberglass: @high
+        ☐ one inch tape on canopy for spacing
+        ☐ pipe tape for epoxy filler
+        ☐ Scuff surfaces
+        ☐ Mix epoxy and microballoons and begin filling
+        ☐ Use dacron peel ply
 
 On Deck:
     Misc:
         ☐ Secure Pilot's stick wiring connector with Zipties @critical
-        ☐ Remove panel to final rivet canopy brace clips
 
+
+Update 10/17/2023:
     Rear Window:
-        ☐ Fillet the rollbar<>rear window interface - aktivator, primer, sika bead, squeegee
+        ✔ Fillet the rollbar<>rear window interface - aktivator, primer, sika bead, squeegee @done(23-10-17)
+        ✔ Removed plastic from canopy and rear window @done(23-10-17)
 
-
+    Fabricated canopy brace connector pieces:
+        ✔ Fabricate pieces according to instructions @done(23-10-17)
+        ✔ Match drill #30 @done(23-10-17)
+        ✔ Paint @done(23-10-17)
+        ✔ Pop rivet @done(23-10-17)
 
 
 Update 10/16/2023:
