@@ -1,38 +1,33 @@
 # Archive items after updating blog
 
 Backlog:
-    ☐ Adjust fuse block position lower to account for top skin access panels in forward fuselage @critical
-    ☐ Fix paint chip on panel @high
-    ☐ Install forward center cover @low
-    ☐ Install double usb power supply @medium
-    ☐ Change avionics dimmer lighting  to be through an "always-on" pin on the vpx instead of aux bus @medium
-    ☐ Account for Aileron autopilot servo disconnect wire (yellow) @critical
-    ☐ Order Canopy cover - lightweight dust cover for hangar use @high
-    ☐ Add Ram mount to rear of roll bar for go pro? @low
+    ☐ @critical Adjust fuse block position lower to account for top skin access panels in forward fuselage
+    ☐ @critical Account for Aileron autopilot servo disconnect wire (yellow)
+    ☐ @critical @rudderFinal Install of Rudder Pedal mounting brackets
+    ☐ @critical Wing Install airplane_notes/wing_installation.tasks
+    ☐ @high Fix paint chip on panel
+    ☐ @high Order Canopy cover - lightweight dust cover for hangar use
+    ☐ @high @canopy_fiberglass One inch tape on canopy for spacing
+    ☐ @high @canopy_fiberglass Pipe tape for epoxy filler
+    ☐ @high @canopy_fiberglass Scuff surfaces
+    ☐ @high @canopy_fiberglass Mix epoxy and microballoons and begin filling
+    ☐ @high @canopy_fiberglass Use dacron peel ply
+    ☐ @high @canopy_fiberglass Iterate until perfect
+    ☐ @high @canopy_fiberglass Primer
+    ☐ @high @rudderAdjust Rudder Trim spring connections
+    ☐ @high @rudder Adjust brake pedals.
+    ☐ @medium Install double usb power supply
+    ☐ @medium Change avionics dimmer lighting  to be through an "always-on" pin on the vpx instead of aux bus
+    ☐ @medium @interior Install seat belts
+    ☐ @low Add Ram mount to rear of roll bar for go pro?
+    ☐ @low Install forward center cover
+    ☐ @low @interior Install popriveted velcro
+    ☐ @low @interior Install carpeting
+    ☐ @low @interior Install side panels
 
-    Rudder:
-        ☐ Final Install of Rudder Pedal mounting brackets @critical
-        ☐ Adjust Rudder Trim spring connections @high
-        ☐ Adjust brake pedals.
-
-    Interior:
-        ☐ Install popriveted velcro
-        ☐ Install seat belts
-        ☐ Install carpeting
-        ☐ Install side panels
-
-    Canopy Fiberglass: @high
-        ☐ one inch tape on canopy for spacing
-        ☐ pipe tape for epoxy filler
-        ☐ Scuff surfaces
-        ☐ Mix epoxy and microballoons and begin filling
-        ☐ Use dacron peel ply
-        ☐ Iterate until perfect
-        ☐ Primer
 
 On Deck:
-    Misc:
-        ☐ Secure Pilot's stick wiring connector with Zipties @critical
+    ☐ @critical Secure Pilot's stick wiring connector with Zipties
 
 
 Below items have been updated in the blog
