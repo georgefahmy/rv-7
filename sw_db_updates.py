@@ -1,6 +1,9 @@
+import json
 import os
 import shutil
+import sys
 import tempfile
+import uuid
 import zipfile
 
 # import PySimpleGUI as pg
@@ -200,6 +203,9 @@ def download_garmin(garmin_url, drive):
 
 
 if __name__ == "__main__":
+    sw_flag = sys.argv[-1]
+
+    sw_flag = False if sw_flag != "True" else True
     dynon_volumes = [
         "/Volumes/" + drive + "/"
         for drive in os.listdir("/Volumes/")
@@ -210,10 +216,39 @@ if __name__ == "__main__":
         for drive in os.listdir("/Volumes/")
         if "GARMIN_G5" in drive
     ]
-    dynon_folder = input("Path to Dynon SW: ")
-    garmin_folder = input("Path to Garmin SW: ")
-    # dynon_folder = "/Users/gfahmy/Documents/projects/dynon/testing/"
-    # garmin_folder = "/Users/gfahmy/Documents/projects/dynon/testing/"
+
+    urn = f"urn:node:{hex(uuid.getnode())}"
+
+    uid = str(uuid.uuid3(uuid.NAMESPACE_DNS, urn))
+    try:
+        config = json.load(open("sw_folder_config.json", "r")).get(uid)
+    except:
+        config = {}
+
+    dynon_folder = (
+        config.get("dynon_path")
+        if config.get("dynon_path") is not None
+        else input("Path to Dynon SW: ")
+    )
+    garmin_folder = (
+        config.get("garmin_path")
+        if config.get("garmin_path") is not None
+        else input("Path to Garmin SW: ")
+    )
+    dynon_documentation_folder = (
+        config.get("dynon_documentation_folder")
+        if config.get("dynon_documentation_folder") is not None
+        else input("Path to Documentation Folder: ")
+    )
+
+    if not dynon_folder.endswith("/"):
+        dynon_folder = dynon_folder + "/"
+
+    if not garmin_folder.endswith("/"):
+        garmin_folder = garmin_folder + "/"
+
+    if not dynon_documentation_folder.endswith("/"):
+        dynon_documentation_folder = dynon_documentation_folder + "/"
 
     current_versions = get_available_versions()
     existing_versions = get_existing_versions(
@@ -227,9 +262,8 @@ if __name__ == "__main__":
         tmp = tmp + "/"
         for sw_category in existing_versions.need_to_update.files:
             if sw_category == "dynon_sw":
-                download_dynon(CHECK_URL, SW_URL, tmp, sw=True)
+                download_dynon(CHECK_URL, SW_URL, tmp, sw=sw_flag)
                 # If we're updating software we're checking for new documentation and saving to HD
-                dynon_documentation_folder = input("Path to Documentation Folder: ")
                 download_skyview_docs(DOCUMENTATION_URL, dynon_documentation_folder)
                 for file in os.listdir(tmp):
                     shutil.copyfile(
@@ -261,3 +295,16 @@ if __name__ == "__main__":
                     for vol in garmin_volumes:
                         shutil.copyfile(tmp + file, f"{vol}/{file}")
                         print(f"Saved {file} to {vol}")
+
+    with open("sw_folder_config.json", "w+") as fp:
+        json.dump(
+            {
+                uid: {
+                    "dynon_path": dynon_folder,
+                    "garmin_path": garmin_folder,
+                    "dynon_documentation_folder": dynon_documentation_folder,
+                }
+            },
+            fp,
+            indent=4,
+        )
