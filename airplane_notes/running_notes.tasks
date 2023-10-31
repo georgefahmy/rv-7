@@ -25,7 +25,6 @@ Backlog:
 
 
 On Deck:
-    ☐ @critical Change desecant beads on engine
     ☐ @critical Check serial number on crackshaft prop flange - check serial number of engine
     ☐ @critical Secure Pilot's stick wiring connector with Zipties
     ☐ @critical Wing Install airplane_notes/wing_installation.tasks
@@ -44,18 +43,22 @@ Daily Updates are collected below this line
 Updates are moved to the archive section after
 they have been added to the build log
 
+Update 10/31/2023:
+    ✔ Picked up new Aircraft cover from bruce's @done(23-10-31)
+    ✔ Change desecant beads on engine @done(23-10-31)
+
 
 Update 10/29/2023:
-    ☐ Re-measured everything
-    ☐ Adjusted incidence angle - 0.0 deg delta with fuselage
-    ☐ Make drill block for #30 1/4" and 5/16" holes
-    ☐ Drilled both wings - installed the bolts
+    ✔ Re-measured everything @done(23-10-29)
+    ✔ Adjusted incidence angle - 0.0 deg delta with fuselage @done(23-10-29)
+    ✔ Make drill block for #30 1/4" and 5/16" holes @done(23-10-29)
+    ✔ Drilled both wings - installed the bolts @done(23-10-29)
 
 Update 10/28/2023:
-    ☐ Spar bolts - in the freezer
-    ☐ Laser alignment and plane leveling
-    ☐ Set sweep to within 0.2deg (1/8" inch)
-    ☐ Set incidence angle equal on both sides to within 0.2deg
+    ✔ Spar bolts - in the freezer @done(23-10-28)
+    ✔ Laser alignment and plane leveling @done(23-10-28)
+    ✔ Set sweep to within 0.2deg (1/8" inch) @done(23-10-28)
+    ✔ Set incidence angle equal on both sides to within 0.2deg @done(23-10-28)
 
 
 Update 10/25/2023:
