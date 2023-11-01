@@ -29,7 +29,7 @@ On Deck:
     ☐ @critical Secure Pilot's stick wiring connector with Zipties
     ☐ @critical Wing Install airplane_notes/wing_installation.tasks
     ☐ @high Add two holes on shear web of spar through center section for wingtip wires
-    ☐ @high Add two grommets to the holes
+        ☐ Add two grommets to the holes
     ☐ @high Install new canopy lift struts
         ☐ Remove current springs and mounting hardware
         ☐ Install new metal brackets
@@ -48,27 +48,6 @@ Update 10/31/2023:
     ✔ Change desecant beads on engine @done(23-10-31)
 
 
-Update 10/29/2023:
-    ✔ Re-measured everything @done(23-10-29)
-    ✔ Adjusted incidence angle - 0.0 deg delta with fuselage @done(23-10-29)
-    ✔ Make drill block for #30 1/4" and 5/16" holes @done(23-10-29)
-    ✔ Drilled both wings - installed the bolts @done(23-10-29)
-
-Update 10/28/2023:
-    ✔ Spar bolts - in the freezer @done(23-10-28)
-    ✔ Laser alignment and plane leveling @done(23-10-28)
-    ✔ Set sweep to within 0.2deg (1/8" inch) @done(23-10-28)
-    ✔ Set incidence angle equal on both sides to within 0.2deg @done(23-10-28)
-
-
-Update 10/25/2023:
-    ✔ Prep wing bolts by putting them in the freezer @done(23-10-25)
-    ✔ Get LPS lube for the spar bolts @done(23-10-25)
-    ✔ Installed fuel pump cover carpet velcro @done(23-10-25)
-    ✔ Installed shoulder seat belts @done(23-10-31)
-
-
-
 Update 10/21/2023:
     ✔ Repainted rollbar @done(23-10-21)
     ✔ Swapped canopy springs for new ones @done(23-10-21)
@@ -76,14 +55,29 @@ Update 10/21/2023:
     ✔ Draw lines on rear spar 5/8" edge distance @done(23-10-21)
     ✔ Prep wing installation documentation and cross-check with the Vans instructions @done(23-10-21)
 
-Update 10/19/2023:
-    ✔ @high Order Canopy cover - lightweight dust cover for hangar use @done(23-10-19)
-
 
 #########################################
 Below items have been updated in the blog
 
 Archive:
+    Update 10/29/2023:
+        ✔ Re-measured everything @done(23-10-29)
+        ✔ Adjusted incidence angle - 0.0 deg delta with fuselage @done(23-10-29)
+        ✔ Make drill block for #30 1/4" and 5/16" holes @done(23-10-29)
+        ✔ Drilled both wings - installed the bolts @done(23-10-29)
+
+    Update 10/28/2023:
+        ✔ Spar bolts - in the freezer @done(23-10-28)
+        ✔ Laser alignment and plane leveling @done(23-10-28)
+        ✔ Set sweep to within 0.2deg (1/8" inch) @done(23-10-28)
+        ✔ Set incidence angle equal on both sides to within 0.2deg @done(23-10-28)
+
+
+    Update 10/25/2023:
+        ✔ Prep wing bolts by putting them in the freezer @done(23-10-25)
+        ✔ Get LPS lube for the spar bolts @done(23-10-25)
+        ✔ Installed fuel pump cover carpet velcro @done(23-10-25)
+        ✔ Installed shoulder seat belts @done(23-10-31)
 
     Update 10/17/2023:
         Rear Window:
