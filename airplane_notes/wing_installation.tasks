@@ -61,17 +61,17 @@ Wing Installation Procedure:
             ☐ use safety wire to attach
 
     Flap Rigging:
-        ☐ Install flaps
-        ☐ Fabricate flap pushrods with rod end bearings
-        ☐ Install pushrods on flaps
-        ☐ Drill hole for initial fitting of pushrod and flap to bottom of fuselage
-        ☐ Adjust pushrod lengths accordingly and test flap deflection
-        ☐ Measure down - up angle (minimum > 32 Deg)
+        ✔ Install flaps @done(23-11-03)
+        ✔ Fabricate flap pushrods with rod end bearings @done(23-11-03)
+        ✔ Install pushrods on flaps @done(23-11-03)
+        ✔ Drill hole for initial fitting of pushrod and flap to bottom of fuselage @done(23-11-03)
+        ✔ Adjust pushrod lengths accordingly and test flap deflection @done(23-11-03)
+        ✔ Measure down - up angle (minimum > 40 Deg - actual: 45) @done(23-11-03)
 
     Aileron Rigging:
-        ☐ Vertically align the control sticks
-        ☐ With the flaps in the up position, use the aileron rigging tool and install the aileron
-        ☐ Adjust pushrod lengths so everything is aligned
+        ✔ Vertically align the control sticks @done(23-11-03)
+        ✔ With the flaps in the up position, use the aileron rigging tool and install the aileron @done(23-11-03)
+        ✔ Adjust pushrod lengths so everything is aligned @done(23-11-03)
 
     Gap Seals:
         ☐ Use the wing cradle with clamps of wood to hold wing
