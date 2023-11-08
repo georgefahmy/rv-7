@@ -19,9 +19,7 @@ Backlog:
     ☐ @medium Change avionics dimmer lighting  to be through an "always-on" pin on the vpx instead of aux bus
     ☐ @low Add Ram mount to rear of roll bar for GoPro?
     ☐ @low Install forward center cover
-    ☐ @low @interior Install popriveted velcro
-    ☐ @low @interior Install carpeting
-    ☐ @low @interior Install side panels
+    ☐ @low @interior Installation instructions interior_installation.tasks
 
 
 On Deck:
@@ -31,7 +29,7 @@ On Deck:
     ☐ @high Add two holes on shear web of spar through center section for wingtip wires
     ☐ @high Add two grommets to the holes
     ✘ @high Add washers to flap bearing to adjust spacing @cancelled(23-11-06)
-    ☐ @high Make spacer for bolt and rod end bearing for flap pushrod
+    ☐ @high Make spacer(s) for bolt and rod end bearing for flap pushrod
 
 ################################################
 Daily Updates are collected below this line
