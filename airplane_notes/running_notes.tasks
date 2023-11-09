@@ -24,7 +24,6 @@ Backlog:
 
 On Deck:
     ☐ @critical Check serial number on crackshaft prop flange - check serial number of engine
-    ☐ @critical check AP panel serial number
     ☐ @critical Secure Pilot's stick wiring connector with Zipties
     ☐ @critical Wing Install airplane_notes/wing_installation.tasks
     ☐ @high Add two holes on shear web of spar through center section for wingtip wires
@@ -36,6 +35,9 @@ On Deck:
 Daily Updates are collected below this line
 Updates are moved to the archive section after
 they have been added to the build log
+
+Update 11/8/2023:
+    ✔ check AP panel serial number @done(23-11-08)
 
 Update 11/3/2023:
     ✔ Rigged flaps @done(23-11-03)
