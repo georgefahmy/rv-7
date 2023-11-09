@@ -23,13 +23,13 @@ Backlog:
 
 
 On Deck:
-    ☐ @critical Check serial number on crackshaft prop flange - check serial number of engine
+    ☐ @critical Drill fuel tank attach bracket before removing wing
     ☐ @critical Secure Pilot's stick wiring connector with Zipties
     ☐ @critical Wing Install airplane_notes/wing_installation.tasks
     ☐ @high Add two holes on shear web of spar through center section for wingtip wires
     ☐ @high Add two grommets to the holes
-    ✘ @high Add washers to flap bearing to adjust spacing @cancelled(23-11-06)
     ☐ @high Make spacer(s) for bolt and rod end bearing for flap pushrod
+    ☐ @high Drill 1" hole in wing for lighting harness connector
 
 ################################################
 Daily Updates are collected below this line
@@ -37,7 +37,11 @@ Updates are moved to the archive section after
 they have been added to the build log
 
 Update 11/8/2023:
-    ✔ check AP panel serial number @done(23-11-08)
+    ✔ check AP panel serial number - TECHNICAL SERVICE BULLETIN: 104808-000 Does not apply - Serial Number 5492 doesnt fall in the affected range @done(23-11-08)
+    ✔ Engine S/N 36H171895 (need to investigate) @done(23-11-08)
+    ✔ Engine Model IO-360-B1HD2 @done(23-11-08)
+    ✔ Drilled lower fuselage skins for wing screws @done(23-11-08)
+    ✔ aligned pilot and copilot sticks to be parallel and vertical @done(23-11-08)
 
 Update 11/3/2023:
     ✔ Rigged flaps @done(23-11-03)
