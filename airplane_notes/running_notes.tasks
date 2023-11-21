@@ -5,14 +5,6 @@ Backlog:
     ☐ @critical Account for Aileron autopilot servo disconnect wire (yellow)
     ☐ @critical @rudderFinal Install of Rudder Pedal mounting brackets
     ☐ @high Fix paint chip on panel
-    ☐ @high Drill hole in canopy brace for panel lighting wires to pass through - add grommet
-    ☐ @high @canopy_fiberglass One inch tape on canopy for spacing
-    ☐ @high @canopy_fiberglass Pipe tape for epoxy filler
-    ☐ @high @canopy_fiberglass Scuff surfaces
-    ☐ @high @canopy_fiberglass Mix epoxy and microballoons and begin filling
-    ☐ @high @canopy_fiberglass Use dacron peel ply
-    ☐ @high @canopy_fiberglass Iterate until perfect
-    ☐ @high @canopy_fiberglass Primer
     ☐ @high @rudderAdjust Rudder Trim spring connections
     ☐ @high @rudder Adjust brake pedals.
     ☐ @medium Install double usb power supply
@@ -23,8 +15,6 @@ Backlog:
 
 
 On Deck:
-    ☐ @critical Make Fuel vent lines
-
     ☐ @critical Secure Pilot's stick wiring connector with Zipties
     ☐ @critical Wing Install airplane_notes/wing_installation.tasks
     ☐ @high Add two holes on shear web of spar through center section for wingtip wires
@@ -32,43 +22,45 @@ On Deck:
     ☐ @high Make spacer(s) for bolt and rod end bearing for flap pushrod
     ☐ @high Drill 1" hole in wing for lighting harness connector
 
+
 ################################################
 Daily Updates are collected below this line
 Updates are moved to the archive section after
 they have been added to the build log
+
 Update 11/18/2023:
-    ☐ Drilled Root Fairings to wings (no pic)
-    ☐ Updated Flap Pushrods to hex rods instead of the plans (no pic)
-    ☐ Updated the rod end bearing to a CM-4M and a AN4-12 bolt with a washer and spacer. (no pic)
-    ☐ Drilled thru-holes in seat rib for Pitot and AOA lines (no pic)
-    ☐ Drilled Fuel Tank Bracket to fuselage bracket hole for an AN4 bolt - will get nutplate and safetywired. (pics available)
-    ☐ Made Fuel Tank to Fuselage Vent lines (pics available)
-
-Update 11/8/2023:
-    ✔ check AP panel serial number - TECHNICAL SERVICE BULLETIN: 104808-000 Does not apply - Serial Number 5492 doesnt fall in the affected range @done(23-11-08)
-    ✔ Engine S/N 36H171895 (need to investigate) @done(23-11-08)
-    ✔ Engine Model IO-360-B1HD2 @done(23-11-08)
-    ✔ Drilled lower fuselage skins for wing screws @done(23-11-08)
-    ✔ aligned pilot and copilot sticks to be parallel and vertical @done(23-11-08)
-
-Update 11/3/2023:
-    ✔ Rigged flaps @done(23-11-03)
-    ✔ Fabricated flap pushrods (learned I need to space them inboard a bit) @done(23-11-03)
-    ✔ Aligned ailerons to flaps and adjusted pushrods @done(23-11-03)
-
-Update 11/2/2023:
-    ✔ Install new canopy lift struts and new geometry @done(23-11-03)
-        ✔ Remove current springs and mounting hardware @done(23-11-03)
-        ✔ Install new metal brackets @done(23-11-03)
-        ✔ Drill holes for metal brackets @done(23-11-03)
-        ✔ Forward bracket mount 2.5" back from panel onto angled deck @done(23-11-03)
-        ✔ Aft bracket mount 24" back from leading edge of canopy frame @done(23-11-03)
+    ✔ Drilled Root Fairings to wings (no pic) @done(23-11-20)
+    ✔ Updated Flap Pushrods to hex rods instead of the plans (no pic) @done(23-11-20)
+    ✔ Updated the rod end bearing to a CM-4M and a AN4-12 bolt with a washer and spacer. (no pic) @done(23-11-20)
+    ✔ Drilled thru-holes in seat rib for Pitot and AOA lines (no pic) @done(23-11-20)
+    ✔ Drilled Fuel Tank Bracket to fuselage bracket hole for an AN4 bolt - will get nutplate and safetywired. (pics available) @done(23-11-20)
+    ✔ Made Fuel Tank to Fuselage Vent lines (pics available) @done(23-11-20)
 
 
 #########################################
 Below items have been updated in the blog
 
 Archive:
+    Update 11/8/2023:
+        ✔ check AP panel serial number - TECHNICAL SERVICE BULLETIN: 104808-000 Does not apply - Serial Number 5492 doesnt fall in the affected range @done(23-11-08)
+        ✔ Engine S/N 36H171895 (need to investigate) @done(23-11-08)
+        ✔ Engine Model IO-360-B1HD2 @done(23-11-08)
+        ✔ Drilled lower fuselage skins for wing screws @done(23-11-08)
+        ✔ aligned pilot and copilot sticks to be parallel and vertical @done(23-11-08)
+
+    Update 11/3/2023:
+        ✔ Rigged flaps @done(23-11-03)
+        ✔ Fabricated flap pushrods (learned I need to space them inboard a bit) @done(23-11-03)
+        ✔ Aligned ailerons to flaps and adjusted pushrods @done(23-11-03)
+
+    Update 11/2/2023:
+        ✔ Install new canopy lift struts and new geometry @done(23-11-03)
+            ✔ Remove current springs and mounting hardware @done(23-11-03)
+            ✔ Install new metal brackets @done(23-11-03)
+            ✔ Drill holes for metal brackets @done(23-11-03)
+            ✔ Forward bracket mount 2.5" back from panel onto angled deck @done(23-11-03)
+            ✔ Aft bracket mount 24" back from leading edge of canopy frame @done(23-11-03)
+
     Update 10/31/2023:
         ✔ Picked up new Aircraft cover from bruce's @done(23-10-31)
         ✔ Change desecant beads on engine @done(23-10-31)
