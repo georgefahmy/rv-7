@@ -6,7 +6,7 @@ from dotmap import DotMap
 
 # TODO add ability to move the checklist to the appropriate drives (DYNON 1 & 2)
 
-# https://docs.google.com/spreadsheets/d/1-EtvM-MdQwJ0Wk8CXvsHwmCrYk3bptP8fpDFwMWMDkc/edit#gid=0
+# Sheets File: https://docs.google.com/spreadsheets/d/1-EtvM-MdQwJ0Wk8CXvsHwmCrYk3bptP8fpDFwMWMDkc/edit#gid=0
 
 
 def make_checklist(worksheets, chklist):
@@ -24,7 +24,7 @@ def make_checklist(worksheets, chklist):
                 if blank > 1:
                     continue
                 # print(f"CHKLST{i}.LINE{j+1},", row[checklist])
-                chklist.sections[f"CHKLST{i}"][f"LINE{j+1}"] = row[checklist]
+                chklist.sections[f"CHKLST{i}"][f"LINE{j + 1}"] = row[checklist]
             i += 1
     chklist.sections[f"CHKLST{i}"].TITLE = "CHECKLIST INFO"
     chklist.sections[f"CHKLST{i}"]["LINE1"] = ""
@@ -41,7 +41,7 @@ def write_checklist(chklist):
         for key, value in chklist.sections.items():
             lines.append("")
             for key2, line in value.items():
-                if type(line) == DotMap:
+                if isinstance(line, DotMap):
                     continue
                 lines.append(key + "." + key2 + ", " + str(line))
         fp.write("\n".join(lines))

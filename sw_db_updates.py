@@ -205,7 +205,7 @@ def download_garmin(garmin_url, drive):
 if __name__ == "__main__":
     sw_flag = sys.argv[-1]
 
-    sw_flag = False if sw_flag != "True" else True
+    sw_flag = False if sw_flag not in ["True", "true"] else True
     dynon_volumes = [
         "/Volumes/" + drive + "/"
         for drive in os.listdir("/Volumes/")
@@ -220,8 +220,10 @@ if __name__ == "__main__":
     urn = f"urn:node:{hex(uuid.getnode())}"
 
     uid = str(uuid.uuid3(uuid.NAMESPACE_DNS, urn))
+    print(uid)
     try:
         config = json.load(open("sw_folder_config.json", "r")).get(uid)
+
     except:
         config = {}
 
