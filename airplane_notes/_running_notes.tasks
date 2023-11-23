@@ -2,7 +2,6 @@
 
 Backlog:
     ☐ @critical Adjust fuse block position lower to account for top skin access panels in forward fuselage
-    ☐ @critical Account for Aileron autopilot servo disconnect wire (yellow)
     ☐ @critical @rudderFinal Install of Rudder Pedal mounting brackets
     ☐ @high Fix paint chip on panel
     ☐ @high @rudderAdjust Rudder Trim spring connections
@@ -14,15 +13,28 @@ Backlog:
 
 
 On Deck:
-    ☐ @critical Buy AN4H-6A bolts (2) for fuel tank bracket
-    ☐ @critical Secure Pilot's stick wiring connector with Zipties
-    ☐ @critical Wing Install airplane_notes/wing_installation.tasks
+    ☐ Buy AN4H-6A bolts (2) for fuel tank bracket
+    ☐ Secure Pilot's stick wiring connector with Zipties
 
 
 ################################################
 Daily Updates are collected below this line
 Updates are moved to the archive section after
 they have been added to the build log
+
+Update 11/22/2023:
+    ✔ Removed Right Flap @done(23-11-22)
+    ✔ Removed Right Wing @done(23-11-22)
+    ✔ Drilled Root fairing mount holes on wing @done(23-11-22)
+    ✔ Installed nutplates @done(23-11-22)
+    ✔ Drilled and installed fuel bracket nut plate @done(23-11-22)
+    ✔ Reinstalled right wing with all bolts @done(23-11-22)
+✔ @done(23-11-22)
+    ✔ Routed autopilot disconnect wire to pilots stick @done(23-11-22)
+    ✔ Added splice to pitot line to prevent issues under the seat pan @done(23-11-22)
+    ✔ Routed autopilot and wingtip harnesses to the appropriate spots @done(23-11-22)
+    ✔ Wing cradle method to hold wing worked perfectly - mention it in write up that vince mentioned it @done(23-11-22)
+
 
 Update 11/21/2023:
     ✔ Removed Left Flap @done(23-11-22)
