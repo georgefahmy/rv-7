@@ -3,6 +3,7 @@
 Backlog:
     ☐ @critical Adjust fuse block position lower to account for top skin access panels in forward fuselage
     ☐ @critical @rudderFinal Install of Rudder Pedal mounting brackets
+    ☐ @critical Attach Fuel Tank Bracket with Safety wired AN4H-6A Bolts
     ☐ @high Fix paint chip on panel
     ☐ @high @rudderAdjust Rudder Trim spring connections
     ☐ @high @rudder Adjust brake pedals.
@@ -15,6 +16,9 @@ Backlog:
 On Deck:
     ☐ Buy AN4H-6A bolts (2) for fuel tank bracket
     ☐ Secure Pilot's stick wiring connector with Zipties
+    ☐ Wire up Landing Light harnesses to Deutsch connectors
+    ☐ Wire up autopilot harness
+    ☐ Wire up autopilot disconnect wire
 
 
 ################################################
@@ -22,44 +26,51 @@ Daily Updates are collected below this line
 Updates are moved to the archive section after
 they have been added to the build log
 
-Update 11/22/2023:
-    ✔ Removed Right Flap @done(23-11-22)
-    ✔ Removed Right Wing @done(23-11-22)
-    ✔ Drilled Root fairing mount holes on wing @done(23-11-22)
-    ✔ Installed nutplates @done(23-11-22)
-    ✔ Drilled and installed fuel bracket nut plate @done(23-11-22)
-    ✔ Reinstalled right wing with all bolts @done(23-11-22)
-✔ @done(23-11-22)
-    ✔ Routed autopilot disconnect wire to pilots stick @done(23-11-22)
-    ✔ Added splice to pitot line to prevent issues under the seat pan @done(23-11-22)
-    ✔ Routed autopilot and wingtip harnesses to the appropriate spots @done(23-11-22)
-    ✔ Wing cradle method to hold wing worked perfectly - mention it in write up that vince mentioned it @done(23-11-22)
-
-
-Update 11/21/2023:
-    ✔ Removed Left Flap @done(23-11-22)
-    ✔ Removed Left wing (all actions on left wing) @done(23-11-22)
-    ✔ Drilled root fairing mount holes on wing @done(23-11-22)
-    ✔ Drilled fuselage holes for pitot tubes @done(23-11-22)
-    ✔ Installed Nutplates for root fairing @done(23-11-22)
-    ✔ Drilled and Installed nutplate for Fuel tank bracket @done(23-11-22)
-    ✔ Reinstalled left wing with all bolts @done(23-11-22)
-    ✔ Drilled hole for Fuel level sensor @done(23-11-22)
-
-
-Update 11/18/2023:
-    ✔ Drilled Root Fairings to wings (no pic) @done(23-11-20)
-    ✔ Updated Flap Pushrods to hex rods instead of the plans (no pic) @done(23-11-20)
-    ✔ Updated the rod end bearing to a CM-4M and a AN4-12 bolt with a washer and spacer. (no pic) @done(23-11-20)
-    ✔ Drilled thru-holes in seat rib for Pitot and AOA lines (no pic) @done(23-11-20)
-    ✔ Drilled Fuel Tank Bracket to fuselage bracket hole for an AN4 bolt - will get nutplate and safetywired. (pics available) @done(23-11-20)
-    ✔ Made Fuel Tank to Fuselage Vent lines (pics available) @done(23-11-20)
+Update 11/26/2023:
+    ✔ Drilled holes through center section for autopilot and lighting harnesses @done(23-11-26)
+    ✔ Routed remaining wiring harnesses forward of spar in preparation of final connections @done(23-11-26)
+    ✔ Created Flap hinge retention clips @done(23-11-26)
+    ✔ Reinstalled Flaps @done(23-11-26)
+    ✔ Installed Wing Walk grip on left wing @done(23-11-26)
 
 
 #########################################
 Below items have been updated in the blog
 
 Archive:
+    Update 11/22/2023:
+        ✔ Removed Right Flap @done(23-11-22)
+        ✔ Removed Right Wing @done(23-11-22)
+        ✔ Drilled Root fairing mount holes on wing @done(23-11-22)
+        ✔ Installed nutplates @done(23-11-22)
+        ✔ Drilled and installed fuel bracket nut plate @done(23-11-22)
+        ✔ Reinstalled right wing with all bolts @done(23-11-22)
+    ✔ @done(23-11-22)
+        ✔ Routed autopilot disconnect wire to pilots stick @done(23-11-22)
+        ✔ Added splice to pitot line to prevent issues under the seat pan @done(23-11-22)
+        ✔ Routed autopilot and wingtip harnesses to the appropriate spots @done(23-11-22)
+        ✔ Wing cradle method to hold wing worked perfectly - mention it in write up that vince mentioned it @done(23-11-22)
+
+
+    Update 11/21/2023:
+        ✔ Removed Left Flap @done(23-11-22)
+        ✔ Removed Left wing (all actions on left wing) @done(23-11-22)
+        ✔ Drilled root fairing mount holes on wing @done(23-11-22)
+        ✔ Drilled fuselage holes for pitot tubes @done(23-11-22)
+        ✔ Installed Nutplates for root fairing @done(23-11-22)
+        ✔ Drilled and Installed nutplate for Fuel tank bracket @done(23-11-22)
+        ✔ Reinstalled left wing with all bolts @done(23-11-22)
+        ✔ Drilled hole for Fuel level sensor @done(23-11-22)
+
+
+    Update 11/18/2023:
+        ✔ Drilled Root Fairings to wings (no pic) @done(23-11-20)
+        ✔ Updated Flap Pushrods to hex rods instead of the plans (no pic) @done(23-11-20)
+        ✔ Updated the rod end bearing to a CM-4M and a AN4-12 bolt with a washer and spacer. (no pic) @done(23-11-20)
+        ✔ Drilled thru-holes in seat rib for Pitot and AOA lines (no pic) @done(23-11-20)
+        ✔ Drilled Fuel Tank Bracket to fuselage bracket hole for an AN4 bolt - will get nutplate and safetywired. (pics available) @done(23-11-20)
+        ✔ Made Fuel Tank to Fuselage Vent lines (pics available) @done(23-11-20)
+
     Update 11/8/2023:
         ✔ check AP panel serial number - TECHNICAL SERVICE BULLETIN: 104808-000 Does not apply - Serial Number 5492 doesnt fall in the affected range @done(23-11-08)
         ✔ Engine S/N 36H171895 (need to investigate) @done(23-11-08)
