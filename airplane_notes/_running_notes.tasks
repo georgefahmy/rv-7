@@ -4,6 +4,8 @@ Backlog:
     ☐ @critical Adjust fuse block position lower to account for top skin access panels in forward fuselage
     ☐ @critical @rudderFinal Install of Rudder Pedal mounting brackets
     ☐ @critical Attach Fuel Tank Bracket with Safety wired AN4H-6A Bolts
+    ☐ @critical Fabricate and attach aileron stops according to up/down deflections (deg)
+         ☐ max: 32/17 min: 25/15
     ☐ @high Fix paint chip on panel
     ☐ @high @rudderAdjust Rudder Trim spring connections
     ☐ @high @rudder Adjust brake pedals.
@@ -24,7 +26,8 @@ On Deck:
     ☐ Buy AN4H-6A bolts (2) for fuel tank bracket
     ☐ Buy stubby flat head and philips head (2")
     ☐ Secure Pilot's stick wiring connector with Zipties
-    ☐ Wire up Landing Light harnesses to Deutsch connectors
+    ☐ Wire up Landing Light harnesses to Deutsch connectors (or skip connectors?)
+        ☐ Plumb shielded wires through wing
     ☐ Wire up autopilot harness
     ☐ Wire up autopilot disconnect wire
     ☐ Extend Right Fuel tank level sensor wire and drill hole in side of fuselage
