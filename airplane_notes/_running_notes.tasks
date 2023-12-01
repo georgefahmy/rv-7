@@ -6,6 +6,7 @@ Backlog:
     ☐ @critical Attach Fuel Tank Bracket with Safety wired AN4H-6A Bolts
     ☐ @critical Fabricate and attach aileron stops according to up/down deflections (deg)
          ☐ max: 32/17 min: 25/15
+    ☐ @critical @critical Check all control mechanism bolts
     ☐ @high Fix paint chip on panel
     ☐ @high @rudderAdjust Rudder Trim spring connections
     ☐ @high @rudder Adjust brake pedals.
@@ -13,30 +14,40 @@ Backlog:
     ☐ @medium Change avionics dimmer lighting  to be through an "always-on" pin on the vpx instead of aux bus
     ☐ @low Add Ram mount to rear of roll bar for GoPro?
     ☐ @low @interior Installation instructions interior_installation.tasks
+    ☐ @low @interior Install seatbelts with AN4-6A bolts and a 3/16th wide 1/4" ID spacer (4 req)
 
-    @critical Spar Bolt Completion :
+
+
+On Deck:
+    ☐ Adjust pitch autopilot pushrod length
+    ☐ Check Roll autopilot pushrod length
+    ☐ Buy AN4H-6A bolts (2) for fuel tank bracket (or find them)
+    Spar Bolt Installation :
         ☐ Install AN960-716 Washers (big bolts) (2 on top bolts 1 on bottom bolts)
         ☐ Install AN365-720A Nuts (big bolts)
         ☐ Install AN960-416 Washers (small bolts) (2 on top bolts 1 on bottom bolts)
         ☐ Install AN365-428 Nuts (small bolts)
         ☐ Install (4) AN4-13A and AN960-416 Washers through the spar to nutplate
-
-
-On Deck:
-    ☐ Buy AN4H-6A bolts (2) for fuel tank bracket (or find them)
     ☐ Secure Pilot's stick wiring connector with Zipties
-    ☐ Wire up Landing Light harnesses to Deutsch connectors (or skip connectors?)
-        ☐ Plumb shielded wires through wing
-        ☐ Wire Strobe Synchro wire from tip to tip
-    ☐ Wire up roll autopilot harness
-    ☐ Wire up roll autopilot disconnect wire
     ☐ Extend Right Fuel tank level sensor wire and drill hole in side of fuselage
+    ☐ Extend strobe synchro wire a bit
 
 
 ################################################
 Daily Updates are collected below this line
 Updates are moved to the archive section after
 they have been added to the build log
+
+Update 11/30/2023:
+    ✔ Wired up Landing Light harnesses in fuselage  @done(23-12-01)
+        ✔ Plumb shielded wires through wing @done(23-12-01)
+        ✔ Wire Strobe Synchro wire from tip to tip @done(23-12-01)
+    ✔ Wire up roll autopilot harness @done(23-12-01)
+    ✔ Wire up roll autopilot disconnect wire @done(23-12-01)
+    ✔ Updated autopilot roll servo firmware @done(23-12-01)
+    ✔ Configured roll servo and updated to expert autopilot mode @done(23-12-01)
+    ✔ Confirmed lighting functions and autopilot functions and no interference with audio noise @done(23-12-01)
+
 
 Update 11/26/2023:
     ✔ Drilled holes through center section for autopilot and lighting harnesses @done(23-11-26)
