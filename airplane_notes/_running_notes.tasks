@@ -5,13 +5,14 @@ Backlog:
     ☐ @critical @rudderFinal Install of Rudder Pedal mounting brackets
     ☐ @critical Attach Fuel Tank Bracket with Safety wired AN4H-6A Bolts
     ☐ @critical Fabricate and attach aileron stops according to up/down deflections (deg)
-         ☐ max: 32/17 min: 25/15
+         ☐ max: 32/17 min: 25/15 NOTE: Bushing method
     ☐ @critical @critical Check all control mechanism bolts
     ☐ @high Fix paint chip on panel
     ☐ @high @rudderAdjust Rudder Trim spring connections
     ☐ @high @rudder Adjust brake pedals.
     ☐ @medium Install double usb power supply
     ☐ @medium Change avionics dimmer lighting  to be through an "always-on" pin on the vpx instead of aux bus
+    ☐ @medium Fabricate Aileron-to-flap alignment tool
     ☐ @low Add Ram mount to rear of roll bar for GoPro?
     ☐ @low @interior Installation instructions interior_installation.tasks
     ☐ @low @interior Install seatbelts with AN4-6A bolts and a 3/16th wide 1/4" ID spacer (4 req)
@@ -21,7 +22,7 @@ Backlog:
 On Deck:
     ☐ Adjust pitch autopilot pushrod length to prevent over centering
     ☐ Check Roll autopilot pushrod length
-    ☐ Buy AN4H-6A bolts (2) for fuel tank bracket (or find them)
+    ☐ Fabricate delrin aileron stops
     Spar Bolt Installation :
         ☐ Install AN960-716 Washers (big bolts) (2 on top bolts 1 on bottom bolts)
         ☐ Install AN365-720A Nuts (big bolts)
@@ -37,6 +38,11 @@ On Deck:
 Daily Updates are collected below this line
 Updates are moved to the archive section after
 they have been added to the build log
+
+Update 12/1/2023:
+    ✔ Added velcoin floor attachments for interior carpet @done(23-12-02)
+    ✔ installed seat cushions @done(23-12-02)
+    ✔ installed stick covers @done(23-12-02)
 
 Update 11/30/2023:
     ✔ Wired up Landing Light harnesses in fuselage  @done(23-12-01)
