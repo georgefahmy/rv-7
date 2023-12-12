@@ -6,10 +6,15 @@ Backlog:
     ☐ @critical Attach Fuel Tank Bracket with Safety wired AN4H-6A Bolts
     ☐ @critical Fabricate and attach aileron stops according to up/down deflections (deg)
          ☐ max: 32/17 min: 25/15 NOTE: Bushing method
-    ☐ @critical @critical Check all control mechanism bolts
+    ☐ @critical @critical Check all control system bolts
+    ☐ @critical Expires end of 2023 - Medical examiner - (https://designee.faa.gov/designeeLocator)
+        ☐ Jean Francois Luong - 295 O'CONNOR DR	SAN JOSE	CA	95128	(408) 279-8171
+        ☐ Tiffany Suzanne Davies - 360 DARDANELLI LANE #2E	LOS GATOS	CA	95032	(408) 378-1101
     ☐ @high Fix paint chip on panel
     ☐ @high @rudderAdjust Rudder Trim spring connections
     ☐ @high @rudder Adjust brake pedals.
+    ☐ @high Fabricate a fuselage seal for the original fuel line side holes
+        ☐ Two circles, one with a nutplate, with a small bolt/screw through the second circle so it can be tightened
     ☐ @medium Install double usb power supply
     ☐ @medium Change avionics dimmer lighting  to be through an "always-on" pin on the vpx instead of aux bus
     ☐ @medium Fabricate Aileron-to-flap alignment tool
