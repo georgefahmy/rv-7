@@ -84,8 +84,8 @@ Wing Installation Procedure:
 
     Wingtip Wiring:
         ✔ Route wires through side of fuselage for connection to wingtip wiring harness @done(23-11-22)
-        ☐ Connect Deutch connector to both fuselage and wing harnesses
-        ☐ Test wing tip lighting
+        ✔ Connect Deutch connector to both fuselage and wing harnesses @done(23-12-13)
+        ✔ Test wing tip lighting @done(23-12-13)
 
     Ziptip installation:
         ☐ Follow VANS wingtip installation procedure

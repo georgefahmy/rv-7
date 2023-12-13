@@ -1,0 +1,77 @@
+Skyview Network DB9 (x4):
+    pin1: data 1A
+    pin2: ground 1
+    pin3: ground 2
+    pin4: data 2B
+    pin5: aux voltage (EMS)
+    pin6: data 1B
+    pin7: power 1
+    pin8: data 2A
+    pin9: power 2
+
+AP DB9 (x2):
+    pin1: data 1A
+    pin2: ground
+    pin3: AP disengage
+    pin4: data 2B
+    pin5: -
+    pin6: data 1B
+    pin7: +12V
+    pin8: data 2A
+    pin9: -
+
+Screen Harness D37 (x2):
+    pin1: power input +12V
+    pin2: SV-Batt input
+    pin3: serial 1 RX
+    pin4: serial 1 TX
+    pin5: serial 2 RX
+    pin6: serial 2 TX
+    pin7: serial 3 RX
+    pin8: serial 3 TX
+    pin9: serial 4 RX
+    pin10: serial 4 TX
+    pin11: serial 5 RX
+    pin12: serial 5 TX
+    pin13: left audio out
+    pin14: -
+    pin15: -
+    pin16: -
+    pin17: -
+    pin18: -
+    pin19: -
+    pin20: power input +12V
+    pin21: aircraft ground
+    pin22: aircraft ground
+    pin23: SV-Batt ground
+    pin24: GPS ground
+    pin25: DIM input
+    pin26: DIM output
+    pin27: -
+    pin28: -
+    pin29: GPS Power output
+    pin30: Audio ground
+    pin31: r audio out
+    pin32: -
+    pin33: -
+    pin34: -
+    pin35: -
+    pin36: -
+    pin37: -
+
+Auto Pilot Panel (x1):
+    pin1: -
+    pin2: ground
+    pin3: control stick trim up
+    pin4: control stick trim down
+    pin5: -
+    pin6: -
+    pin7: pitch trim motor wire 1
+    pin8: pitch trim motor wire 2
+    pin9: trim motor power +12V (4 amps)
+    pin10: control stick trim right
+    pin11: control stick trim left
+    pin12: -
+    pin13: -
+    pin14: roll trim motor wire 1
+    pin15: roll trim motor wire 2
