@@ -20,8 +20,6 @@ Backlog:
     ☐ @medium Fabricate Aileron-to-flap alignment tool
     ☐ @low Add Ram mount to rear of roll bar for GoPro?
     ☐ @low @interior Installation instructions interior_installation.tasks
-    ☐ @low @interior Install seatbelts with AN4-6A bolts and a 3/16th wide 1/4" ID spacer (4 req)
-    ☐ @low @ifr_updates Create new wiring diagram elements for GPS 175, GMA 245 and Dynon Comm 2
 
 
 On Deck:
@@ -36,6 +34,12 @@ On Deck:
 Daily Updates are collected below this line
 Updates are moved to the archive section after
 they have been added to the build log
+
+Update 12/17/2023:
+    ✔ Installed final nutplates for flap motor side panels @done(23-12-17)
+    ✔ Installed seatbelts waist straps @done(23-12-17)
+    ✔ Create new wiring diagram elements for GPS 175, GMA 245 and Dynon Comm 2 @done(23-12-17)
+
 
 Update 12/14/2023:
     ✔ Installed both wingtips with clecos @done(23-12-15)
