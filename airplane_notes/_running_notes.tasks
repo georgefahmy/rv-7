@@ -10,14 +10,15 @@ Backlog:
     ☐ @critical Expires end of 2023 - Medical examiner - (https://designee.faa.gov/designeeLocator)
         ☐ Jean Francois Luong - 295 O'CONNOR DR	SAN JOSE	CA	95128	(408) 279-8171
         ☐ Tiffany Suzanne Davies - 360 DARDANELLI LANE #2E	LOS GATOS	CA	95032	(408) 378-1101
+    ☐ @critical Perform Transponder and Pitot Static check in accordance with FAR 91.217 91.413 and 91.411 - this needs to be performed not by me - page 340 of installation guide for SV
     ☐ @high Fix paint chip on panel
     ☐ @high @rudderAdjust Rudder Trim spring connections
     ☐ @high @rudder Adjust brake pedals.
     ☐ @high Fabricate a fuselage seal for the original fuel line side holes
         ☐ Two aluminum circles, one with a nutplate, with a small bolt/screw through the second circle so it can be tightened
     ☐ @medium Install double usb power supply
-    ☐ @medium Change avionics dimmer lighting  to be through an "always-on" pin on the vpx instead of aux bus
-    ☐ @medium Fabricate Aileron-to-flap alignment tool
+    ☐ @medium Change avionics dimmer lighting to same as PFD power
+    ☐ @low Fabricate Aileron-to-flap alignment tool
     ☐ @low Add Ram mount to rear of roll bar for GoPro?
     ☐ @low @interior Installation instructions interior_installation.tasks
 
@@ -28,7 +29,6 @@ On Deck:
     ☐ Check Roll autopilot pushrod length
     ☐ Fabricate delrin aileron stops
     ☐ Secure Pilot's stick wiring connector with Zipties
-    ☐ Extend Right Fuel tank level sensor wire and drill hole in side of fuselage
 
 ################################################
 Daily Updates are collected below this line
@@ -39,6 +39,7 @@ Update 12/17/2023:
     ✔ Installed final nutplates for flap motor side panels @done(23-12-17)
     ✔ Installed seatbelts waist straps @done(23-12-17)
     ✔ Create new wiring diagram elements for GPS 175, GMA 245 and Dynon Comm 2 @done(23-12-17)
+    ✔ Installed Fuel Level Sensor wires @done(23-12-17)
 
 
 Update 12/14/2023:
