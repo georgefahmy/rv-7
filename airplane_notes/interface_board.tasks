@@ -1,2 +1,16 @@
+Steps to update version:
+    1. update schematic with new items
+    2. update text on schematic for version bump
+    3. update PCB with new footprints
+    4. update text on PCB drawing for version bump
+    5. Export new DSN for routing
+    6. Open Freerouting for auto-routing
+    7. export spectra session back to kicad
+    8. import spectra session
+    9. verify pin mapping
+    10. export gerbers and drill files to gerbers folder with new version folder
+    11. compress new folder to .zip
+
 V1.0 is done
 v1.1 includes provisions for ident sw along with dimmer switch on separate connector
+v1.3 includes all male connectors on board for simplicity and cost reduction
