@@ -13,5 +13,6 @@ Steps to update version:
 
 V1.0 is done
 v1.1 includes provisions for ident sw along with dimmer switch on separate connector
+v1.2 NULL
 v1.3 includes all male connectors on board for simplicity and cost reduction
-v1.4 add Transponder Serial output pin (1ith 1.21k resistor) to board (use pin X) on serial port for transponder
+v1.4 add Transponder Serial output pin (with 1.21k resistor) to board (use pin 6) on serial port for transponder
