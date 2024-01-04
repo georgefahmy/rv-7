@@ -26,9 +26,7 @@ Backlog:
 On Deck:
     ☐ write update for wingtip installation
 
-    ☐ Remove Wingtips and install Nutplates
     ☐ Adjust pitch autopilot pushrod length to prevent over centering
-    ☐ Check Roll autopilot pushrod length
     ☐ Fabricate delrin aileron stops
     ☐ Secure Pilot's stick wiring connector with Zipties
     ☐ Secure wiring below seat pans
@@ -38,6 +36,10 @@ On Deck:
 Daily Updates are collected below this line
 Updates are moved to the archive section after
 they have been added to the build log
+
+Update 1/03/2023:
+    ✔ Riveted all nutplates to right wingtip @done(24-01-03)
+    ✔ Installed right wingtip and tested lighting @done(24-01-03)
 
 Update 01/02/2023:
     ✔ Drilled all the holes for the right wingtip @done(24-01-02)
