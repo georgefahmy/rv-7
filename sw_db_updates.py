@@ -1,3 +1,4 @@
+import itertools
 import json
 import os
 import shutil
@@ -54,7 +55,6 @@ def get_existing_versions(dynon_folder=None, garmin_folder=None):
         dynon_folder = "/Users/GFahmy/Desktop/RV-7_Plans/SkyView/sotware_updates/"
     if not garmin_folder:
         garmin_folder = "/Users/GFahmy/Desktop/RV-7_Plans/garmin/"
-
     return DotMap(
         dynon=DotMap(
             software=DotMap(
@@ -83,19 +83,27 @@ def compare_version(existing_versions, current_versions):
     for file in existing_versions.dynon.software.files:
         if file in current_versions.available_sw_versions:
             print(f"Existing {file} is latest version")
+            existing_versions.dynon.current = True
             existing_versions.dynon.software.current = True
             existing_versions.dynon.software.download = False
+
         else:
+            existing_versions.dynon.current = False
             existing_versions.dynon.software.current = False
             existing_versions.dynon.software.download = True
+
     for file in existing_versions.dynon.database.files:
         if file in current_versions.available_database_versions:
             print(f"Existing {file} Database is latest version")
+            existing_versions.dynon.current = True
             existing_versions.dynon.database.current = True
             existing_versions.dynon.database.download = False
+
         else:
+            existing_versions.dynon.current = False
             existing_versions.dynon.database.current = False
             existing_versions.dynon.database.download = True
+
     for file in existing_versions.garming_g5.files:
         if file in current_versions.available_g5_sw_version:
             print(f"Existing {file} is latest version")
@@ -215,6 +223,50 @@ def download_garmin(garmin_url, drive):
         print(f"File saved to {drive} {file}")
 
 
+def compare_file_dates(f1: DotMap, f2: DotMap):
+    if f1.ctime < f2.ctime:
+        return f1.name
+    else:
+        return f2.name
+
+
+def remove_old(dynon_folder):
+    db_files = [
+        dynon_folder + file
+        for file in os.listdir(dynon_folder)
+        if file.startswith("FAA")
+    ]
+    sw_hw4_files = [
+        dynon_folder + file
+        for file in os.listdir(dynon_folder)
+        if file.startswith("SkyView") and "hw4" in file
+    ]
+
+    sw_files = [
+        dynon_folder + file
+        for file in os.listdir(dynon_folder)
+        if file.startswith("SkyView") and "hw4" not in file
+    ]
+
+    for x, y in itertools.pairwise(db_files):
+        f1 = DotMap(name=x, ctime=os.stat(x).st_birthtime)
+        f2 = DotMap(name=y, ctime=os.stat(y).st_birthtime)
+        remove_file = compare_file_dates(f1, f2)
+        os.remove(remove_file)
+
+    for x, y in itertools.pairwise(sw_hw4_files):
+        f1 = DotMap(name=x, ctime=os.stat(x).st_birthtime)
+        f2 = DotMap(name=y, ctime=os.stat(y).st_birthtime)
+        remove_file = compare_file_dates(f1, f2)
+        os.remove(remove_file)
+
+    for x, y in itertools.pairwise(sw_files):
+        f1 = DotMap(name=x, ctime=os.stat(x).st_birthtime)
+        f2 = DotMap(name=y, ctime=os.stat(y).st_birthtime)
+        remove_file = compare_file_dates(f1, f2)
+        os.remove(remove_file)
+
+
 if __name__ == "__main__":
     sw_flag = sys.argv[-1]
 
@@ -305,7 +357,7 @@ if __name__ == "__main__":
                     for vol in garmin_volumes:
                         shutil.copyfile(tmp + file, f"{vol}/{file}")
                         print(f"Saved {file} to {vol}")
-
+    remove_old(dynon_folder)
     with open("sw_folder_config.json", "w+") as fp:
         json.dump(
             {
