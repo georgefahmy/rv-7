@@ -56,15 +56,21 @@ def get_existing_versions(dynon_folder=None, garmin_folder=None):
         garmin_folder = "/Users/GFahmy/Desktop/RV-7_Plans/garmin/"
 
     return DotMap(
-        dynon_sw=DotMap(
-            files=[
-                file for file in os.listdir(dynon_folder) if file.startswith("SkyView")
-            ],
-            current=False,
-        ),
-        dynon_db=DotMap(
-            files=[file for file in os.listdir(dynon_folder) if file.startswith("FAA")],
-            current=False,
+        dynon=DotMap(
+            software=DotMap(
+                files=[
+                    file
+                    for file in os.listdir(dynon_folder)
+                    if file.startswith("SkyView")
+                ],
+                current=False,
+            ),
+            database=DotMap(
+                files=[
+                    file for file in os.listdir(dynon_folder) if file.startswith("FAA")
+                ],
+                current=False,
+            ),
         ),
         garming_g5=DotMap(
             files=[file for file in os.listdir(garmin_folder) if file.startswith("G5")],
@@ -74,24 +80,31 @@ def get_existing_versions(dynon_folder=None, garmin_folder=None):
 
 
 def compare_version(existing_versions, current_versions):
-    for file in existing_versions.dynon_sw.files:
+    for file in existing_versions.dynon.software.files:
         if file in current_versions.available_sw_versions:
             print(f"Existing {file} is latest version")
-            existing_versions.dynon_sw.current = True
+            existing_versions.dynon.software.current = True
+            existing_versions.dynon.software.download = False
         else:
-            existing_versions.dynon_sw.current = False
-    for file in existing_versions.dynon_db.files:
+            existing_versions.dynon.software.current = False
+            existing_versions.dynon.software.download = True
+    for file in existing_versions.dynon.database.files:
         if file in current_versions.available_database_versions:
             print(f"Existing {file} Database is latest version")
-            existing_versions.dynon_db.current = True
+            existing_versions.dynon.database.current = True
+            existing_versions.dynon.database.download = False
         else:
-            existing_versions.dynon_db.current = False
+            existing_versions.dynon.database.current = False
+            existing_versions.dynon.database.download = True
     for file in existing_versions.garming_g5.files:
         if file in current_versions.available_g5_sw_version:
             print(f"Existing {file} is latest version")
             existing_versions.garming_g5.current = True
+            existing_versions.garming_g5.download = False
+
         else:
             existing_versions.garming_g5.current = False
+            existing_versions.garming_g5.download = True
     existing_versions.need_to_update = DotMap(
         files=[key for key, values in existing_versions.items() if not values.current],
         current=True,
@@ -263,21 +276,16 @@ if __name__ == "__main__":
     with tempfile.TemporaryDirectory() as tmp:
         tmp = tmp + "/"
         for sw_category in existing_versions.need_to_update.files:
-            if sw_category == "dynon_sw":
-                download_dynon(CHECK_URL, SW_URL, tmp, sw=sw_flag)
+            if "dynon" in sw_category:
+                download_dynon(
+                    CHECK_URL,
+                    SW_URL,
+                    tmp,
+                    db=existing_versions.dynon.database.download,
+                    sw=existing_versions.dynon.software.download,
+                )
                 # If we're updating software we're checking for new documentation and saving to HD
                 download_skyview_docs(DOCUMENTATION_URL, dynon_documentation_folder)
-                for file in os.listdir(tmp):
-                    shutil.copyfile(
-                        tmp + file,
-                        dynon_folder + file,
-                    )
-                    for vol in dynon_volumes:
-                        shutil.copyfile(tmp + file, f"{vol}/{file}")
-                        print(f"Saved {file} to {vol}")
-
-            if sw_category == "dynon_db":
-                download_dynon(CHECK_URL, SW_URL, tmp, db=True)
                 for file in os.listdir(tmp):
                     shutil.copyfile(
                         tmp + file,
