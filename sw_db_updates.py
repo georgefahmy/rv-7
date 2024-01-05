@@ -286,11 +286,17 @@ if __name__ == "__main__":
 
     uid = str(uuid.uuid3(uuid.NAMESPACE_DNS, urn))
     print(uid)
-    try:
-        config = json.load(open("sw_folder_config.json", "r")).get(uid)
 
-    except:
-        config = {}
+    config_file = json.load(open("sw_folder_config.json", "r"))
+    config = (
+        config_file.get(uid)
+        if uid in config_file.keys()
+        else {
+            "dynon_path": None,
+            "garmin_path": None,
+            "dynon_documentation_folder": None,
+        }
+    )
 
     dynon_folder = (
         config.get("dynon_path")
@@ -358,15 +364,10 @@ if __name__ == "__main__":
                         shutil.copyfile(tmp + file, f"{vol}/{file}")
                         print(f"Saved {file} to {vol}")
     remove_old(dynon_folder)
+    config_file[uid] = {
+        "dynon_path": dynon_folder,
+        "garmin_path": garmin_folder,
+        "dynon_documentation_folder": dynon_documentation_folder,
+    }
     with open("sw_folder_config.json", "w+") as fp:
-        json.dump(
-            {
-                uid: {
-                    "dynon_path": dynon_folder,
-                    "garmin_path": garmin_folder,
-                    "dynon_documentation_folder": dynon_documentation_folder,
-                }
-            },
-            fp,
-            indent=4,
-        )
+        json.dump(config_file, fp, indent=4)
