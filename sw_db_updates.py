@@ -341,9 +341,8 @@ if __name__ == "__main__":
     # Copy the newly downloaded software to their respective aircraft drives and SD cards
     for folder in os.listdir(main_folder):
         if folder == "sv_software":
-            shutil.copytree(main_folder + folder, "TEST", dirs_exist_ok=True)
             for vol in dynon_volumes:
-                shutil.copytree(folder, f"{vol}", dirs_exist_ok=True)
+                shutil.copytree(main_folder + folder, f"{vol}", dirs_exist_ok=True)
 
         if folder == "garmin_software":
             for vol in garmin_volumes:
