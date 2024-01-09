@@ -2,7 +2,6 @@ import itertools
 import json
 import os
 import shutil
-import sys
 import tempfile
 import uuid
 import zipfile
@@ -72,7 +71,7 @@ def get_existing_versions(dynon_folder=None, garmin_folder=None):
                 current=False,
             ),
         ),
-        garming_g5=DotMap(
+        garmin_g5=DotMap(
             files=[file for file in os.listdir(garmin_folder) if file.startswith("G5")],
             current=False,
         ),
@@ -80,8 +79,8 @@ def get_existing_versions(dynon_folder=None, garmin_folder=None):
 
 
 def compare_version(existing_versions, current_versions):
-    for file in existing_versions.dynon.software.files:
-        if file in current_versions.available_sw_versions:
+    for file in current_versions.available_sw_versions:
+        if file in existing_versions.dynon.software.files:
             print(f"Existing {file} is latest version")
             existing_versions.dynon.current = True
             existing_versions.dynon.software.current = True
@@ -92,8 +91,8 @@ def compare_version(existing_versions, current_versions):
             existing_versions.dynon.software.current = False
             existing_versions.dynon.software.download = True
 
-    for file in existing_versions.dynon.database.files:
-        if file in current_versions.available_database_versions:
+    for file in current_versions.available_database_versions:
+        if file in existing_versions.dynon.database.files:
             print(f"Existing {file} Database is latest version")
             existing_versions.dynon.current = True
             existing_versions.dynon.database.current = True
@@ -104,15 +103,15 @@ def compare_version(existing_versions, current_versions):
             existing_versions.dynon.database.current = False
             existing_versions.dynon.database.download = True
 
-    for file in existing_versions.garming_g5.files:
+    for file in existing_versions.garmin_g5.files:
         if file in current_versions.available_g5_sw_version:
             print(f"Existing {file} is latest version")
-            existing_versions.garming_g5.current = True
-            existing_versions.garming_g5.download = False
+            existing_versions.garmin_g5.current = True
+            existing_versions.garmin_g5.download = False
 
         else:
-            existing_versions.garming_g5.current = False
-            existing_versions.garming_g5.download = True
+            existing_versions.garmin_g5.current = False
+            existing_versions.garmin_g5.download = True
     existing_versions.need_to_update = DotMap(
         files=[key for key, values in existing_versions.items() if not values.current],
         current=True,
@@ -184,10 +183,7 @@ def download_skyview_docs(documentation_url, drive=None):
         and "SkyView_SE" not in link.get("href")
         and "D10_D100" not in link.get("href")
     ]
-    if not drive:
-        drive = "/Users/GFahmy/Desktop/RV-7_Plans/SkyView/PDFs/"
-    if not os.path.isdir(drive):
-        drive = "/Users/gfahmy/Documents/projects/dynon/testing/documentation/"
+
     existing_files = [file for file in os.listdir(drive)]
     for link in documentation_links:
         file = link.split("/")[-1]
@@ -218,9 +214,13 @@ def download_garmin(garmin_url, drive):
     with open(drive + file, "wb+") as out_file:
         content = requests.get(garmin_software, stream=True).content
         out_file.write(content)
-        with zipfile.ZipFile(drive + file, "r") as zip_ref:
-            zip_ref.extractall(drive)
-        print(f"File saved to {drive} {file}")
+
+        print(f"ZIP file saved to {drive} {file}")
+
+    with zipfile.ZipFile(drive + file, "r") as zip_ref:
+        zip_ref.extractall(drive)
+
+    return drive
 
 
 def compare_file_dates(f1: DotMap, f2: DotMap):
@@ -268,9 +268,6 @@ def remove_old(dynon_folder):
 
 
 if __name__ == "__main__":
-    sw_flag = sys.argv[-1]
-
-    sw_flag = False if sw_flag not in ["True", "true"] else True
     dynon_volumes = [
         "/Volumes/" + drive + "/"
         for drive in os.listdir("/Volumes/")
@@ -292,36 +289,27 @@ if __name__ == "__main__":
         config_file.get(uid)
         if uid in config_file.keys()
         else {
-            "dynon_path": None,
-            "garmin_path": None,
-            "dynon_documentation_folder": None,
+            "main_path": None,
         }
     )
 
-    dynon_folder = (
-        config.get("dynon_path")
-        if config.get("dynon_path") is not None
-        else input("Path to Dynon SW: ")
+    main_folder = (
+        config.get("main_path")
+        if config.get("main_path") is not None
+        else input("Path to SW Folder: ")
     )
-    garmin_folder = (
-        config.get("garmin_path")
-        if config.get("garmin_path") is not None
-        else input("Path to Garmin SW: ")
-    )
-    dynon_documentation_folder = (
-        config.get("dynon_documentation_folder")
-        if config.get("dynon_documentation_folder") is not None
-        else input("Path to Documentation Folder: ")
-    )
+    if not main_folder.endswith("/"):
+        main_folder = main_folder + "/"
 
-    if not dynon_folder.endswith("/"):
-        dynon_folder = dynon_folder + "/"
+    dynon_folder = main_folder + "sv_software/"
+    garmin_folder = main_folder + "garmin_software/"
+    dynon_documentation_folder = main_folder + "documentation/"
 
-    if not garmin_folder.endswith("/"):
-        garmin_folder = garmin_folder + "/"
-
-    if not dynon_documentation_folder.endswith("/"):
-        dynon_documentation_folder = dynon_documentation_folder + "/"
+    [
+        os.mkdir(folder)
+        for folder in [dynon_folder, garmin_folder, dynon_documentation_folder]
+        if not os.path.isdir(folder)
+    ]
 
     current_versions = get_available_versions()
     existing_versions = get_existing_versions(
@@ -343,31 +331,29 @@ if __name__ == "__main__":
                     sw=existing_versions.dynon.software.download,
                 )
                 # If we're updating software we're checking for new documentation and saving to HD
+                shutil.copytree(tmp, dynon_folder, dirs_exist_ok=True)
                 download_skyview_docs(DOCUMENTATION_URL, dynon_documentation_folder)
-                for file in os.listdir(tmp):
-                    shutil.copyfile(
-                        tmp + file,
-                        dynon_folder + file,
-                    )
-                    for vol in dynon_volumes:
-                        shutil.copyfile(tmp + file, f"{vol}/{file}")
-                        print(f"Saved {file} to {vol}")
 
             if sw_category == "garmin_g5":
-                download_garmin(GARMIN_G5_URL, tmp)
-                for file in os.listdir(tmp):
-                    shutil.copyfile(
-                        tmp + file,
-                        garmin_folder + file,
-                    )
-                    for vol in garmin_volumes:
-                        shutil.copyfile(tmp + file, f"{vol}/{file}")
-                        print(f"Saved {file} to {vol}")
+                tmp = download_garmin(GARMIN_G5_URL, tmp)
+                shutil.copytree(tmp, garmin_folder, dirs_exist_ok=True)
+
+    # Copy the newly downloaded software to their respective aircraft drives and SD cards
+    for folder in os.listdir(main_folder):
+        if folder == "sv_software":
+            shutil.copytree(main_folder + folder, "TEST", dirs_exist_ok=True)
+            for vol in dynon_volumes:
+                shutil.copytree(folder, f"{vol}", dirs_exist_ok=True)
+
+        if folder == "garmin_software":
+            for vol in garmin_volumes:
+                shutil.copytree(
+                    main_folder + "garmin_software/" + "Garmin/", f"{vol}/Garmin/"
+                )
+
     remove_old(dynon_folder)
     config_file[uid] = {
-        "dynon_path": dynon_folder,
-        "garmin_path": garmin_folder,
-        "dynon_documentation_folder": dynon_documentation_folder,
+        "main_path": main_folder,
     }
     with open("sw_folder_config.json", "w+") as fp:
         json.dump(config_file, fp, indent=4)
