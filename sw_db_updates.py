@@ -22,6 +22,15 @@ GARMIN_GPS_175_URL = (
 
 
 def get_available_versions():
+    database_content = requests.get(CHECK_URL).content
+    dates = (
+        bs(database_content, "html.parser")
+        .find("div", {"class": "download-block"})
+        .find_all("td")[1]
+        .find_all("span")
+    )
+    print(f"Aviation Database {dates[0].text}")
+    print(f"Obstacle Database {dates[1].text}")
     return DotMap(
         available_sw_versions=[
             link["href"].split("/")[-1]
@@ -34,9 +43,7 @@ def get_available_versions():
         ],
         available_database_versions=[
             link["href"].split("/")[-1]
-            for link in bs(
-                requests.get(CHECK_URL).content, "html.parser", parse_only=ss("a")
-            )
+            for link in bs(database_content, "html.parser", parse_only=ss("a"))
             if ".duc" in link.get("href")
         ],
         available_g5_sw_version=[
