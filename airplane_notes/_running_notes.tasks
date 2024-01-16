@@ -1,11 +1,7 @@
 # Archive items after updating blog
 
 Backlog:
-    ☐ @critical Adjust fuse block position lower to account for top skin access panels in forward fuselage
     ☐ @critical @rudder Final Install of Rudder Pedal mounting brackets
-    ☐ @critical Attach Fuel Tank Bracket with Safety wired AN4H-6A Bolts
-    ☐ @critical Fabricate and attach aileron stops according to up/down deflections (deg)
-         ☐ max: 32/17 min: 25/15 NOTE: Bushing method
     ☐ @critical Check all control system bolts
     ☐ @critical Expires end of 2023 - Medical examiner - (https://designee.faa.gov/designeeLocator)
         ☐ Jean Francois Luong - 295 O'CONNOR DR	SAN JOSE	CA	95128	(408) 279-8171
@@ -23,20 +19,29 @@ Backlog:
 
 On Deck:
     ☐ Adjust pitch autopilot pushrod length to prevent over centering
-    ☐ Fabricate delrin aileron stops
+    ☐ Secure wiring below seat pans
+    ☐ Secure jam nuts on aileron belcranks in wing
+    ☐ secure Jam nunts on aileron pushron to control stick
+    ☐ torque all control system bolts under floor pans
+    ☐ Torque Flap control arm bolts
+    ☐ Check Elevator pushrod bolts for torque
 
 
 ################################################
 Daily Updates are collected below this line
 Updates are moved to the archive section after
 they have been added to the build log
-Update 1/13/2024:
-    ☐ Attach Fuel Tank Bracket with Safety wired AN4H-6A Bolts
-    ☐ Fabricate a fuselage seal for the original fuel line side holes
-        ☐ Two aluminum circles, one with a nutplate, with a small bolt/screw through the second circle so it can be tightened
-    ☐ Secure bolts under seat pans
-    ☐ Secure wiring below seat pans
-    ☐ Secure Pilot's stick wiring connector with Zipties
+Update 1/15/2024:
+    ✔ Attach Fuel Tank Bracket with Safety wired AN4H-6A Bolts @done(24-01-15)
+    ✔ Fabricate a fuselage seal for the original fuel line side holes @done(24-01-15)
+        ✔ Two aluminum circles, one with a nutplate, with a small bolt/screw through the second circle so it can be tightened @done(24-01-15)
+    ✔ Adjusted Exhaust Temp probe mounting locations in exhaust pipes @done(24-01-15)
+    ✔ Installed screws holding bottom wing skins to fuselage, and fuselage to wing fairing (will remove) @done(24-01-15)
+    ✔ Adjusted fuse block position lower to account for top skin access panels in forward fuselage @done(24-01-15)
+    ✔ Fabricate and attach aileron stops according to up/down deflections (deg) @done(24-01-15)
+         ✔ max: 32/17 min: 25/15 NOTE: Used the Delrin Bushing method @done(24-01-15)
+         ✔ Actual: 27 up 16 down @done(24-01-15)
+    ✔ Secure Pilot's stick wiring connector with Zipties @done(24-01-15)
 
 #########################################
 Below items have been updated in the blog
