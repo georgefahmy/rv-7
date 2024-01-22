@@ -1,31 +1,37 @@
 # Archive items after updating blog
 
 Backlog:
-    ☐ @critical @rudder Final Install of Rudder Pedal mounting brackets
     ☐ @critical Check all control system bolts
-    ☐ @critical Expires end of 2023 - Medical examiner - (https://designee.faa.gov/designeeLocator)
-        ☐ Jean Francois Luong - 295 O'CONNOR DR	SAN JOSE	CA	95128	(408) 279-8171
-        ☐ Tiffany Suzanne Davies - 360 DARDANELLI LANE #2E	LOS GATOS	CA	95032	(408) 378-1101
+    ☐ @critical Expired - Pilot Medical - Find Medical examiners - (https://designee.faa.gov/designeeLocator)
+        ☐ OPTION 2: Jean Francois Luong - 295 O'CONNOR DR	SAN JOSE	CA	95128	(408) 279-8171
+        ☐ OPTION 1: Tiffany Suzanne Davies - 360 DARDANELLI LANE #2E	LOS GATOS	CA	95032	(408) 378-1101
     ☐ @critical Perform Transponder and Pitot Static check in accordance with FAR 91.217 91.413 and 91.411 - this needs to be performed not by me - page 340 of installation guide for SV
-    ☐ @high @rudder Adjust Rudder Trim spring connections
-    ☐ @high @rudder Adjust brake pedals.
-    ☐ @medium Fix paint chip on panel
-    ☐ @medium Install double usb power supply
-    ☐ @medium Change avionics dimmer lighting to same as PFD power
-    ☐ @low Fabricate Aileron-to-flap alignment tool
-    ☐ @low Add Ram mount to rear of roll bar for GoPro?
-    ☐ @low @interior Installation instructions interior_installation.tasks @started(23-12-08)
+    ☐ @rudder Final Install of Rudder Pedal mounting brackets
+    ☐ @rudder Adjust Rudder Trim spring connections
+    ☐ @rudder Adjust brake pedals.
+    ☐ @avionics Install double usb power supply
+    ☐ @avionics Change avionics dimmer lighting to same as PFD power
+    ☐ @interior Add Ram mount to rear of roll bar for GoPro?
+    ☐ @interior Installation instructions interior_installation.tasks @started(23-12-08)
+    ☐ @interior Fix paint chip on panel
 
 
 On Deck:
-    ☐ Adjust pitch autopilot pushrod length to prevent over centering
-        shorten each of the two pushrods to pivot the bellcrank
-        ☐ Check Elevator pushrod bolts for torque after adjusting
-    ☐ Secure wiring below seat pans
-    ☐ Secure jam nuts on aileron belcranks in wing
-    ☐ secure Jam nunts on aileron pushron to control stick
-    ☐ torque all control system bolts under floor pans
-    ☐ Torque Flap control arm bolts
+    ☐ Take pictures of aileron angles up and down
+    ☐ Take picture of Aileron bushing stops
+    Pitch System:
+        ☐ Adjust pitch autopilot pushrod length to prevent over centering
+        shorten each of the two pushrods to pivot the bellcrank backwards a bit
+            ☐ Check Elevator pushrod jam nuts for torque after adjusting
+    Roll/Wing Systems:
+        ☐ Secure jam nuts on aileron belcranks in wing
+        ☐ secure Jam nunts on aileron pushron to control stick
+        ☐ Torque all control system bolts under floor pans
+        ☐ Torque Flap control arm bolts
+        ☐ Secure flap motor and position sensor wiring to flap motor housing cover
+    Wiring:
+        ☐ Secure remaining wiring below seat pans
+
 
 
 ################################################
