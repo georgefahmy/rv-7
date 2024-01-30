@@ -169,7 +169,7 @@ def download_dynon(database_url, software_update_url, drive, sw=False, db=False)
         file = link.split("/")[-1]
         filename = drive + file
         download_url = "https://dynonavionics.com" + link
-        print(f"\nDownloading {file} to {drive} ...")
+        print(f"\nDownloading {file}...")
         with open(filename, "wb+") as out_file:
             content = requests.get(download_url, stream=True).content
             out_file.write(content)
@@ -200,7 +200,7 @@ def download_skyview_docs(documentation_url, drive=None):
             existing_files.remove(file)
             print(f"{file} already exists...skipping")
         else:
-            print(f"\nDownloading {file} to {drive} ...")
+            print(f"\nDownloading {file}...")
             with open(filename, "wb+") as out_file:
                 content = requests.get(download_url, stream=True).content
                 out_file.write(content)
@@ -217,7 +217,7 @@ def download_garmin(garmin_url, drive):
         if link.has_attr("href") and ".zip" in link["href"]
     ][0]
     file = garmin_software.split("/")[-1]
-    print(f"\nDownloading {file} to {drive} ...")
+    print(f"\nDownloading {file}...")
     with open(drive + file, "wb+") as out_file:
         content = requests.get(garmin_software, stream=True).content
         out_file.write(content)
