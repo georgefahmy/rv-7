@@ -126,20 +126,6 @@ def compare_version(existing_versions, current_versions):
     return existing_versions
 
 
-def archive_old_sw_databases(drive):
-    existing_files = [
-        file
-        for file in os.listdir(drive)
-        if file.startswith("FAA") or file.startswith("SkyView")
-    ]
-    if not existing_files:
-        print("No databases to archive")
-    for file in existing_files:
-        print(f"Archived {file}")
-        os.remove(drive + file)
-    return
-
-
 def download_dynon(database_url, software_update_url, drive, sw=False, db=False):
     print("\nDownloading Dynon Software and Databases")
     if sw:
