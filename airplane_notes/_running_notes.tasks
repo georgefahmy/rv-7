@@ -10,7 +10,7 @@ Backlog:
     ☐ @rudder Adjust Rudder Trim spring connections
     ☐ @rudder Adjust brake pedals.
     ☐ @avionics Install double usb power supply
-    ☐ @avionics Change avionics dimmer lighting to same as PFD power
+    ☐ @avionics Change avionics dimmer lighting to same as PFD power (solved with interface board)
     ☐ @interior Add Ram mount to rear of roll bar for GoPro?
     ☐ @interior Installation instructions interior_installation.tasks @started(23-12-08)
     ☐ @interior Fix paint chip on panel
@@ -23,14 +23,15 @@ On Deck:
             ☐ Check Elevator pushrod jam nuts for torque after adjusting
     Roll/Wing Systems:
         ☐ Secure jam nuts on aileron belcranks in wing
-        ☐ secure Jam nunts on aileron pushron to control stick
-        ☐ Torque all control system bolts under floor pans
+        ☐ Secure Jam nunts on aileron pushrod to control stick connections
+        ☐ Torque all control system bolts under floor pans (and add cotter pins)
         ☐ Torque Flap control arm bolts
-        ☐ Secure flap motor and position sensor wiring to flap motor housing cover
+        ☐ Secure flap motor and position sensor wiring to flap motor housing cover (not side walls)
     Wiring:
         ☐ Secure remaining wiring below seat pans
+        ☐ Update Co-Pilot wiring to go through the control column
         ✔ Secure all wiring behind panel @done(24-01-30)
-    ☐ Add four remaining bolts to wing spars
+    ☐ Add four remaining AN4 bolts to wing spars
 
 
 
