@@ -20,7 +20,21 @@ v1.4 add optional Transponder Serial output pin (with 1.21k resistor) to board (
 ☐ Remove Canopy for easier access?
 Build wiring harnesses necessary:
     ☐ Remake Serial harnesses with power to components into DB9s.
+    Component Tx connect to HDX Rx
+        ☐ ADSB
+        ☐ XPNDR
+        ☐ VPX (no power)
+        ☐ ELT
+        ☐ GPS
     ☐ Build 37p harnesses for HDX screens
         ☐ d37 (board side) into d37 and d9 (back of screen) x2
+        May purchase new D37 harness? might not be worth it if I can just match the pins
     ☐ Power harness (power from VPX and Grounds)
     ☐ Dimmer/Ident harness
+        ☐ Connect the two components to a single D9
+    ☐ New Intercom harness for better wiring?
+        ☐ Headphones Lemo (pilot and copilot)
+        ☐ Radio (make harness for second radio)
+        ☐ Bluetooth Music
+        ☐ Dynon Audio
+        ☐ Power/Gnd (with Radio power)
