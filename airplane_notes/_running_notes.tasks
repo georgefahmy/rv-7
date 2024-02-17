@@ -18,10 +18,10 @@ Backlog:
 
 On Deck:
     Pitch System:
-        ☐ Adjust pitch autopilot pushrod length to prevent over centering
+        ✔ Adjust pitch autopilot pushrod length to prevent over centering @done(24-02-16)
             Clamp the elevators and shorten each of the two pushrods to pivot the bellcrank backwards a bit
-            ☐ Check Elevator pushrod jam nuts for torque after adjusting
-            ☐ Torque elevator horn to pushrod bolts/nuts
+            ✔ Check Elevator pushrod jam nuts for torque after adjusting @done(24-02-16)
+            ✔ Torque elevator horn to pushrod bolts/nuts @done(24-02-16)
             ☐ Install access panel covers
     Roll/Wing Systems:
         ☐ Secure jam nuts on aileron belcranks in wing
