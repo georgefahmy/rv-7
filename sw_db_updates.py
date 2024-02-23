@@ -94,30 +94,33 @@ def get_existing_versions(dynon_folder=None, garmin_folder=None):
 
 
 def compare_version(existing_versions, current_versions):
+    for file in current_versions.available_database_versions:
+        if file in existing_versions.dynon.database.files:
+            print(f"Existing {file} Database is latest version")
+            existing_versions.dynon.database.current = True
+            existing_versions.dynon.database.download = False
+        else:
+            existing_versions.dynon.database.current = False
+            existing_versions.dynon.database.download = True
+
     for file in current_versions.available_sw_versions:
         if file in existing_versions.dynon.software.files:
             print(f"Existing {file} is latest version")
-            existing_versions.dynon.current = True
             existing_versions.dynon.software.current = True
             existing_versions.dynon.software.download = False
 
         else:
-            existing_versions.dynon.current = False
             existing_versions.dynon.software.current = False
             existing_versions.dynon.software.download = True
-
-    for file in current_versions.available_database_versions:
-        if file in existing_versions.dynon.database.files:
-            print(f"Existing {file} Database is latest version")
-            existing_versions.dynon.current = True
-            existing_versions.dynon.database.current = True
-            existing_versions.dynon.database.download = False
-
-        else:
-            existing_versions.dynon.current = False
-            existing_versions.dynon.database.current = False
-            existing_versions.dynon.database.download = True
-
+    if any(
+        [
+            existing_versions.dynon.database.current,
+            existing_versions.dynon.software.current,
+        ]
+    ):
+        existing_versions.dynon.current = True
+    else:
+        existing_versions.dynon.current = False
     for file in existing_versions.garmin_g5.files:
         if file in current_versions.available_g5_sw_version:
             print(f"Existing {file} is latest version")
@@ -127,6 +130,7 @@ def compare_version(existing_versions, current_versions):
         else:
             existing_versions.garmin_g5.current = False
             existing_versions.garmin_g5.download = True
+
     existing_versions.need_to_update = DotMap(
         files=[key for key, values in existing_versions.items() if not values.current],
         current=True,
