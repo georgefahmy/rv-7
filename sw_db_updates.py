@@ -112,11 +112,10 @@ def compare_version(existing_versions, current_versions):
         else:
             existing_versions.dynon.software.current = False
             existing_versions.dynon.software.download = True
-    if any(
-        [
-            existing_versions.dynon.database.current,
-            existing_versions.dynon.software.current,
-        ]
+
+    if (
+        existing_versions.dynon.database.current
+        and existing_versions.dynon.software.current
     ):
         existing_versions.dynon.current = True
     else:
