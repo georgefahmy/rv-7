@@ -3,7 +3,6 @@ import json
 import os
 import shutil
 import tempfile
-import uuid
 import zipfile
 
 # import PySimpleGUI as pg
@@ -283,15 +282,10 @@ if __name__ == "__main__":
         if "GARMIN_G5" in drive
     ]
 
-    urn = f"urn:node:{hex(uuid.getnode())}"
-
-    uid = str(uuid.uuid3(uuid.NAMESPACE_DNS, urn))
-    print(uid)
-
     config_file = json.load(open("sw_folder_config.json", "r"))
     config = (
-        config_file.get(uid)
-        if uid in config_file.keys()
+        config_file.get("default")
+        if "default" in config_file.keys()
         else {
             "main_path": None,
         }
@@ -355,7 +349,7 @@ if __name__ == "__main__":
                 )
 
     remove_old(dynon_folder)
-    config_file[uid] = {
+    config_file["default"] = {
         "main_path": main_folder,
     }
     with open("sw_folder_config.json", "w+") as fp:
