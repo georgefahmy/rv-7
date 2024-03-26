@@ -1,22 +1,64 @@
-all tasks remaining:
-    ☐ elevator bolts
-    ☐ rudder bolts
+☐ elevator bolts
+☐ rudder bolts
+☐ finish canopy fairing - (canopy.tasks)
+☐ install tail fairing
+☐ underside of horizontal stab fairing
+☐ rudder stops
+☐ rear lower fuselage access panels
+☐ vertical stab camera
+☐ baggage area rear panel interior cover
+☐ flap pushrod bolts and final clearance on fuselage holes
+☐ rudder pedal bolts
+☐ rudder pedal brake adjustments
+☐ add hydraulic fluid to brakes
+☐ bleed brakes
+☐ proper brake line attachment to landing gear
+☐ rewire panel dimmer to PFD
+☐ vacuum all interior of the aircraft
+☐ install forward top skin with rivets
+☐ add fourth access panel to forward top skin (before or after install)
+☐ install top cowl with skybolts (follow skybolt procedure)
+☐ cut bottom cowl for landing gear
+☐ install bottom cowl with skybolts
+☐ cut oil door on top cowl
+☐ install hinge for oil door
+☐ install oil door
+☐ install skybolts on bottom cowl
+☐ shape and fit top and bottom cowl together
+☐ install snorkel on engine
+☐ modify forward baffle ramp for airfilter and snorkel
+☐ install engine baffles and trim for upper cowl fitment
+☐ cover engine with plastic and use expanding foam for plenum shape
+☐ add more plastic to top foam for fiberglass and core layup
+☐ make planum on plastic using thin core and fiberglass/epoxy
+☐ add moutning provisions to baffle for plenum top
+☐ create a gasket for plenum top so no air leaks (research this)
+☐ install oil cooler on rear baffle
+☐ install oil cooler hoses to oil cooler
+☐ torque all FWF hoses
+☐ install top spark plugs and ignition harnesses
+☐ add adel clamps everywhere for wiring support
+☐ check for any rubbing/chafing between air hoses and fuel hoses and wiring and engine mount
+☐ install blast tubes from aft baffle for PMAG ignitions cooling
+☐ install blast tube from forward baffle for alternator cooling
+☐ torque and install safety wiring to prop bolts
+☐ add all screws for spinner
+☐ add break-in mineral oil engine oil to engine (6-8 qts) - GOT IT
+☐ install entire interior of aircraft
+☐ check propeller governer stops (with engine run)
+☐ check prop pitch stops (https://www.youtube.com/watch?v=yq7cuDJJCXQ&t=179s&ab_channel=BaseLegAviation, https://inspire.eaa.org/2023/05/25/propeller-adjustments/)
+☐ do a complete dry run of DAR checklist
+
+
+Archive:
     ✔ fuselage skin rivets (may need to remove emp) @done(24-02-23)
     ✔ elevator fiberglass tips @done(24-03-11)
     ✔ vertical stab fiberglass tip @done(24-03-11)
     ✔ rudder bottom fiberglass fill and glass @done(24-03-11)
     ✔ horizontal stab fiber glass tips @done(24-03-11)
-    ☐ finish canopy fairing - (canopy.tasks)
-    ☐ install tail fairing
-    ☐ underside of horizontal stab fairing
-    ☐ rudder stops
-    ☐ rear lower fuselage access panels
-    ☐ vertical stab camera
     ✔ elevator pushrod extension and bellcrank realignment for autopilot pushrod @done(24-03-02)
     ✔ interior wiring clean up under floor panels @done(24-03-11)
     ✔ baggage area carpet and side pockets @done(24-03-24)
-    ☐ baggage area rear panel interior cover
-    ☐ flap pushrod bolts and final clearance on fuselage holes
     ✔ elevator pushrod jam nuts @done(24-03-02)
     ✔ flap motor wiring restraing @done(24-03-24)
     ✔ under floor wiring @done(24-03-11)
@@ -24,52 +66,12 @@ all tasks remaining:
     ✔ forward of spar wiring clean up and retention @done(24-03-24)
     ✔ forward spar covers @done(24-03-24)
     ✔ fuel line passthrough rubber - GOT IT @done(24-03-24)
-    ☐ rudder pedal bolts
-    ☐ rudder pedal brake adjustments
-    ☐ add hydraulic fluid to brakes
-    ☐ bleed brakes
-    ☐ proper brake line attachment to landing gear
     ✔ second panel/subpanel support bracket for passenger side @done(24-03-24)
     ✔ behind panel wiring clean up @done(24-01-28)
-    ☐ rewire panel dimmer to PFD
     ✔ lash and support all wiring behind panel @done(24-01-28)
     ✔ drill hole in canopy brace for panel lighting wires @done(24-03-24)
     ✔ add rubber to subpanel passthroughs for all wiring @done(24-01-28)
-    ☐ vacuum all interior of the aircraft
-    ☐ install forward top skin with rivets
-    ☐ add fourth access panel to forward top skin (before or after install)
-    ☐ install top cowl with skybolts (follow skybolt procedure)
-    ☐ cut bottom cowl for landing gear
-    ☐ install bottom cowl with skybolts
-    ☐ cut oil door on top cowl
-    ☐ install hinge for oil door
-    ☐ install oil door
-    ☐ install skybolts on bottom cowl
-    ☐ shape and fit top and bottom cowl together
-    ☐ install snorkel on engine
-    ☐ modify forward baffle ramp for airfilter and snorkel
-    ☐ install engine baffles and trim for upper cowl fitment
-    ☐ cover engine with plastic and use expanding foam for plenum shape
-    ☐ add more plastic to top foam for fiberglass and core layup
-    ☐ make planum on plastic using thin core and fiberglass/epoxy
-    ☐ add moutning provisions to baffle for plenum top
-    ☐ create a gasket for plenum top so no air leaks (research this)
-    ☐ install oil cooler on rear baffle
-    ☐ install oil cooler hoses to oil cooler
-    ☐ torque all FWF hoses
-    ☐ install top spark plugs and ignition harnesses
-    ☐ add adel clamps everywhere for wiring support
-    ☐ check for any rubbing/chafing between air hoses and fuel hoses and wiring and engine mount
-    ☐ install blast tubes from aft baffle for PMAG ignitions cooling
-    ☐ install blast tube from forward baffle for alternator cooling
-    ☐ torque and install safety wiring to prop bolts
-    ☐ add all screws for spinner
-    ☐ add break-in mineral oil engine oil to engine (6-8 qts) - GOT IT
-    ☐ install entire interior of aircraft
     ✔ mark a 3/16th distance along wing fuselage fairing for rubber seal @done(24-03-24)
     ✔ cut wing fuselage fairing for 3/16th gap @done(24-03-24)
     ✔ add rubber seal to wing/fuselage fairing @done(24-03-24)
     ✔ reinstall wing fairing @done(24-03-24)
-    ☐ check propeller governer stops (with engine run)
-    ☐ check prop pitch stops (https://www.youtube.com/watch?v=yq7cuDJJCXQ&t=179s&ab_channel=BaseLegAviation, https://inspire.eaa.org/2023/05/25/propeller-adjustments/)
-    ☐ do a complete dry run of DAR checklist
