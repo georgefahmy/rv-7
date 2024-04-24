@@ -2,14 +2,8 @@
 
 Backlog:
     ☐ @critical Check all control system bolts
-    ☐ @critical Expired - Pilot Medical - Find Medical examiners - (https://designee.faa.gov/designeeLocator)
-        ☐ OPTION 1: Tiffany Suzanne Davies - 360 DARDANELLI LANE #2E	LOS GATOS	CA	95032	(408) 378-1101
-        ☐ OPTION 2: Jean Francois Luong - 295 O'CONNOR DR	SAN JOSE	CA	95128	(408) 279-8171
-
     ☐ @critical Perform Transponder and Pitot Static check in accordance with FAR 91.217 91.413 and 91.411 - this needs to be performed not by me - page 340 of installation guide for SV
-    ☐ @rudder Final Install of Rudder Pedal mounting brackets
-    ☐ @rudder Adjust Rudder Trim spring connections
-    ☐ @rudder Adjust brake pedals.
+
     ☐ @avionics Install double usb power supply
     ☐ @avionics Change avionics dimmer lighting to same as PFD power (solved with interface board)
     ☐ @interior Add Ram mount to rear of roll bar for GoPro?
@@ -17,21 +11,36 @@ Backlog:
     ☐ @interior Fix paint chip on panel
     ☐ @cowl 18 skybolts across top cowl (centerline split - not aligned to a single skybolt)
     ☐ @cowl 10 skybolts on each side of bottom cowl to top joint
-
-
-On Deck:
     Pitch System:
         ☐ Install rear access panel covers
         ☐ Bolt Elevators to HS
+
+
+On Deck:
     Roll/Wing Systems:
         ☐ Install cover panels
         ☐ Torque Flap control arm bolts
+    Rudder:
+        ☐ Final Install of Rudder Pedal mounting brackets
+        ☐ Adjust Rudder Trim spring connections
+        ☐ Adjust brake pedals.
+    ☐ FAA Medical ExamExpired
+        Find Medical examiners - (https://designee.faa.gov/designeeLocator)
+        ✔ OPTION 1: Tiffany Suzanne Davies - 360 DARDANELLI LANE #2E	LOS GATOS	CA	95032	(408) 378-1101 @done(24-04-24)
 
 
 ################################################
 Daily Updates are collected below this line
 Updates are moved to the archive section after
 they have been added to the build log
+4/21/2024:
+    ✔ More sanding of tail @done(24-04-24)
+    ✔ installed tunnel cover and arm rest @done(24-04-24)
+    ✔ installed forward carpet @done(24-04-24)
+    ✔ installed passenger side upper side panels @done(24-04-24)
+    ✔ added 8 qts of oil to engine @done(24-04-24)
+    ✔ temporarily installed oil cooler @done(24-04-24)
+    ✔ Installed new tail camera - but it failed and blew the fuse - replaced fuse @done(24-04-24)
 
 4/2/2024:
     ✔ More sanding and iterations on the tail fairings @done(24-04-02)
