@@ -233,43 +233,12 @@ def compare_file_dates(f1: DotMap, f2: DotMap):
         return f2.name
 
 
-def file_to_remove(files):
+def files_to_remove(files):
     for x, y in itertools.pairwise(files):
         f1 = DotMap(name=x, ctime=os.stat(x).st_birthtime)
         f2 = DotMap(name=y, ctime=os.stat(y).st_birthtime)
         remove_file = compare_file_dates(f1, f2)
         os.remove(remove_file)
-
-
-def remove_old_documentation(doc_folder):
-    pilots_guide = [
-        doc_folder + file
-        for file in os.listdir(doc_folder)
-        if file.startswith("SkyView_HDX_Pilots")
-    ]
-
-    autopilot_docs = [
-        doc_folder + file
-        for file in os.listdir(doc_folder)
-        if file.startswith("SkyView_Autopilot")
-    ]
-
-    third_part_devices = [
-        doc_folder + file
-        for file in os.listdir(doc_folder)
-        if file.startswith("Third_Party_Device")
-    ]
-
-    system_installation = [
-        doc_folder + file
-        for file in os.listdir(doc_folder)
-        if file.startswith("SkyView_System_Install")
-    ]
-
-    file_to_remove(pilots_guide)
-    file_to_remove(autopilot_docs)
-    file_to_remove(third_part_devices)
-    file_to_remove(system_installation)
 
 
 def remove_old(dynon_folder):
@@ -290,9 +259,24 @@ def remove_old(dynon_folder):
         if file.startswith("SkyView") and "hw4" not in file
     ]
 
-    file_to_remove(db_files)
-    file_to_remove(sw_hw4_files)
-    file_to_remove(sw_files)
+    files_to_remove(db_files)
+    files_to_remove(sw_hw4_files)
+    files_to_remove(sw_files)
+
+
+def clean_up_files(folder):
+    files = sorted(os.listdir(folder))
+    for x, y in itertools.pairwise(files):
+        if x[:10] == y[:10]:
+            x = folder + x
+            y = folder + y
+            f1 = DotMap(name=x, ctime=os.stat(x).st_birthtime)
+            f2 = DotMap(name=y, ctime=os.stat(y).st_birthtime)
+            remove_file = compare_file_dates(f1, f2)
+            print("Removed " + remove_file)
+            os.remove(remove_file)
+        else:
+            continue
 
 
 if __name__ == "__main__":
@@ -374,7 +358,7 @@ if __name__ == "__main__":
                 )
 
     remove_old(dynon_folder)
-    remove_old_documentation(dynon_documentation_folder)
+    clean_up_files(dynon_documentation_folder)
     config_file["default"] = {
         "main_path": main_folder,
     }
