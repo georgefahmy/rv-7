@@ -326,9 +326,9 @@ if __name__ == "__main__":
 
     existing_versions = compare_version(existing_versions, current_versions)
 
-    with tempfile.TemporaryDirectory() as tmp:
-        tmp = tmp + "/"
-        for sw_category in existing_versions.need_to_update.files:
+    for sw_category in existing_versions.need_to_update.files:
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = tmp + "/"
             if "dynon" in sw_category:
                 download_dynon(
                     CHECK_URL,
