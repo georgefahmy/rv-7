@@ -349,13 +349,17 @@ if __name__ == "__main__":
     for folder in os.listdir(main_folder):
         if folder == "sv_software":
             for vol in dynon_volumes:
-                shutil.copytree(main_folder + folder, f"{vol}", dirs_exist_ok=True)
+                shutil.copytree(main_folder + folder, f"{vol}/", dirs_exist_ok=True)
+                print(f"Copied SV software and Databases to {vol}")
 
         if folder == "garmin_software":
             for vol in garmin_volumes:
                 shutil.copytree(
-                    main_folder + "garmin_software/" + "Garmin/", f"{vol}/Garmin/"
+                    main_folder + "garmin_software/Garmin/",
+                    f"{vol}/Garmin/",
+                    dirs_exist_ok=True,
                 )
+                print(f"Copied Garmin software to {vol}")
 
     remove_old(dynon_folder)
     clean_up_files(dynon_documentation_folder)
