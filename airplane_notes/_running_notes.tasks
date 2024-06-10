@@ -7,7 +7,7 @@ Backlog:
     ☐ @avionics Install double usb power supply
     ☐ @avionics Change avionics dimmer lighting to same as PFD power (solved with interface board)
     ☐ @interior Add Ram mount to rear of roll bar for GoPro?
-    ☐ @interior Installation instructions interior_installation.tasks @started(23-12-08)
+    ☐ @interior Installation instructions interior_installation.tasks
     ☐ @interior Fix paint chip on panel
     ☐ @cowl 18 skybolts across top cowl (centerline split - not aligned to a single skybolt)
     ☐ @cowl 10 skybolts on each side of bottom cowl to top joint
@@ -30,34 +30,36 @@ On Deck:
 Daily Updates are collected below this line
 Updates are moved to the archive section after
 they have been added to the build log
-6/3/2024:
 
-
-6/1/2024:
-    ☐ Continued Canopy Fairing work
-    ☐ Finalize all avionics wiring behind panel
-
-5/30/2024:
-    ✔ Bolted and torqued elevator and rudder hinges @done(24-05-31)
-    ✔ Removed canopy and began the canopy fairing @done(24-05-31)
-
-5/25/2024:
-    ✔ Final Install of Rudder Pedal mounting brackets @done(24-05-25)
-    ✔ Torque Flap control arm bolts @done(24-05-25)
-    ✔ bled the brakes @done(24-05-25)
-    ✔ finished rudder bottom fairing @done(24-05-25)
-    ✔ installed rudder @done(24-05-25)
-
-
-5/22/2024:
-    ✔ installed the wheel pant brackets to the landing gear @done(24-05-25)
-    ✔ continued final sanding of rudder @done(24-05-25)
 
 
 #########################################
 Below items have been updated in the blog
 
 Archive:
+    6/3/2024:
+        ✔ Continued sanding in prep for final fiberglass layup of canopy fairing @done(24-06-10)
+
+    6/1/2024:
+        ✔ Continued Canopy Fairing work @done(24-06-10)
+        ✔ Finalize all avionics wiring behind panel @done(24-06-10)
+
+    5/30/2024:
+        ✔ Bolted and torqued elevator and rudder hinges @done(24-05-31)
+        ✔ Removed canopy and began the canopy fairing @done(24-05-31)
+
+    5/25/2024:
+        ✔ Final Install of Rudder Pedal mounting brackets @done(24-05-25)
+        ✔ Torque Flap control arm bolts @done(24-05-25)
+        ✔ bled the brakes @done(24-05-25)
+        ✔ finished rudder bottom fairing @done(24-05-25)
+        ✔ installed rudder @done(24-05-25)
+
+
+    5/22/2024:
+        ✔ installed the wheel pant brackets to the landing gear @done(24-05-25)
+        ✔ continued final sanding of rudder @done(24-05-25)
+
     4/28/2024:
         ✔ Finished and primed elevator fairings and installed elevators @done(24-04-29)
         ✔ Applied filler to horizontal stab and vertical stab fairings @done(24-04-29)
