@@ -112,13 +112,12 @@ def compare_version(existing_versions, current_versions):
             existing_versions.dynon.software.current = False
             existing_versions.dynon.software.download = True
 
-    if (
-        existing_versions.dynon.database.current
-        and existing_versions.dynon.software.current
-    ):
-        existing_versions.dynon.current = True
-    else:
-        existing_versions.dynon.current = False
+    existing_versions.dynon.current = bool(
+        (
+            existing_versions.dynon.database.current
+            and existing_versions.dynon.software.current
+        )
+    )
     for file in existing_versions.garmin_g5.files:
         if file in current_versions.available_g5_sw_version:
             print(f"Existing {file} is latest version")
@@ -164,7 +163,7 @@ def download_dynon(database_url, software_update_url, drive, sw=False, db=False)
     for link in download_urls:
         file = link.split("/")[-1]
         filename = drive + file
-        download_url = "https://dynonavionics.com" + link
+        download_url = f"https://dynonavionics.com{link}"
         print(f"\nDownloading {file}...")
         with open(filename, "wb+") as out_file:
             content = requests.get(download_url, stream=True).content
@@ -187,11 +186,11 @@ def download_skyview_docs(documentation_url, drive=None):
         and "D10_D100" not in link.get("href")
     ]
 
-    existing_files = [file for file in os.listdir(drive)]
+    existing_files = list(os.listdir(drive))
     for link in documentation_links:
         file = link.split("/")[-1]
         filename = drive + file
-        download_url = "https://dynonavionics.com/" + link
+        download_url = f"https://dynonavionics.com/{link}"
         if file in existing_files:
             existing_files.remove(file)
             print(f"{file} already exists...skipping")
@@ -227,10 +226,7 @@ def download_garmin(garmin_url, drive):
 
 
 def compare_file_dates(f1: DotMap, f2: DotMap):
-    if f1.ctime < f2.ctime:
-        return f1.name
-    else:
-        return f2.name
+    return f1.name if f1.ctime < f2.ctime else f2.name
 
 
 def files_to_remove(files):
@@ -273,7 +269,7 @@ def clean_up_files(folder):
             f1 = DotMap(name=x, ctime=os.stat(x).st_birthtime)
             f2 = DotMap(name=y, ctime=os.stat(y).st_birthtime)
             remove_file = compare_file_dates(f1, f2)
-            print("Removed " + remove_file)
+            print(f"Removed {remove_file}")
             os.remove(remove_file)
         else:
             continue
@@ -281,12 +277,10 @@ def clean_up_files(folder):
 
 if __name__ == "__main__":
     dynon_volumes = [
-        "/Volumes/" + drive + "/"
-        for drive in os.listdir("/Volumes/")
-        if "DYNON" in drive
+        f"/Volumes/{drive}/" for drive in os.listdir("/Volumes/") if "DYNON" in drive
     ]
     garmin_volumes = [
-        "/Volumes/" + drive + "/"
+        f"/Volumes/{drive}/"
         for drive in os.listdir("/Volumes/")
         if "GARMIN_G5" in drive
     ]
@@ -306,11 +300,11 @@ if __name__ == "__main__":
         else input("Path to SW Folder: ")
     )
     if not main_folder.endswith("/"):
-        main_folder = main_folder + "/"
+        main_folder = f"{main_folder}/"
 
-    dynon_folder = main_folder + "sv_software/"
-    garmin_folder = main_folder + "garmin_software/"
-    dynon_documentation_folder = main_folder + "documentation/"
+    dynon_folder = f"{main_folder}sv_software/"
+    garmin_folder = f"{main_folder}garmin_software/"
+    dynon_documentation_folder = f"{main_folder}documentation/"
 
     [
         os.mkdir(folder)
@@ -328,7 +322,7 @@ if __name__ == "__main__":
 
     for sw_category in existing_versions.need_to_update.files:
         with tempfile.TemporaryDirectory() as tmp:
-            tmp = tmp + "/"
+            tmp = f"{tmp}/"
             if "dynon" in sw_category:
                 download_dynon(
                     CHECK_URL,
@@ -347,19 +341,19 @@ if __name__ == "__main__":
 
     # Copy the newly downloaded software to their respective aircraft drives and SD cards
     for folder in os.listdir(main_folder):
-        if folder == "sv_software":
-            for vol in dynon_volumes:
-                shutil.copytree(main_folder + folder, f"{vol}/", dirs_exist_ok=True)
-                print(f"Copied SV software and Databases to {vol}")
-
         if folder == "garmin_software":
             for vol in garmin_volumes:
                 shutil.copytree(
-                    main_folder + "garmin_software/Garmin/",
+                    f"{main_folder}garmin_software/Garmin/",
                     f"{vol}/Garmin/",
                     dirs_exist_ok=True,
                 )
                 print(f"Copied Garmin software to {vol}")
+
+        elif folder == "sv_software":
+            for vol in dynon_volumes:
+                shutil.copytree(main_folder + folder, f"{vol}/", dirs_exist_ok=True)
+                print(f"Copied SV software and Databases to {vol}")
 
     remove_old(dynon_folder)
     clean_up_files(dynon_documentation_folder)

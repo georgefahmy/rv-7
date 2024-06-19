@@ -40,10 +40,11 @@ def write_checklist(chklist):
         lines = []
         for key, value in chklist.sections.items():
             lines.append("")
-            for key2, line in value.items():
-                if isinstance(line, DotMap):
-                    continue
-                lines.append(key + "." + key2 + ", " + str(line))
+            lines.extend(
+                f"{key}.{key2}, {str(line)}"
+                for key2, line in value.items()
+                if not isinstance(line, DotMap)
+            )
         fp.write("\n".join(lines))
 
 
