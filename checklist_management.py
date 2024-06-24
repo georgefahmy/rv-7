@@ -53,9 +53,18 @@ def add_checklist_to_drives():
 
 
 SHEET_ID = "1-EtvM-MdQwJ0Wk8CXvsHwmCrYk3bptP8fpDFwMWMDkc"
-DYNON_SHEET = gspread.service_account().open_by_key(SHEET_ID)
+try:
+    DYNON_SHEET = gspread.service_account().open_by_key(SHEET_ID)
+except Exception:
+    print(
+        "Not Authorized...Check instructions here: https://docs.gspread.org/en/latest/oauth2.html"
+    )
 
 filename = input("Enter Filename for Checklist: ")
+folder = (
+    input("Enter path for checklist: ")
+    or "/Users/GFahmy/Desktop/RV-7_Plans/SkyView/checklists/"
+)
 if not filename.endswith(".txt"):
     filename = filename.split(".")[0] + ".txt"
 
@@ -63,7 +72,7 @@ chklist = DotMap(
     sections=DotMap(),
     filename=filename,
     date=datetime.datetime.now().isoformat(),
-    folder="/Users/GFahmy/Desktop/RV-7_Plans/SkyView/checklists/",
+    folder=folder,
 )
 
 if not os.path.isdir(chklist.folder):

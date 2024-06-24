@@ -1,8 +1,7 @@
-☐ finish canopy fairing - (canopy.tasks)
-✔ install tail fairing @done(24-06-19)
-☐ underside of horizontal stab fairing
+☐ finish canopy fairing - (canopy.tasks) @started(24-06-24)
+☐ install tail fairing @started(24-06-24)
+☐ underside of horizontal stab fairing @started(24-06-24)
 ☐ rudder stops
-✔ rear lower fuselage access panels @done(24-06-19)
 ☐ vertical stab camera
 ☐ baggage area rear panel interior cover
 ☐ rewire panel dimmer to PFD
@@ -42,6 +41,7 @@
 ☐ do a complete dry run of DAR checklist
 
 Archive:
+    ✔ rear lower fuselage access panels @done(24-06-19)
     ✔ elevator bolts @done(24-06-01)
     ✔ rudder bolts @done(24-06-01)
     ✔ flap pushrod bolts and final clearance on fuselage holes @done(24-05-25)
