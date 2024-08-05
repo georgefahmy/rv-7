@@ -4,15 +4,8 @@
 ☐ rewire panel dimmer to PFD
 ☐ vacuum all interior of the aircraft
 ☐ install forward top skin with rivets
-✔ add fourth access panel to forward top skin (before or after install) @done(24-08-04)
-✔ install top cowl with skybolts (follow skybolt procedure) @done(24-07-14)
-✔ cut bottom cowl for landing gear @done(24-07-14)
 ☐ install bottom cowl with skybolts
-✔ cut oil door on top cowl @done(24-07-22)
-✔ install hinge for oil door @done(24-07-22)
-✔ install oil door @done(24-07-22)
 ☐ install skybolts on bottom cowl
-✔ shape and fit top and bottom cowl together @done(24-08-04)
 ☐ install snorkel on engine
 ☐ modify forward baffle ramp for airfilter and snorkel
 ☐ install engine baffles and trim for upper cowl fitment
@@ -30,7 +23,6 @@
 ☐ install blast tubes from aft baffle for PMAG ignitions cooling
 ☐ install blast tube from forward baffle for alternator cooling
 ☐ torque and install safety wiring to prop bolts
-✔ torque seatbelt bolts @done(24-07-22)
 ☐ add all screws for spinner
 ☐ install entire interior of aircraft
 ☐ check propeller governer stops (with engine run)
@@ -38,6 +30,14 @@
 ☐ do a complete dry run of DAR checklist
 
 Archive:
+    ✔ add fourth access panel to forward top skin (before or after install) @done(24-08-04)
+    ✔ install top cowl with skybolts (follow skybolt procedure) @done(24-07-14)
+    ✔ cut bottom cowl for landing gear @done(24-07-14)
+    ✔ cut oil door on top cowl @done(24-07-22)
+    ✔ install hinge for oil door @done(24-07-22)
+    ✔ install oil door @done(24-07-22)
+    ✔ shape and fit top and bottom cowl together @done(24-08-04)
+    ✔ torque seatbelt bolts @done(24-07-22)
     ✔ finish canopy fairing - (canopy.tasks) @started(24-06-24) @done(24-07-05)
     ✔ underside of horizontal stab fairing @started(24-06-24) @done(24-07-12)
     ✔ install tail fairing @started(24-06-24) @done(24-06-30)
