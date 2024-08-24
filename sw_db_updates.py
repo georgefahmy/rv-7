@@ -246,13 +246,13 @@ def remove_old(dynon_folder):
     sw_hw4_files = [
         dynon_folder + file
         for file in os.listdir(dynon_folder)
-        if file.startswith("SkyView") and "hw4" in file
+        if file.startswith("SkyView") and "hw" in file
     ]
 
     sw_files = [
         dynon_folder + file
         for file in os.listdir(dynon_folder)
-        if file.startswith("SkyView") and "hw4" not in file
+        if file.startswith("SkyView") and "hw" not in file
     ]
 
     files_to_remove(db_files)
