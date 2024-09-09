@@ -19,15 +19,56 @@ On Deck:
 
     ☐ rivet forward top skin (except firewall)
     ☐ rivet flanges for cowl to firewall
-    ☐ install roller transfer bearings to rear or canopy frame using 1/4-20 nuts/washers
+
+    baffle:
+        install baffle to engine
+        Make 4" spacer blocks (slot to slot is 4.5")
+        lift top cowl up with spacer blocks
+        use a 4.5" tool to mark 4.5" under top of cowl onto baffles for trimming
+        draw line .5" above that for initial trim
+        refine height using paper clip method for 1/2" clearance (can go more if using plenum?)
+        finish baffle side bends to lower front baffle
+        add plastic barrier to baffle after final trim
+        fill with expanding foam (do a test first?)
+        trim foam to appropriate height and match inlet height
+        add more plastic and packing tape to create mold surface
+        add plastic over exterior of baffles for overlapping fiberglass and to prevent drips
+        mold fiberglass (3 layers + core + 3 layers?) to top of foam. wrap fiberglass around top of baffle and leave core 1/2" inboard from edge of baffles
+        trim exterior fiberglass to 3/4" overlap of baffles
+        add drill marks for 2"? spacing and drill through plenum and baffles for #8 screws
+        add nutplates to interior of baffles for plenum screws
+        shape inlets around baffle
+
+    snorkle:
+        with initial lower left baffle installed, trace out snorkel cutout
+        ensure snorkel fit to lower cowl
+        ensure snorkel fit to fuel servo
+        trim circular edges of snorkel to align with servo edges
+        drill holes for snorkel attachment bolts
+        cut baffle to fit snorkel
+        trim snorkel to appropriate height at baffle
+        install snorkel attachment hardware
+        connect to baffle
+        install air filter
+        install air filter retainer hardware
+
 
     lower cowl:
+        ☐ align flange with top flange to mark bottom edge on splitline (take pic)
+        ☐ draw vertical lines to top cowl and mark for #30
+        ☐ drill #30 pilot hole to top cowl at proper spacing
         ☐ install side flanges to outside and hold to top cowl with #30 clecos
-        ☐ drill bottom cowl to flanges using rivet fan
-        ☐ remove top cowl temp clecos and drill to 15/32" w@done(24-09-06)
-        ☐ move flanges to inside of bottom cowl
-        ☐ countersink lower cowl for flanges
-        ☐ install receptacles on splitline  flanges
+        ☐ drill flanges to bottom cowl using rivet fan
+        ☐ cleco flanges to bottom cowl
+        ☐ remove top cowl temp clecos and drill to 15/32"
+        ☐ countersink lower cowl for flange rivets
+        ☐ prime, prep and install receptacles on splitline flanges
+        ☐ install flanges to bottom cowl with rivets
+        ☐ drill forward inlet nutplate holes for #8 screws
+        ☐ mark nutplte rivet locations
+        ☐ countersink rivet holes
+        ☐ install forward inlet nutplates
+
 
 
 ################################################
