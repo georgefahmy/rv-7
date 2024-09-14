@@ -22,7 +22,7 @@ On Deck:
 
     baffle:
         install baffle to engine
-        Make 4" spacer blocks (slot to slot is 4.5")
+        make 4" spacer blocks (slot to slot is 4.5")
         lift top cowl up with spacer blocks
         use a 4.5" tool to mark 4.5" under top of cowl onto baffles for trimming
         draw line .5" above that for initial trim
@@ -310,7 +310,7 @@ Archive:
         ✔ Riveted all nutplates to right wingtip @done(24-01-03)
         ✔ Installed right wingtip and tested lighting @done(24-01-03)
 
-    01/02/2023:
+    1/02/2023:
         ✔ Drilled all the holes for the right wingtip @done(24-01-02)
         ✔ drilled all the nutplates for the wingtip @done(24-01-02)
 
@@ -499,24 +499,24 @@ Archive:
         ✔ Dimple side skirts @done(23-10-13)
 
 
-    for 10/8/2023:
+    10/8/2023:
         ✔ Trim rear window aft edge for fit @done(23-10-08)
         ✔ Finish riveting aft fuse skin @done(23-10-08)
         ✔ Final prep for bonding @done(23-10-08)
 
 
-    for 9/29/2023:
+    9/29/2023:
         ✔ Trim rear window aft edge for fit @done(23-09-29)
         ✔ Surface prep aluminum skin and plexi @done(23-09-29)
         ✔ minor adjustments to canopy latch fit @done(23-09-29)
 
 
-    for 9/17/2023:
+    9/17/2023:
         ✔ Rivet aft top fuse skin  @done(23-09-17)
         ✔ Reinstall Canopy @done(23-09-17)
         ✔ Fabricate canopy panel light connector @done(23-09-17)
 
-    for 9/14/2023:
+    9/14/2023:
 
         ✔ Cleco the top skin onto the fuselage in prepartion for riveting @done(23-09-14)
         ✔ Update Bus Bar to the new Fused bar @done(23-09-14)
@@ -526,7 +526,7 @@ Archive:
         ✔ Update wiring diagram for Auxillary bus (and accessories) and pinout of VPX @done(23-09-14)
         ✔ test fit the rear window and marked the top skin 1.25" back from the edge for trimming the window @done(23-09-14)
 
-    for 9/9/2023:
+    9/9/2023:
         ✔ Finished installation of Aithre CO monitor signal wire @done(23-09-13)
         ✔ Updated Dynon EMS Config files to support Aithre CO monitor sensor type @done(23-09-11)
         ✔ Updated different EMS pages on dynon screens to have the new CO monitor widget @done(23-09-11)
@@ -534,7 +534,7 @@ Archive:
         ✔ Installed Air Vents to panel @done(23-09-11)
             Note: Chipped paint on panel - need to update
 
-    for 9/4/2023:
+    9/4/2023:
         ✔ updated skyview software and databases @done(23-09-11)
         ✔ installed under-screen lighting for switches @done(23-09-11)
         ✔ installed boost pump connector @done(23-09-11)
