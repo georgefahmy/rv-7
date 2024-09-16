@@ -6,10 +6,6 @@
 ☐ add filler to forward top skin after riveting to blend with canopy skin
 cowl:
     ☐ install forward top skin with rivets
-    ☐ install skybolt system on top cowl
-    ☐ install bottom cowl with skybolts
-    ☐ drill top cowl for bottom cowl skybolt flanges
-    ☐ install skybolt flanges on bottom cowl
 baffle:
     ☐ make top cowl spacers 4" tall to allow for marking baffle cut marks
     ☐ modify forward baffle ramp for airfilter and snorkel
@@ -37,6 +33,10 @@ fwf:
 ☐ do a complete dry run of DAR checklist
 
 Archive:
+    ✔ install skybolt system on top cowl @done(24-09-16) @project(cowl)
+    ✔ install bottom cowl with skybolts @done(24-09-16) @project(cowl)
+    ✔ drill top cowl for bottom cowl skybolt flanges @done(24-09-16) @project(cowl)
+    ✔ install skybolt flanges on bottom cowl @done(24-09-16) @project(cowl)
     ✔ add fourth access panel to forward top skin (before or after install) @done(24-08-04)
     ✔ install top cowl with skybolts (follow skybolt procedure) @done(24-07-14)
     ✔ cut bottom cowl for landing gear @done(24-07-14)

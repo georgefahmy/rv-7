@@ -21,7 +21,7 @@ On Deck:
     ☐ rivet flanges for cowl to firewall
 
     baffle:
-        install baffle to engine
+        ✔ install baffle to engine @done(24-09-16)
         make 4" spacer blocks (slot to slot is 4.5")
         lift top cowl up with spacer blocks
         use a 4.5" tool to mark 4.5" under top of cowl onto baffles for trimming
@@ -42,8 +42,8 @@ On Deck:
     snorkle:
         with initial lower left baffle installed, trace out snorkel cutout
         ensure snorkel fit to lower cowl
-        ensure snorkel fit to fuel servo
-        trim circular edges of snorkel to align with servo edges
+        ✔ ensure snorkel fit to fuel servo @done(24-09-16)
+        ✔ trim circular edges of snorkel to align with servo edges @done(24-09-16)
         drill holes for snorkel attachment bolts
         cut baffle to fit snorkel
         trim snorkel to appropriate height at baffle
@@ -53,17 +53,21 @@ On Deck:
         install air filter retainer hardware
 
 
-    lower cowl:
-        ☐ install flanges to bottom cowl with rivets
-        ☐ drill forward inlet nutplate holes for #8 screws
-        ☐ mark nutplte rivet locations
-        ☐ countersink rivet holes
-        ☐ install forward inlet nutplates
-
 ################################################
 Daily Updates are collected below this line
 Updates are moved to the archive section after
 they have been added to the build log
+9/14/2024:
+    ✔ installed flanges to bottom cowl with rivets @done(24-09-16)
+    ✔ drilled forward inlet nutplate holes for #8 screws @done(24-09-16)
+    ✔ marked nutplte rivet locations @done(24-09-16)
+    ✔ countersunk rivet holes @done(24-09-16)
+    ✔ installed forward inlet nutplates @done(24-09-16)
+    ✔ installed baffles on engine @done(24-09-16)
+    ✔ trimmed baffles around engine for better fit - valve covers, rear engine, cylinder fins @done(24-09-16)
+    ✔ made hole spacer for snorkel @done(24-09-16)
+    ✔ fit snorkel to inlet @done(24-09-16)
+
 9/13/2024:
     ✔ aligned flange with top flange to mark bottom edge on splitline (take pic) @done(24-09-13)
     ✔ drew vertical lines to top cowl and mark for #30 @done(24-09-13)
