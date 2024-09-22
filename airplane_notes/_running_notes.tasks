@@ -20,12 +20,7 @@ On Deck:
     ☐ rivet forward top skin (except firewall)
 
     baffle:
-        ✔ install baffle to engine @done(24-09-16)
-        make 4" spacer blocks (slot to slot is 4.5")
-        lift top cowl up with spacer blocks
-        use a 4.5" tool to mark 4.5" under top of cowl onto baffles for trimming
-        draw line .5" above that for initial trim
-        refine height using paper clip method for 1/2" clearance (can go more if using plenum?)
+        fabricate all baffle brackets for holding front gear baffle to inlet baffles
         finish baffle side bends to lower front baffle
         add plastic barrier to baffle after final trim
         fill with expanding foam (do a test first?)
@@ -39,14 +34,6 @@ On Deck:
         shape inlets around baffle (custom inlet ducts using fiberglass?)
 
     snorkle:
-        with initial lower left baffle installed, trace out snorkel cutout
-        ✔ ensure snorkel fit to lower cowl @done(24-09-18)
-        ✔ ensure snorkel fit to fuel servo @done(24-09-16)
-        ✔ trim circular edges of snorkel to align with servo edges @done(24-09-16)
-        drill holes for snorkel attachment bolts to intake
-        cut baffle to fit snorkel
-        trim snorkel to appropriate height at baffle
-        install snorkel attachment hardware
         connect to baffle
         install air filter
         install air filter retainer hardware
@@ -56,62 +43,75 @@ On Deck:
 Daily Updates are collected below this line
 Updates are moved to the archive section after
 they have been added to the build log
-9/14/2024:
-    ✔ installed flanges to bottom cowl with rivets @done(24-09-16)
-    ✔ drilled forward inlet nutplate holes for #8 screws @done(24-09-16)
-    ✔ marked nutplte rivet locations @done(24-09-16)
-    ✔ countersunk rivet holes @done(24-09-16)
-    ✔ installed forward inlet nutplates @done(24-09-16)
-    ✔ installed baffles on engine @done(24-09-16)
-    ✔ trimmed baffles around engine for better fit - valve covers, rear engine, cylinder fins @done(24-09-16)
-    ✔ made hole spacer for snorkel @done(24-09-16)
-    ✔ fit snorkel to inlet @done(24-09-16)
+9/21/2024:
+    ✔ with initial lower left baffle installed, traced out snorkel cutout @done(24-09-21)
+    ✔ drilled holes for snorkel attachment bolts to intake @done(24-09-21)
+    ✔ cut baffle to fit snorkel @done(24-09-21)
+    ✔ trimed snorkel to appropriate height at baffle @done(24-09-21)
+    ✔ installed snorkel attachment hardware @done(24-09-21)
+    ✔ refined height using paper clip method for 1/2" clearance (can go more if using plenum?) @done(24-09-21)
 
-9/13/2024:
-    ✔ aligned flange with top flange to mark bottom edge on splitline (take pic) @done(24-09-13)
-    ✔ drew vertical lines to top cowl and mark for #30 @done(24-09-13)
-    ✔ drilled #30 pilot hole to top cowl at proper spacing @done(24-09-13)
-    ✔ installed side flanges to outside and hold to top cowl with #30 clecos @done(24-09-13)
-    ✔ drilled flanges to bottom cowl using rivet fan @done(24-09-13)
-    ✔ clecoed flanges to bottom cowl @done(24-09-13)
-    ✔ removed top cowl temp clecos and drill to 15/32" @done(24-09-13)
-    ✔ countersunk lower cowl for flange rivets @done(24-09-13)
-    ✔ primed, prepped and installed receptacles on splitline flanges @done(24-09-13)
-    ✔ installed flanges to bottom cowl with epoxy and hold with clecos @done(24-09-13)
-
-9/8/2024:
-    ✔ removed top and bottom cowl @done(24-09-08)
-    ✔ installed o-rings to bottom cowl receptacles @done(24-09-08)
-    ✔ removed flanges from firewall @done(24-09-08)
-    ✔ dimpled flanges @done(24-09-08)
-    ✔ counter sunk flanges @done(24-09-08)
-    ✔ primed flanges @done(24-09-08)
-    ✔ riveted receptacles to flanges @done(24-09-08)
-    ✔ installed flanges to firewall @done(24-09-08)
-    ✔ confirmed stud depth @done(24-09-08)
-    ✔ removed locking pins @done(24-09-08)
-
-    ✔ trim/sand bottom cowl to match top cowl @done(24-09-08)
-    ✔ confirm straight edge @done(24-09-08)
-    ✔ iterate edge mating @done(24-09-08)
-
-    ✔ drilled splitline top cowl 15/32", installed grommets, and studs @done(24-09-08)
-    ✔ drilled flanges to splitline bottom cowl with 31/32" using rivet fan @done(24-09-08)
-    ✔ temporarily installed flanges to bottom cowl @done(24-09-08)
-
-9/6/2024:
-    ✔ installed roller bearings to rollbar to push canopy frame forward against pneumatic pistons @done(24-09-06)
-    ✔ drilled bottom and side holes to 15/32" @done(24-09-06)
-    ✔ installed grommets @done(24-09-06)
-    ✔ install receptacles on flanges temporarily @done(24-09-06)
-    ✔ set stud depth @done(24-09-06)
-    ✔ sanded top cowl sides to straight in prep for mating to bottom cowl @done(24-09-06)
-    ✔ marked bottom cowl split line for trimming @done(24-09-06)
+9/20/2024:
+    ✔ made 4" spacer blocks (slot to slot is 4.5") @done(24-09-20)
+    ✔ lifted top cowl up with spacer blocks @done(24-09-20)
+    ✔ used a 4.5" tool to mark 4.5" under top of cowl onto baffles for trimming @done(24-09-20)
+    ✔ drew line .5" above that for initial trim @done(24-09-20)
 
 #########################################
 Below items have been updated in the blog
 
 Archive:
+    9/14/2024:
+        ✔ installed flanges to bottom cowl with rivets @done(24-09-16)
+        ✔ drilled forward inlet nutplate holes for #8 screws @done(24-09-16)
+        ✔ marked nutplte rivet locations @done(24-09-16)
+        ✔ countersunk rivet holes @done(24-09-16)
+        ✔ installed forward inlet nutplates @done(24-09-16)
+        ✔ installed baffles on engine @done(24-09-16)
+        ✔ trimmed baffles around engine for better fit - valve covers, rear engine, cylinder fins @done(24-09-16)
+        ✔ made hole spacer for snorkel @done(24-09-16)
+        ✔ fit snorkel to inlet @done(24-09-16)
+
+    9/13/2024:
+        ✔ aligned flange with top flange to mark bottom edge on splitline (take pic) @done(24-09-13)
+        ✔ drew vertical lines to top cowl and mark for #30 @done(24-09-13)
+        ✔ drilled #30 pilot hole to top cowl at proper spacing @done(24-09-13)
+        ✔ installed side flanges to outside and hold to top cowl with #30 clecos @done(24-09-13)
+        ✔ drilled flanges to bottom cowl using rivet fan @done(24-09-13)
+        ✔ clecoed flanges to bottom cowl @done(24-09-13)
+        ✔ removed top cowl temp clecos and drill to 15/32" @done(24-09-13)
+        ✔ countersunk lower cowl for flange rivets @done(24-09-13)
+        ✔ primed, prepped and installed receptacles on splitline flanges @done(24-09-13)
+        ✔ installed flanges to bottom cowl with epoxy and hold with clecos @done(24-09-13)
+
+    9/8/2024:
+        ✔ removed top and bottom cowl @done(24-09-08)
+        ✔ installed o-rings to bottom cowl receptacles @done(24-09-08)
+        ✔ removed flanges from firewall @done(24-09-08)
+        ✔ dimpled flanges @done(24-09-08)
+        ✔ counter sunk flanges @done(24-09-08)
+        ✔ primed flanges @done(24-09-08)
+        ✔ riveted receptacles to flanges @done(24-09-08)
+        ✔ installed flanges to firewall @done(24-09-08)
+        ✔ confirmed stud depth @done(24-09-08)
+        ✔ removed locking pins @done(24-09-08)
+
+        ✔ trim/sand bottom cowl to match top cowl @done(24-09-08)
+        ✔ confirm straight edge @done(24-09-08)
+        ✔ iterate edge mating @done(24-09-08)
+
+        ✔ drilled splitline top cowl 15/32", installed grommets, and studs @done(24-09-08)
+        ✔ drilled flanges to splitline bottom cowl with 31/32" using rivet fan @done(24-09-08)
+        ✔ temporarily installed flanges to bottom cowl @done(24-09-08)
+
+    9/6/2024:
+        ✔ installed roller bearings to rollbar to push canopy frame forward against pneumatic pistons @done(24-09-06)
+        ✔ drilled bottom and side holes to 15/32" @done(24-09-06)
+        ✔ installed grommets @done(24-09-06)
+        ✔ install receptacles on flanges temporarily @done(24-09-06)
+        ✔ set stud depth @done(24-09-06)
+        ✔ sanded top cowl sides to straight in prep for mating to bottom cowl @done(24-09-06)
+        ✔ marked bottom cowl split line for trimming @done(24-09-06)
 
     8/30/2024:
         ✔ drilled all skybolt holes to 15/32nds on top cowl @done(24-08-31)
