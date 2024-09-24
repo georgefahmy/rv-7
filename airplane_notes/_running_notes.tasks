@@ -16,33 +16,65 @@ On Deck:
     ☐ Torque rudder cable bolts and tailwheel spring
     ☐ Paint horizontal/vertical stab tips
     ☐ Use Pink foam to make a mold for the tail camera housing
-
     ☐ rivet forward top skin (except firewall)
+    ☐ fabricate rudder stop extensions and rivet to existing rudder stops
+
+
+    interior:
+        install baggage area cover panels
+        install forward carpet
+        install forward and side panels
+        secure bolts for seatbelts
+        install crotch strap (remove interior to do this)
+        drill hole for alternate air control cable above rudder trim knob
+        add labels to panel for engine controls and other items
+        fabricate mounting bracket for shore power receptacle
 
     baffle:
+        bend right side baffle to support inlet baffle
+        further trim baffles around inlet to plan for plenum
+        drill holes for ingition wire retaining hardware
+        drill hole for fuel flow sensor wire
+        use a connector for the fuel flow sensor wire
         fabricate all baffle brackets for holding front gear baffle to inlet baffles
-        finish baffle side bends to lower front baffle
         add plastic barrier to baffle after final trim
         fill with expanding foam (do a test first?)
         trim foam to appropriate height and match inlet height
         add more plastic and packing tape to create mold surface
         add plastic over exterior of baffles for overlapping fiberglass and to prevent drips
-        mold fiberglass (3 layers + core + 3 layers?) to top of foam. wrap fiberglass around top of baffle and leave core 1/2" inboard from edge of baffles
+        mold fiberglass (3 layers + core + 3 layers? - 4-6 layers total) to top of foam. wrap fiberglass around top of baffle and leave core 1/2" inboard from edge of baffles
         trim exterior fiberglass to 3/4" overlap of baffles (maybe bend baffles to 45deg to)
         add drill marks for 2"? spacing and drill through plenum and baffles for #8 screws
         add nutplates to interior of baffles for plenum screws
         shape inlets around baffle (custom inlet ducts using fiberglass?)
+        fabricate seals around inlet ducts to baffles
 
     snorkle:
+        drill snorkel flange to inlet baffle
+        dimple snorkel flanges for flush rivets
+        countersink snorkel (maybe not because its thin)
+        rivet snorkel flanges to snorkel
+        fiberglass reinforcement around snorkel and flanges
+        drill mounting screw holes through inlet baffle and snorkel flanges
+        drill/dimple/rivet nutplates to snorkel flanges as in the design
+        fabricate the filter retaining brackets
         connect to baffle
         install air filter
         install air filter retainer hardware
+        drill #30 hole in bottom near servo for water draining
 
 
 ################################################
 Daily Updates are collected below this line
 Updates are moved to the archive section after
 they have been added to the build log
+9/22/2024:
+    ✔ trimmed lower inlet baffle to fit to snorkel @done(24-09-23)
+    ✔ bent side baffle to fit under snorkel and inflet flange @done(24-09-23)
+    ✔ fixed the snorkel height to fit under the inlet baffle and align to lower cowl inlet @done(24-09-23)
+    ✔ trimmed forward baffle behind ring gear @done(24-09-23)
+    ✔ installed battery charging leads to PPS for shore power @done(24-09-23)
+
 9/21/2024:
     ✔ with initial lower left baffle installed, traced out snorkel cutout @done(24-09-21)
     ✔ drilled holes for snorkel attachment bolts to intake @done(24-09-21)
@@ -50,6 +82,7 @@ they have been added to the build log
     ✔ trimed snorkel to appropriate height at baffle @done(24-09-21)
     ✔ installed snorkel attachment hardware @done(24-09-21)
     ✔ refined height using paper clip method for 1/2" clearance (can go more if using plenum?) @done(24-09-21)
+    ✔ removed propeller @done(24-09-23)
 
 9/20/2024:
     ✔ made 4" spacer blocks (slot to slot is 4.5") @done(24-09-20)
