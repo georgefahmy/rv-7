@@ -31,12 +31,15 @@ On Deck:
         fabricate mounting bracket for shore power receptacle
 
     baffle:
-        bend right side baffle to support inlet baffle
-        further trim baffles around inlet to plan for plenum
         drill holes for ingition wire retaining hardware
         drill hole for fuel flow sensor wire
         use a connector for the fuel flow sensor wire
-        fabricate all baffle brackets for holding front gear baffle to inlet baffles
+        remove baffles
+        prime baffles
+        rivet baffles permenantly
+        install baffles
+        seal with caulking
+    Plenum:
         add plastic barrier to baffle after final trim
         fill with expanding foam (do a test first?)
         trim foam to appropriate height and match inlet height
@@ -50,7 +53,6 @@ On Deck:
         fabricate seals around inlet ducts to baffles
 
     snorkle:
-        drill snorkel flange to inlet baffle
         dimple snorkel flanges for flush rivets
         countersink snorkel (maybe not because its thin)
         rivet snorkel flanges to snorkel
@@ -63,11 +65,18 @@ On Deck:
         install air filter retainer hardware
         drill #30 hole in bottom near servo for water draining
 
+    Cowl:
+        rivet flanges to firewall DO THIS NEXT TIME
 
 ################################################
 Daily Updates are collected below this line
 Updates are moved to the archive section after
 they have been added to the build log
+9/26/2024:
+    ✔ drilled snorkel flange to inlet baffle @done(24-09-26)
+    ✔ bent right side baffle to support inlet baffle @done(24-09-26)
+    ✔ further trimmed baffles around inlet to plan for plenum @done(24-09-26)
+    ☐ fabricated baffle connecting brackets CB 702-P,CB 702-Q, CB 710-P
 9/22/2024:
     ✔ trimmed lower inlet baffle to fit to snorkel @done(24-09-23)
     ✔ bent side baffle to fit under snorkel and inflet flange @done(24-09-23)
