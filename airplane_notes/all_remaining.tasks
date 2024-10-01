@@ -7,9 +7,6 @@
 cowl:
     ☐ install forward top skin with rivets
 baffle:
-    ☐ make top cowl spacers 4" tall to allow for marking baffle cut marks
-    ☐ modify forward baffle ramp for airfilter and snorkel
-    ☐ install engine baffles and trim for upper cowl fitment
     ☐ cover engine with plastic and use expanding foam for plenum shape
     ☐ add more plastic to top foam for fiberglass and core layup
     ☐ make planum on plastic using thin core and fiberglass/epoxy
@@ -33,6 +30,9 @@ fwf:
 ☐ do a complete dry run of DAR checklist
 
 Archive:
+    ✔ make top cowl spacers 4" tall to allow for marking baffle cut marks @done(24-10-01) @project(baffle)
+    ✔ modify forward baffle ramp for airfilter and snorkel @done(24-10-01) @project(baffle)
+    ✔ install engine baffles and trim for upper cowl fitment @done(24-10-01) @project(baffle)
     ✔ install skybolt system on top cowl @done(24-09-16) @project(cowl)
     ✔ install bottom cowl with skybolts @done(24-09-16) @project(cowl)
     ✔ drill top cowl for bottom cowl skybolt flanges @done(24-09-16) @project(cowl)
