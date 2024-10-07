@@ -32,6 +32,8 @@ On Deck:
 
     baffle:
         drill hole for fuel flow sensor wire
+        add blast tube holes for ignitions
+        add blast tube hole for alternator
         use a connector for the fuel flow sensor wire
         seal with caulking
 
@@ -43,16 +45,18 @@ On Deck:
         add plastic over exterior of baffles for overlapping fiberglass and to prevent drips
         mold fiberglass (3 layers + core + 3 layers? - 4-6 layers total) to top of foam. wrap fiberglass around top of baffle and leave core 1/2" inboard from edge of baffles
         trim exterior fiberglass to 3/4" overlap of baffles (maybe bend baffles to 45deg to)
-        add drill marks for 2"? spacing and drill through plenum and baffles for #8 screws
+        add marks for 2"? spacing and drill through plenum and baffles for #8 screws
         add nutplates to interior of baffles for plenum screws
         shape inlets around baffle (custom inlet ducts using fiberglass?)
         fabricate seals around inlet ducts to baffles
 
     snorkle:
-        fabricate the filter retaining brackets
         connect to baffle
         install air filter
         install air filter retainer hardware
+        add alternate air 2.5" hole
+        install alt air bracket
+        add filler to bracket to smooth transition
 
     Cowl:
         rivet rop flanges to firewall
@@ -61,20 +65,23 @@ On Deck:
 Daily Updates are collected below this line
 Updates are moved to the archive section after
 they have been added to the build log
+10/6/2024:
+    ✔ fabricated filter retaining bracket @done(24-10-06)
+
 10/5/2024:
-    ✔ dimpled snorkel flanges for flush rivets @done(24-10-06)
-    ✔ countersunk snorkel (maybe not because its thin) @done(24-10-06)
-    ✔ riveted snorkel flanges to snorkel @done(24-10-06)
-    ✔ fiberglassed reinforcement around snorkel and flanges @done(24-10-06)
-    ✔ drilled mounting screw holes through inlet baffle and snorkel flanges @done(24-10-06)
-    ✔ drilled/dimple/rivet nutplates to snorkel flanges as in the design @done(24-10-06)
-    ✔ drilled #30 hole in bottom near servo for water draining @done(24-10-06)
-    ✔ removed baffles @done(24-10-06)
-    ✔ primed baffles @done(24-10-06)
-    ✔ riveted baffles permenantly @done(24-10-06)
-    ✔ drilled holes for ingition wire retaining hardware @done(24-10-06)
-    ✔ installed baffles @done(24-10-06)
-    ✔ started filter retaining bracket @done(24-10-06)
+    ✔ dimpled snorkel flanges for flush rivets @done(24-10-05)
+    ✔ countersunk snorkel (maybe not because its thin) @done(24-10-05)
+    ✔ riveted snorkel flanges to snorkel @done(24-10-05)
+    ✔ fiberglassed reinforcement around snorkel and flanges @done(24-10-05)
+    ✔ drilled mounting screw holes through inlet baffle and snorkel flanges @done(24-10-05)
+    ✔ drilled/dimple/rivet nutplates to snorkel flanges as in the design @done(24-10-05)
+    ✔ drilled #30 hole in bottom near servo for water draining @done(24-10-05)
+    ✔ removed baffles @done(24-10-05)
+    ✔ primed baffles @done(24-10-05)
+    ✔ riveted baffles permenantly @done(24-10-05)
+    ✔ drilled holes for ingition wire retaining hardware @done(24-10-05)
+    ✔ installed baffles @done(24-10-05)
+    ✔ started filter retaining bracket @done(24-10-05)
 
 
 #########################################
