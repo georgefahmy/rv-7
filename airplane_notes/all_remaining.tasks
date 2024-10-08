@@ -13,7 +13,6 @@ baffle:
     ☐ add moutning provisions to baffle for plenum top
     ☐ create a gasket for plenum top so no air leaks (research this)
 fwf:
-    ☐ install snorkel on engine
     ☐ install oil cooler on rear baffle
     ☐ install oil cooler hoses to oil cooler
     ☐ torque all FWF hoses
@@ -30,9 +29,10 @@ fwf:
 ☐ do a complete dry run of DAR checklist
 
 Archive:
-    ✔ make top cowl spacers 4" tall to allow for marking baffle cut marks @done(24-10-01) @project(baffle)
-    ✔ modify forward baffle ramp for airfilter and snorkel @done(24-10-01) @project(baffle)
-    ✔ install engine baffles and trim for upper cowl fitment @done(24-10-01) @project(baffle)
+    ✔ make top cowl spacers 4" tall to allow for marking baffle cut marks @done(24-10-06) @project(baffle)
+    ✔ modify forward baffle ramp for airfilter and snorkel @done(24-10-06) @project(baffle)
+    ✔ install engine baffles and trim for upper cowl fitment @done(24-10-06) @project(baffle)
+    ✔ install snorkel on engine @done(24-10-06) @project(fwf)
     ✔ install skybolt system on top cowl @done(24-09-16) @project(cowl)
     ✔ install bottom cowl with skybolts @done(24-09-16) @project(cowl)
     ✔ drill top cowl for bottom cowl skybolt flanges @done(24-09-16) @project(cowl)
