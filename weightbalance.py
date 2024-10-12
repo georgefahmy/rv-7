@@ -2,6 +2,8 @@ from dotmap import DotMap
 
 # Designed CG envelope - 15% - 29% of chord - 8.7" -16.82" aft of LE - 78.7" - 86.82" of datum
 
+# Update all numbers to be real distances
+
 # distances
 DATUM = 0
 WING_LE = 70
@@ -13,6 +15,13 @@ CABIN_SEATS_DIST = 97.48
 BAGGAGE_DIST = 126.78
 FWD_CG_LIMIT = 78.7
 AFT_CG_LIMIT = 86.82
+
+
+def sum(*args):
+    x = 0
+    for val in args:
+        x += val
+    return x
 
 
 def multiply(x, y):
@@ -42,26 +51,22 @@ def calc_cg(
 ):
     fuel_weight = multiply(fuel_gal, 6)
     weight = sum(
-        [
-            left_front_weight,
-            right_front_weight,
-            tailwheel_weight,
-            fuel_weight,
-            pilot_weight,
-            passenger_weight,
-            baggage_weight,
-        ]
+        left_front_weight,
+        right_front_weight,
+        tailwheel_weight,
+        fuel_weight,
+        pilot_weight,
+        passenger_weight,
+        baggage_weight,
     )
     moment = sum(
-        [
-            multiply(left_front_weight, FRONT_LEFT_DIST),
-            multiply(right_front_weight, FRONT_RIGHT_DIST),
-            multiply(tailwheel_weight, TAILWHEEL_DIST),
-            multiply(fuel_weight, FUEL_DIST),
-            multiply(pilot_weight, CABIN_SEATS_DIST),
-            multiply(passenger_weight, CABIN_SEATS_DIST),
-            multiply(baggage_weight, BAGGAGE_DIST),
-        ]
+        multiply(left_front_weight, FRONT_LEFT_DIST),
+        multiply(right_front_weight, FRONT_RIGHT_DIST),
+        multiply(tailwheel_weight, TAILWHEEL_DIST),
+        multiply(fuel_weight, FUEL_DIST),
+        multiply(pilot_weight, CABIN_SEATS_DIST),
+        multiply(passenger_weight, CABIN_SEATS_DIST),
+        multiply(baggage_weight, BAGGAGE_DIST),
     )
     cg = divide(moment, weight)
     cg_percent = calc_cg_percent(cg)
@@ -76,10 +81,10 @@ def calc_cg(
         raise f"Fuel QTY {fuel_gal} exceeds max allowable of 42 gal"
 
     return DotMap(
-        weight=_round(weight),
-        moment=_round(moment),
-        cg_location=_round(cg),
-        cg_percent=_round(cg_percent),
+        weight=f"{_round(weight)} lbs",
+        moment=f"{_round(moment)} in-lbs",
+        cg_location=f"{_round(cg)} inches",
+        cg_percent=f"{_round(cg_percent)}%",
     )
 
 
@@ -89,10 +94,27 @@ right_front_weight = 522.89
 tailwheel_weight = 65.22
 
 if input_flag:
-    fuel_gal = int(input("Fuel Gallons: ")) or 42
-    pilot_weight = int(input("Pilot Weight: ")) or 210
-    passenger_weight = int(input("Passenger Weight: ")) or 130
-    baggage_weight = int(input("Baggage Weight: ")) or 97
+    fuel_gal = input("Fuel Gallons: ") or 42
+    pilot_weight = input("Pilot Weight: ") or 210
+    passenger_weight = input("Passenger Weight: ") or 130
+    baggage_weight = input("Baggage Weight: ") or 97
+    config_name = input("Config name: ")
+
+result = DotMap(
+    {
+        config_name: calc_cg(
+            left_front_weight=left_front_weight,
+            right_front_weight=right_front_weight,
+            tailwheel_weight=tailwheel_weight,
+            fuel_gal=int(fuel_gal),
+            pilot_weight=int(pilot_weight),
+            passenger_weight=int(passenger_weight),
+            baggage_weight=int(baggage_weight),
+        )
+    }
+)
+result.pprint(pformat="json")
+exit()
 
 empty_weight = calc_cg(
     left_front_weight=left_front_weight,
@@ -143,3 +165,5 @@ aircraft_configs = DotMap(
     most_forward_cg=most_forward_cg,
     first_flight_config=first_flight_config,
 )
+
+aircraft_configs.pprint(pformat="json")
