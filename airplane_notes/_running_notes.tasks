@@ -38,20 +38,13 @@ On Deck:
         seal with caulking
         fabricate the conical gussets for the interior of the inlet ramps
 
-
     Plenum:
-        add plastic over exterior of baffles for overlapping fiberglass and to prevent drips
-        mold fiberglass (3 layers + core + 3 layers? - 4-6 layers total) to top of foam. wrap fiberglass around top of baffle and leave core 1/2" inboard from edge of baffles
-        trim exterior fiberglass to 3/4" overlap of baffles (maybe bend baffles to 45deg to)
         add marks for 2"? spacing and drill through plenum and baffles for #8 screws
         add nutplates to interior of baffles for plenum screws
         shape inlets around baffle (custom inlet ducts using fiberglass?)
         fabricate seals around inlet ducts to baffles
 
     snorkle:
-        connect to baffle
-        install air filter
-        install air filter retainer hardware
         add alternate air 2.5" hole
         install alt air bracket
         add filler to bracket to smooth transition
@@ -63,13 +56,28 @@ On Deck:
 Daily Updates are collected below this line
 Updates are moved to the archive section after
 they have been added to the build log
-10/16/2024:
+10/18/2024:
+    cut alternate air hole
+    drill hole in panel for alt air
+    add label for alt air to panel
+    drill hole in baffel for fuel flow sensor cable
+    make connectors for fuel flow wire
 
 
 #########################################
 Below items have been updated in the blog
 
 Archive:
+    10/17/2024:
+        ✔ trimmed exterior fiberglass to match baffles @done(24-10-17)
+        ✔ adjusted fit around cowl inlets @done(24-10-17)
+        ✔ test fit baffle seals around inlets @done(24-10-17)
+
+    10/16/2024:
+        ✔ fiberglass layup of plenum @done(24-10-16)
+        ✔ add plastic over exterior of baffles for overlapping fiberglass and to prevent drips @done(24-10-16)
+        ✔ mold fiberglass (3 layers + core + 3 layers? - 4-6 layers total) to top of foam. wrap fiberglass around top of baffle and leave core 1/2" inboard from edge of baffles @done(24-10-16)
+
     10/15/2024:
         ✔ installed data plate @done(24-10-15)
         ✔ add plastic barrier to baffle after final trim @done(24-10-15)
