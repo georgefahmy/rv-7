@@ -52,16 +52,18 @@ On Deck:
     Cowl:
         rivet rop flanges to firewall
 
+    FWF:
+        add label for alt air to panel
+        cut alternate air hole
+
 ################################################
 Daily Updates are collected below this line
 Updates are moved to the archive section after
 they have been added to the build log
 10/18/2024:
-    cut alternate air hole
-    drill hole in panel for alt air
-    add label for alt air to panel
-    drill hole in baffel for fuel flow sensor cable
-    make connectors for fuel flow wire
+    ✔ drill hole in panel, sub panel, firewall, for alt air cable @done(24-10-18)
+    ✔ drill hole in baffel for fuel flow sensor cable @done(24-10-18)
+    ✔ make connectors for fuel flow wire @done(24-10-18)
 
 
 #########################################
