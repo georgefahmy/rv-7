@@ -31,40 +31,49 @@ On Deck:
         fabricate mounting bracket for shore power receptacle
 
     baffle:
-        drill hole for fuel flow sensor wire
-        use a connector for the fuel flow sensor wire
         add blast tube holes for ignitions
         add blast tube hole for alternator
         seal with caulking
         fabricate the conical gussets for the interior of the inlet ramps
 
     Plenum:
-        add marks for 2"? spacing and drill through plenum and baffles for #8 screws
-        add nutplates to interior of baffles for plenum screws
+        install angle brackets to baffles. flute if necessary to match curves
+        add marks for 2"? spacing and drill through brackets for #8 screws
+        add nutplates to brackets for plenum screws
         shape inlets around baffle (custom inlet ducts using fiberglass?)
         fabricate seals around inlet ducts to baffles
 
     snorkle:
-        add alternate air 2.5" hole
-        install alt air bracket
-        add filler to bracket to smooth transition
+        final install alt air bracket
+        install alt air cable adell clamps
 
     Cowl:
-        rivet rop flanges to firewall
+        rivet top flanges to firewall
 
     FWF:
-        add label for alt air to panel
-        cut alternate air hole
+        measure engine mount and intake tubes
+            engine mount -
+            intake tubes -
+        buy adel clamps
+        redo engine monitor wiring and all FWF wires
+
 
 ################################################
 Daily Updates are collected below this line
 Updates are moved to the archive section after
 they have been added to the build log
+
+10/22/2024:
+    ✔ installed rivnuts for thrust bearings @done(24-10-22)
+    ✔ added label for alt air to panel @done(24-10-22)
+    ✔ cut alternate air hole @done(24-10-22)
+    ✔ install alt air bracket @done(24-10-22)
+    ✔ added filler to bracket to smooth transition @done(24-10-22)
+
 10/18/2024:
     ✔ drill hole in panel, sub panel, firewall, for alt air cable @done(24-10-18)
     ✔ drill hole in baffel for fuel flow sensor cable @done(24-10-18)
     ✔ make connectors for fuel flow wire @done(24-10-18)
-
 
 #########################################
 Below items have been updated in the blog
