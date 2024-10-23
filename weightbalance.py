@@ -16,7 +16,7 @@ BAGGAGE_DIST = 126.78
 FWD_CG_LIMIT = 78.7
 AFT_CG_LIMIT = 86.82
 AFT_AEROBATIC_CG_LIMIT = 84.5
-MAX_WEIGHT_LIMIT = 1800
+MAX_WEIGHT_LIMIT = 1850
 CHORD_LENGTH = 58
 
 
@@ -117,29 +117,36 @@ def calc_cg(
     else:
         end_cg_percent = calc_cg_percent(end_cg)
 
-    if any([start_weight, end_weight]) > MAX_WEIGHT_LIMIT:
-        raise f"Max Gross Weight {start_weight} must be less than 1800lb"
+    if start_weight > MAX_WEIGHT_LIMIT:
+        raise Exception(
+            f"Max Gross Weight {int(start_weight)} must be less than {MAX_WEIGHT_LIMIT}lb - {int(start_weight - MAX_WEIGHT_LIMIT)}lbs overweight"
+        )
+
+    if end_weight > MAX_WEIGHT_LIMIT:
+        raise Exception(
+            f"Max Gross Weight {int(end_weight)} must be less than {MAX_WEIGHT_LIMIT}lb - {int(end_weight - MAX_WEIGHT_LIMIT)}lbs overweight"
+        )
 
     if 0 > any([start_cg_percent, end_cg_percent]) > 100:
-        raise "CG outside CG envelope"
+        raise Exception("CG outside CG envelope")
 
     if fuel_gal_start > 42:
-        raise f"Fuel QTY {fuel_gal_start} exceeds max allowable of 42 gal"
+        raise Exception(f"Fuel QTY {fuel_gal_start} exceeds max allowable of 42 gal")
 
     chord_limit = " of chord" if chord else " of CG envelope"
 
     results = DotMap(
-        start_weight=f"{_round(start_weight)} lbs",
-        start_moment=f"{_round(start_moment)} in-lbs",
-        start_cg_location=f"{_round(start_cg)} inches",
-        start_cg_percent=f"{_round(start_cg_percent)}%{chord_limit}",
+        weight_begin=f"{_round(start_weight)} lbs",
+        moment_begin=f"{_round(start_moment)} in-lbs",
+        cg_location_begin=f"{_round(start_cg)} inches",
+        cg_percent_begin=f"{_round(start_cg_percent)}%{chord_limit}",
     )
 
     if fuel_gal_use:
-        results["end_weight"] = f"{_round(end_weight)} lbs"
-        results["end_moment"] = f"{_round(end_moment)} in-lbs"
-        results["end_cg_location"] = f"{_round(end_cg)} inches"
-        results["end_cg_percent"] = f"{_round(end_cg_percent)}%{chord_limit}"
+        results["weight_end"] = f"{_round(end_weight)} lbs"
+        results["moment_end"] = f"{_round(end_moment)} in-lbs"
+        results["cg_location_end"] = f"{_round(end_cg)} inches"
+        results["cg_percent_end"] = f"{_round(end_cg_percent)}%{chord_limit}"
 
     return results
 
@@ -148,6 +155,7 @@ input_flag = 1
 left_front_weight = 522.89
 right_front_weight = 522.89
 tailwheel_weight = 65.22
+empty_weight = sum(left_front_weight, right_front_weight, tailwheel_weight)
 fuel_gal_start = 0
 fuel_gal_use = 0
 pilot_weight = 0
@@ -157,6 +165,7 @@ config_name = "Default"
 chord_flag = False
 
 if input_flag:
+    print(f"Empty Weight: {empty_weight}lbs")
     fuel_gal_start = input("Starting Fuel Gallons: ") or fuel_gal_start
     fuel_gal_use = input("Fuel usage: ") or fuel_gal_use
     pilot_weight = input("Pilot Weight: ") or pilot_weight
@@ -181,56 +190,3 @@ result = DotMap(
     }
 )
 result.pprint(pformat="json")
-exit()
-
-empty_weight = calc_cg(
-    left_front_weight=left_front_weight,
-    right_front_weight=right_front_weight,
-    tailwheel_weight=tailwheel_weight,
-)
-
-max_gross_weight = calc_cg(
-    left_front_weight=left_front_weight,
-    right_front_weight=right_front_weight,
-    tailwheel_weight=tailwheel_weight,
-    fuel_gal_start=42,
-    pilot_weight=210,
-    passenger_weight=130,
-    baggage_weight=97,
-)
-
-most_aft_cg = calc_cg(
-    left_front_weight=left_front_weight,
-    right_front_weight=right_front_weight,
-    tailwheel_weight=tailwheel_weight,
-    fuel_gal_start=5,
-    pilot_weight=210,
-    passenger_weight=130,
-    baggage_weight=97,
-)
-
-most_forward_cg = calc_cg(
-    left_front_weight=left_front_weight,
-    right_front_weight=right_front_weight,
-    tailwheel_weight=tailwheel_weight,
-    fuel_gal_start=42,
-    pilot_weight=210,
-)
-
-first_flight_config = calc_cg(
-    left_front_weight=left_front_weight,
-    right_front_weight=right_front_weight,
-    tailwheel_weight=tailwheel_weight,
-    fuel_gal_start=42,
-    pilot_weight=210,
-)
-
-aircraft_configs = DotMap(
-    empty_weight=empty_weight,
-    max_gross_weight=max_gross_weight,
-    most_aft_cg=most_aft_cg,
-    most_forward_cg=most_forward_cg,
-    first_flight_config=first_flight_config,
-)
-
-aircraft_configs.pprint(pformat="json")
