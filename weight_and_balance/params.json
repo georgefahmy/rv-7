@@ -1,0 +1,18 @@
+{
+    "baggage_arm_input": "126.78",
+    "baggage_weight_input": "50.0",
+    "copilot_arm_input": "97.48",
+    "copilot_weight_input": "150.0",
+    "fuel_arm_input": "80.0",
+    "fuel_start_weight_input": "42.0",
+    "fuel_use_input": "40.0",
+    "left_main_arm_input": "68.45",
+    "left_main_weight_input": "522.89",
+    "max_gross_weight_input": "1850.0",
+    "pilot_arm_input": "97.48",
+    "pilot_weight_input": "220.0",
+    "right_main_arm_input": "68.45",
+    "right_main_weight_input": "522.89",
+    "tailwheel_arm_input": "249.19",
+    "tailwheel_weight_input": "65.22"
+}
