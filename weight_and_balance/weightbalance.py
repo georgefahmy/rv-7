@@ -4,7 +4,6 @@ from dotmap import DotMap
 
 # Update all numbers to be real distances
 
-# distances
 DATUM = 0
 WING_LE = 70
 FRONT_LEFT_DIST = 68.45
@@ -24,15 +23,15 @@ def sum(*args):
     x = 0
     for val in args:
         x += val
-    return x
+    return round(x, 2)
 
 
 def multiply(x, y):
-    return x * y
+    return round(x * y, 2)
 
 
 def divide(x, y):
-    return x / y
+    return round(x / y, 2)
 
 
 def calc_cg_percent_of_chord(cg):
@@ -151,42 +150,43 @@ def calc_cg(
     return results
 
 
-input_flag = 1
-left_front_weight = 522.89
-right_front_weight = 522.89
-tailwheel_weight = 65.22
-empty_weight = sum(left_front_weight, right_front_weight, tailwheel_weight)
-fuel_gal_start = 0
-fuel_gal_use = 0
-pilot_weight = 0
-passenger_weight = 0
-baggage_weight = 0
-config_name = "Default"
-chord_flag = False
+if __name__ == "__main__":
+    input_flag = 1
+    left_front_weight = 522.89
+    right_front_weight = 522.89
+    tailwheel_weight = 65.22
+    empty_weight = sum(left_front_weight, right_front_weight, tailwheel_weight)
+    fuel_gal_start = 0
+    fuel_gal_use = 0
+    pilot_weight = 0
+    passenger_weight = 0
+    baggage_weight = 0
+    config_name = "Default"
+    chord_flag = False
 
-if input_flag:
-    print(f"Empty Weight: {empty_weight}lbs")
-    fuel_gal_start = input("Starting Fuel Gallons: ") or fuel_gal_start
-    fuel_gal_use = input("Fuel usage: ") or fuel_gal_use
-    pilot_weight = input("Pilot Weight: ") or pilot_weight
-    passenger_weight = input("Passenger Weight: ") or passenger_weight
-    baggage_weight = input("Baggage Weight: ") or baggage_weight
-    config_name = input("Config name: ") or config_name
-    chord_flag = bool(input("Chord Flag: "))
+    if input_flag:
+        print(f"Empty Weight: {empty_weight}lbs")
+        fuel_gal_start = input("Starting Fuel Gallons: ") or fuel_gal_start
+        fuel_gal_use = input("Fuel usage: ") or fuel_gal_use
+        pilot_weight = input("Pilot Weight: ") or pilot_weight
+        passenger_weight = input("Passenger Weight: ") or passenger_weight
+        baggage_weight = input("Baggage Weight: ") or baggage_weight
+        config_name = input("Config name: ") or config_name
+        chord_flag = bool(input("Chord Flag: "))
 
-result = DotMap(
-    {
-        config_name: calc_cg(
-            left_front_weight=left_front_weight,
-            right_front_weight=right_front_weight,
-            tailwheel_weight=tailwheel_weight,
-            fuel_gal_start=int(fuel_gal_start),
-            fuel_gal_use=int(fuel_gal_use),
-            pilot_weight=int(pilot_weight),
-            passenger_weight=int(passenger_weight),
-            baggage_weight=int(baggage_weight),
-            chord=chord_flag,
-        )
-    }
-)
-result.pprint(pformat="json")
+    result = DotMap(
+        {
+            config_name: calc_cg(
+                left_front_weight=left_front_weight,
+                right_front_weight=right_front_weight,
+                tailwheel_weight=tailwheel_weight,
+                fuel_gal_start=int(fuel_gal_start),
+                fuel_gal_use=int(fuel_gal_use),
+                pilot_weight=int(pilot_weight),
+                passenger_weight=int(passenger_weight),
+                baggage_weight=int(baggage_weight),
+                chord=chord_flag,
+            )
+        }
+    )
+    result.pprint(pformat="json")
