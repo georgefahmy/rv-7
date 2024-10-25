@@ -2,7 +2,7 @@ import json
 
 import PySimpleGUI as sg
 from dotmap import DotMap
-from functions import calc_cg
+from weight_and_balance.functions import calc_cg
 
 sg.theme("Reddit")
 sg.set_options(font=("Arial", 16))
