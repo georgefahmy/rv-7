@@ -2,14 +2,11 @@ import json
 
 import PySimpleGUI as sg
 from dotmap import DotMap
-from weightbalance import _round, calc_cg_percent, divide, multiply, sum
+from functions import calc_cg
 
 sg.theme("Reddit")
 sg.set_options(font=("Arial", 16))
 
-
-with open("weight_and_balance/default_params.json", "r") as fp:
-    default_params = DotMap(json.load(fp))
 
 with open("weight_and_balance/params.json", "r") as fp:
     params = DotMap(json.load(fp))
@@ -18,80 +15,6 @@ with open("weight_and_balance/params.json", "r") as fp:
             params[config][key] = (
                 float(params[config][key]) if params[config][key] else 0
             )
-
-
-def calc_cg(
-    params,
-):
-    fuel_start_weight = multiply(params.fuel_start_weight_input, 6)
-    fuel_use_weight = multiply(params.fuel_use_input, 6)
-
-    empty_weight = sum(
-        params.left_main_weight_input,
-        params.right_main_weight_input,
-        params.tailwheel_weight_input,
-    )
-
-    start_weight = sum(
-        empty_weight,
-        fuel_start_weight,
-        params.pilot_weight_input,
-        params.copilot_weight_input,
-        params.baggage_weight_input,
-    )
-    end_weight = start_weight - fuel_use_weight
-    zero_fuel_weight = start_weight - fuel_start_weight
-
-    empty_moment = sum(
-        multiply(params.left_main_weight_input, params.left_main_arm_input),
-        multiply(params.right_main_weight_input, params.right_main_arm_input),
-        multiply(params.tailwheel_weight_input, params.tailwheel_arm_input),
-    )
-
-    start_moment = sum(
-        empty_moment,
-        multiply(fuel_start_weight, params.fuel_arm_input),
-        multiply(params.pilot_weight_input, params.pilot_arm_input),
-        multiply(params.copilot_weight_input, params.copilot_arm_input),
-        multiply(params.baggage_weight_input, params.baggage_arm_input),
-    )
-
-    end_moment = sum(
-        empty_moment,
-        multiply(fuel_start_weight - fuel_use_weight, params.fuel_arm_input),
-        multiply(params.pilot_weight_input, params.pilot_arm_input),
-        multiply(params.copilot_weight_input, params.copilot_arm_input),
-        multiply(params.baggage_weight_input, params.baggage_arm_input),
-    )
-    zero_fuel_moment = sum(
-        empty_moment,
-        multiply(params.pilot_weight_input, params.pilot_arm_input),
-        multiply(params.copilot_weight_input, params.copilot_arm_input),
-        multiply(params.baggage_weight_input, params.baggage_arm_input),
-    )
-    start_cg = divide(start_moment, start_weight)
-    start_cg_percent = calc_cg_percent(start_cg)
-
-    end_cg = divide(end_moment, end_weight)
-    end_cg_percent = calc_cg_percent(end_cg)
-    zero_fuel_cg = divide(zero_fuel_moment, zero_fuel_weight)
-
-    return DotMap(
-        empty_weight=empty_weight,
-        weight_begin=_round(start_weight),
-        moment_begin=_round(start_moment),
-        cg_location_begin=_round(start_cg),
-        cg_percent_begin=_round(start_cg_percent),
-        fuel_start_weight=_round(fuel_start_weight),
-        weight_end=_round(end_weight),
-        moment_end=_round(end_moment),
-        cg_location_end=_round(end_cg),
-        cg_percent_end=_round(end_cg_percent),
-        fuel_end_weight=_round(fuel_start_weight - fuel_use_weight),
-        fuel_use_weight=_round(fuel_use_weight),
-        zero_fuel_cg=_round(zero_fuel_cg),
-        zero_fuel_weight=_round(zero_fuel_weight),
-    )
 
 
 results = calc_cg(params.Default)
@@ -243,6 +166,38 @@ layout = [
                         border_width=0,
                         pad=(6, 0),
                         key=None,
+                    ),
+                ],
+                [
+                    sg.Text("Fwd CG Limit:", expand_x=True),
+                    sg.Input(
+                        size=10,
+                        disabled=True,
+                        disabled_readonly_background_color="white",
+                        border_width=0,
+                        pad=(6, 0),
+                        key=None,
+                    ),
+                    sg.Input(
+                        size=10,
+                        key="forward_cg_limit_input",
+                        enable_events=True,
+                    ),
+                ],
+                [
+                    sg.Text("Aft CG Limit:", expand_x=True),
+                    sg.Input(
+                        size=10,
+                        disabled=True,
+                        disabled_readonly_background_color="white",
+                        border_width=0,
+                        pad=(6, 0),
+                        key=None,
+                    ),
+                    sg.Input(
+                        size=10,
+                        key="aft_cg_limit_input",
+                        enable_events=True,
                     ),
                 ],
             ],
@@ -434,10 +389,11 @@ while True:
         save_params = values.copy()
         del save_params[0]
         del save_params[1]
+        del save_params[2]
+        del save_params[3]
         del save_params["wb_graph"]
         del save_params["load_config_name"]
         del save_params["save_config_name"]
-
         params[values["save_config_name"]] = save_params.toDict()
         with open("weight_and_balance/params.json", "w") as fp:
             json.dump(
