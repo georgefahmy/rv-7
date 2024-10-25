@@ -13,11 +13,12 @@ with open("weight_and_balance/default_params.json", "r") as fp:
 
 with open("weight_and_balance/params.json", "r") as fp:
     params = DotMap(json.load(fp))
-    for key in params.keys():
-        if params[key]:
-            params[key] = float(params[key])
-        else:
-            params[key] = 0
+    for config in params:
+        for key in params[config].keys():
+            if params[config][key]:
+                params[config][key] = float(params[config][key])
+            else:
+                params[config][key] = 0
 
 
 def calc_cg(
@@ -40,6 +41,7 @@ def calc_cg(
         params.baggage_weight_input,
     )
     end_weight = start_weight - fuel_use_weight
+    zero_fuel_weight = start_weight - fuel_start_weight
 
     empty_moment = sum(
         multiply(params.left_main_weight_input, params.left_main_arm_input),
@@ -62,11 +64,18 @@ def calc_cg(
         multiply(params.copilot_weight_input, params.copilot_arm_input),
         multiply(params.baggage_weight_input, params.baggage_arm_input),
     )
+    zero_fuel_moment = sum(
+        empty_moment,
+        multiply(params.pilot_weight_input, params.pilot_arm_input),
+        multiply(params.copilot_weight_input, params.copilot_arm_input),
+        multiply(params.baggage_weight_input, params.baggage_arm_input),
+    )
     start_cg = divide(start_moment, start_weight)
     start_cg_percent = calc_cg_percent(start_cg)
 
     end_cg = divide(end_moment, end_weight)
     end_cg_percent = calc_cg_percent(end_cg)
+    zero_fuel_cg = divide(zero_fuel_moment, zero_fuel_weight)
 
     results = DotMap(
         empty_weight=empty_weight,
@@ -81,16 +90,28 @@ def calc_cg(
         cg_percent_end=_round(end_cg_percent),
         fuel_end_weight=_round(fuel_start_weight - fuel_use_weight),
         fuel_use_weight=_round(fuel_use_weight),
+        zero_fuel_cg=_round(zero_fuel_cg),
+        zero_fuel_weight=_round(zero_fuel_weight),
     )
 
     return results
 
 
-results = calc_cg(params)
+results = calc_cg(params.Default)
 
 layout = [
     [
-        sg.Button("Load Params", font=("Arial", 14), key="load_params_button"),
+        sg.Text("Load Config Name:"),
+        sg.Combo(
+            values=list(params.keys()),
+            size=20,
+            key="load_config_name",
+            enable_events=True,
+        ),
+    ],
+    [
+        sg.Text("Save Config Name:"),
+        sg.Input(size=20, key="save_config_name"),
         sg.Button("Save Params", font=("Arial", 14), key="save_params_button"),
     ],
     [
@@ -107,13 +128,11 @@ layout = [
                 [
                     sg.Text("Left Main Wheel:", expand_x=True),
                     sg.Input(
-                        default_text=params.left_main_weight_input,
                         size=10,
                         key="left_main_weight_input",
                         enable_events=True,
                     ),
                     sg.Input(
-                        default_text=params.left_main_arm_input,
                         size=10,
                         key="left_main_arm_input",
                         enable_events=True,
@@ -122,13 +141,11 @@ layout = [
                 [
                     sg.Text("Right Main Wheel:", expand_x=True),
                     sg.Input(
-                        default_text=params.right_main_weight_input,
                         size=10,
                         key="right_main_weight_input",
                         enable_events=True,
                     ),
                     sg.Input(
-                        default_text=params.right_main_arm_input,
                         size=10,
                         key="right_main_arm_input",
                         enable_events=True,
@@ -137,13 +154,11 @@ layout = [
                 [
                     sg.Text("Tailwheel:", expand_x=True),
                     sg.Input(
-                        default_text=params.tailwheel_weight_input,
                         size=10,
                         key="tailwheel_weight_input",
                         enable_events=True,
                     ),
                     sg.Input(
-                        default_text=params.tailwheel_arm_input,
                         size=10,
                         key="tailwheel_arm_input",
                         enable_events=True,
@@ -152,13 +167,11 @@ layout = [
                 [
                     sg.Text("Pilot:", expand_x=True),
                     sg.Input(
-                        default_text=params.pilot_weight_input,
                         size=10,
                         key="pilot_weight_input",
                         enable_events=True,
                     ),
                     sg.Input(
-                        default_text=params.pilot_arm_input,
                         size=10,
                         key="pilot_arm_input",
                         enable_events=True,
@@ -167,13 +180,11 @@ layout = [
                 [
                     sg.Text("Copilot:", expand_x=True),
                     sg.Input(
-                        default_text=params.copilot_weight_input,
                         size=10,
                         key="copilot_weight_input",
                         enable_events=True,
                     ),
                     sg.Input(
-                        default_text=params.copilot_arm_input,
                         size=10,
                         key="copilot_arm_input",
                         enable_events=True,
@@ -182,13 +193,11 @@ layout = [
                 [
                     sg.Text("Baggage:", expand_x=True),
                     sg.Input(
-                        default_text=params.baggage_weight_input,
                         size=10,
                         key="baggage_weight_input",
                         enable_events=True,
                     ),
                     sg.Input(
-                        default_text=params.baggage_arm_input,
                         size=10,
                         key="baggage_arm_input",
                         enable_events=True,
@@ -197,13 +206,11 @@ layout = [
                 [
                     sg.Text("Fuel Start (gal):", expand_x=True),
                     sg.Input(
-                        default_text=params.fuel_start_weight_input,
                         size=10,
                         key="fuel_start_weight_input",
                         enable_events=True,
                     ),
                     sg.Input(
-                        default_text=params.fuel_arm_input,
                         size=10,
                         key="fuel_arm_input",
                         enable_events=True,
@@ -212,7 +219,6 @@ layout = [
                 [
                     sg.Text("Fuel Use (gal):", expand_x=True),
                     sg.Input(
-                        default_text=params.fuel_use_input,
                         size=10,
                         key="fuel_use_input",
                         enable_events=True,
@@ -229,7 +235,6 @@ layout = [
                 [
                     sg.Text("Max Gross Weight:", expand_x=True),
                     sg.Input(
-                        default_text=params.max_gross_weight_input,
                         size=10,
                         key="max_gross_weight_input",
                         enable_events=True,
@@ -248,6 +253,7 @@ layout = [
         sg.Frame(
             title="Outputs",
             expand_y=True,
+            expand_x=True,
             background_color="white",
             key="output_frame",
             layout=[
@@ -315,9 +321,9 @@ layout = [
             layout=[
                 [
                     sg.Graph(
-                        canvas_size=(500, 300),
+                        canvas_size=(600, 300),
                         graph_bottom_left=(78.7, 1111),
-                        graph_top_right=(86.82, 1800),
+                        graph_top_right=(86.82, params.Default.max_gross_weight_input),
                         background_color="light gray",
                         expand_x=True,
                         expand_y=True,
@@ -334,18 +340,6 @@ layout = [
 
 
 window = sg.Window("Weight & Balance", layout=layout, finalize=True)
-graph = window["wb_graph"]
-
-# Draw axes
-graph.draw_line((78.7, 1111), (86.82, 1111), color="black", width=2)  # X-axis
-graph.draw_line(
-    (78.7, 1111 + 1), (78.7, params.max_gross_weight_input - 1), color="black", width=2
-)  # Y-axis
-graph.change_coordinates(
-    graph_bottom_left=(78.7, 1111),
-    graph_top_right=(86.82, 1800),
-)
-# window.refresh()
 
 
 def draw_graph(window, results, values):
@@ -359,19 +353,61 @@ def draw_graph(window, results, values):
     graph.draw_circle(
         (results.cg_location_begin, results.weight_begin), 0.05, fill_color="green"
     )
+    graph.draw_text(
+        "Starting CG",
+        (results.cg_location_begin + 0.1, results.weight_begin),
+        text_location=sg.TEXT_LOCATION_LEFT,
+    )
     graph.draw_circle(
         (results.cg_location_end, results.weight_end), 0.05, fill_color="blue"
+    )
+    graph.draw_text(
+        "Ending CG",
+        (results.cg_location_end + 0.1, results.weight_end),
+        text_location=sg.TEXT_LOCATION_LEFT,
     )
     graph.draw_line(
         point_from=(results.cg_location_begin, results.weight_begin),
         point_to=(results.cg_location_end, results.weight_end),
     )
-    graph.draw_line((78.7, 1111), (86.82, 1111), width=5)  # X-axis
+    graph.draw_circle(
+        (results.zero_fuel_cg, results.zero_fuel_weight), 0.05, fill_color="red"
+    )
+    graph.draw_text(
+        "Zero Fuel CG",
+        (results.zero_fuel_cg, results.zero_fuel_weight - 20),
+        text_location=sg.TEXT_LOCATION_TOP,
+    )
     graph.draw_line(
-        (78.7, 1111),
-        (78.7, params.max_gross_weight_input),
+        point_from=(results.cg_location_end, results.weight_end),
+        point_to=(results.zero_fuel_cg, results.zero_fuel_weight),
+        color="gray",
+    )
+    graph.draw_lines(
+        [
+            (78.7, results.empty_weight),
+            (86.82, results.empty_weight),
+            (78.7, results.empty_weight),
+            (78.7, values.max_gross_weight_input),
+        ],
+        color="black",
         width=2,
-    )  # Y-axis
+    )
+    graph.draw_text(
+        f"{results.empty_weight} lbs\n{78.7}in",
+        (78.7, results.empty_weight),
+        text_location=sg.TEXT_LOCATION_BOTTOM_LEFT,
+    )
+    graph.draw_text(
+        f"{86.82} in",
+        (86.82, results.empty_weight),
+        text_location=sg.TEXT_LOCATION_BOTTOM_RIGHT,
+    )
+    graph.draw_text(
+        f"{values.max_gross_weight_input} lbs",
+        (78.7, values.max_gross_weight_input),
+        text_location=sg.TEXT_LOCATION_TOP_LEFT,
+    )
 
 
 while True:
@@ -382,27 +418,43 @@ while True:
         window.close()
         break
 
-    if event == "load_params_button":
+    if event == "load_config_name":
         with open("weight_and_balance/params.json", "r") as fp:
             params = DotMap(json.load(fp))
-            for key in params.keys():
-                if params[key]:
-                    params[key] = float(params[key])
-                else:
-                    params[key] = 0
+            for config in params:
+                for key in params[config].keys():
+                    if params[config][key]:
+                        params[config][key] = float(params[config][key])
+                    else:
+                        params[config][key] = 0
 
-        for key in params.keys():
-            sg.fill_form_with_values(window, params)
-            window.write_event_value(key, params[key])
+        for key in params[values["load_config_name"]].keys():
+            sg.fill_form_with_values(window, params[values["load_config_name"]])
+            window.write_event_value(key, params[values["load_config_name"]][key])
 
     if event == "save_params_button":
-        del values[0]
-        del values[1]
+        if not values.save_config_name:
+            continue
+
+        save_params = values.copy()
+        del save_params[0]
+        del save_params[1]
+        del save_params["wb_graph"]
+        del save_params["load_config_name"]
+        del save_params["save_config_name"]
+
+        params[values["save_config_name"]] = save_params.toDict()
         with open("weight_and_balance/params.json", "w") as fp:
-            json.dump(values.toDict(), fp, indent=4, sort_keys=True)
+            json.dump(
+                params,
+                fp,
+                indent=4,
+                sort_keys=True,
+            )
+        window["save_config_name"].update(value="")
 
     if "input" in event:
-        values.pprint()
+        # values.pprint()
         for element in window.element_list():
             if type(element.key) is str:
                 if "input" in element.key:
