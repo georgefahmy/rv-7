@@ -15,10 +15,9 @@ with open("weight_and_balance/params.json", "r") as fp:
     params = DotMap(json.load(fp))
     for config in params:
         for key in params[config].keys():
-            if params[config][key]:
-                params[config][key] = float(params[config][key])
-            else:
-                params[config][key] = 0
+            params[config][key] = (
+                float(params[config][key]) if params[config][key] else 0
+            )
 
 
 def calc_cg(
@@ -77,7 +76,7 @@ def calc_cg(
     end_cg_percent = calc_cg_percent(end_cg)
     zero_fuel_cg = divide(zero_fuel_moment, zero_fuel_weight)
 
-    results = DotMap(
+    return DotMap(
         empty_weight=empty_weight,
         weight_begin=_round(start_weight),
         moment_begin=_round(start_moment),
@@ -94,14 +93,12 @@ def calc_cg(
         zero_fuel_weight=_round(zero_fuel_weight),
     )
 
-    return results
-
 
 results = calc_cg(params.Default)
 
 layout = [
     [
-        sg.Text("Load Config Name:"),
+        sg.Text("Load Config Name:", expand_x=True),
         sg.Combo(
             values=list(params.keys()),
             size=20,
@@ -110,9 +107,9 @@ layout = [
         ),
     ],
     [
-        sg.Text("Save Config Name:"),
-        sg.Input(size=20, key="save_config_name"),
+        sg.Text("Save Config Name:", expand_x=True),
         sg.Button("Save Params", font=("Arial", 14), key="save_params_button"),
+        sg.Input(size=21, key="save_config_name"),
     ],
     [
         sg.Frame(
@@ -394,12 +391,12 @@ def draw_graph(window, results, values):
         width=2,
     )
     graph.draw_text(
-        f"{results.empty_weight} lbs\n{78.7}in",
+        f"{results.empty_weight} lbs\n78.7in",
         (78.7, results.empty_weight),
         text_location=sg.TEXT_LOCATION_BOTTOM_LEFT,
     )
     graph.draw_text(
-        f"{86.82} in",
+        "86.82 in",
         (86.82, results.empty_weight),
         text_location=sg.TEXT_LOCATION_BOTTOM_RIGHT,
     )
@@ -423,11 +420,9 @@ while True:
             params = DotMap(json.load(fp))
             for config in params:
                 for key in params[config].keys():
-                    if params[config][key]:
-                        params[config][key] = float(params[config][key])
-                    else:
-                        params[config][key] = 0
-
+                    params[config][key] = (
+                        float(params[config][key]) if params[config][key] else 0
+                    )
         for key in params[values["load_config_name"]].keys():
             sg.fill_form_with_values(window, params[values["load_config_name"]])
             window.write_event_value(key, params[values["load_config_name"]][key])
@@ -451,18 +446,20 @@ while True:
                 indent=4,
                 sort_keys=True,
             )
+        window["load_config_name"].update(
+            value=values["save_config_name"], values=list(params.keys())
+        )
         window["save_config_name"].update(value="")
 
     if "input" in event:
         # values.pprint()
         for element in window.element_list():
-            if type(element.key) is str:
-                if "input" in element.key:
-                    specific_element = values[element.key]
-                    try:
-                        values[element.key] = float(specific_element)
-                    except Exception:
-                        values[element.key] = 0
+            if type(element.key) is str and "input" in element.key:
+                specific_element = values[element.key]
+                try:
+                    values[element.key] = float(specific_element)
+                except Exception:
+                    values[element.key] = 0
 
         results = calc_cg(values)
         draw_graph(window, results, values)
