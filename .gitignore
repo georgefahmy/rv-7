@@ -2,3 +2,4 @@ testing/
 checklists/
 Software
 sw_folder_config.json
+__pycache__/
