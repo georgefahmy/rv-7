@@ -52,6 +52,14 @@ On Deck:
         fabricate mounting bracket for shore power receptacle
         redo engine monitor wiring and all FWF wires
 
+    W&B:
+        weigh main wheel in 3 point attitude
+        weigh main wheel in longeron level attitude (tail high)
+        weigh tailwheel in 3 point attitude
+        calc empty weight (main + main + tailwheel)
+        calc tailwheel weight (empty weight - (main horizontal + main horizontal))
+        use main horizontal + main horizontal + calculated tailwheel for all W&B calcs
+
 
 ################################################
 Daily Updates are collected below this line
