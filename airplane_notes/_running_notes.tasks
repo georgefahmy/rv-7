@@ -28,33 +28,28 @@ On Deck:
         install crotch strap (remove interior to do this)
         drill hole for alternate air control cable above rudder trim knob
         add labels to panel for engine controls and other items
-        fabricate mounting bracket for shore power receptacle
 
     baffle:
         add blast tube holes for ignitions
-        add blast tube hole for alternator
         seal with caulking
         fabricate the conical gussets for the interior of the inlet ramps
 
     Plenum:
-        install angle brackets to baffles. flute if necessary to match curves
+        install angle brackets to rear baffles. flute if necessary to match curves
         add marks for 2"? spacing and drill through brackets for #8 screws
         add nutplates to brackets for plenum screws
         shape inlets around baffle (custom inlet ducts using fiberglass?)
         fabricate seals around inlet ducts to baffles
 
-    snorkle:
-        final install alt air bracket
-        install alt air cable adell clamps
-
     Cowl:
         rivet top flanges to firewall
 
     FWF:
-        measure engine mount and intake tubes
-            engine mount -
-            intake tubes -
-        buy adel clamps
+        ✔ measure engine mount and intake tubes @done(24-10-27)
+            ✔ engine mount - @done(24-10-27)
+            ✔ intake tubes - @done(24-10-27)
+        ✔ buy adel clamps @done(24-10-27)
+        fabricate mounting bracket for shore power receptacle
         redo engine monitor wiring and all FWF wires
 
 
@@ -62,6 +57,15 @@ On Deck:
 Daily Updates are collected below this line
 Updates are moved to the archive section after
 they have been added to the build log
+10/27/2024:
+    ✔ layed up forward plenum flange @done(24-10-27)
+    ✔ drilled #30 holes on side flanges @done(24-10-27)
+
+10/26/2024:
+    ✔ final install alt air bracket @done(24-10-27)
+    ✔ install alt air cable adell clamps @done(24-10-27)
+    ✔ installed two side flanges for plenum with fiberglass @done(24-10-27)
+    ✔ layed up attachment flanges with 4 layers of 9oz glass @done(24-10-27)
 
 10/22/2024:
     ✔ installed rivnuts for thrust bearings @done(24-10-22)
