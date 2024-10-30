@@ -1,3 +1,7 @@
+import json
+
+import numpy as np
+import PySimpleGUI as sg
 from dotmap import DotMap
 
 
@@ -22,6 +26,17 @@ def calc_cg_percent(cg, fwd_limit, aft_limit):
 
 def _round(x):
     return round(x, 2)
+
+
+def load_params():
+    with open("weight_and_balance/params.json", "r") as fp:
+        params = DotMap(json.load(fp))
+        for config in params:
+            for key in params[config].keys():
+                params[config][key] = (
+                    float(params[config][key]) if params[config][key] else 0
+                )
+    return params
 
 
 def calc_cg(
@@ -99,4 +114,111 @@ def calc_cg(
         fuel_use_weight=_round(fuel_use_weight),
         zero_fuel_cg=_round(zero_fuel_cg),
         zero_fuel_weight=_round(zero_fuel_weight),
+    )
+
+
+def draw_graph(window, results, values):
+    graph = window["wb_graph"]
+
+    # Setup graph grid
+    graph.erase()
+    x_markers = np.linspace(78.7, 86.82, 10)[1:]
+    y_markers = np.linspace(results.empty_weight, values.max_gross_weight_input, 10)
+    for x_val in x_markers:
+        graph.draw_lines(
+            [
+                (x_val, results.empty_weight),
+                (x_val, values.max_gross_weight_input),
+            ],
+            color="gray",
+            width=1,
+        )
+        graph.draw_text(
+            f"{round(x_val, 2)} in",
+            (x_val, results.empty_weight),
+            text_location=sg.TEXT_LOCATION_BOTTOM_LEFT,
+        )
+    for y_val in y_markers:
+        graph.draw_lines(
+            [
+                (78.7, y_val),
+                (86.82, y_val),
+            ],
+            color="gray",
+            width=1,
+        )
+        graph.draw_text(
+            f"{round(y_val, 0)} lbs",
+            (78.7, y_val),
+            text_location=sg.TEXT_LOCATION_BOTTOM_LEFT,
+        )
+
+    graph.draw_text(
+        f"{78.7} in\n",
+        (78.7, results.empty_weight),
+        text_location=sg.TEXT_LOCATION_BOTTOM_LEFT,
+    )
+    graph.draw_text(
+        "86.82 in\n",
+        (86.82, results.empty_weight),
+        text_location=sg.TEXT_LOCATION_BOTTOM_RIGHT,
+    )
+    graph.draw_text(
+        f"{values.max_gross_weight_input} lbs",
+        (78.7, values.max_gross_weight_input),
+        text_location=sg.TEXT_LOCATION_TOP_LEFT,
+    )
+    graph.change_coordinates(
+        graph_bottom_left=(78.7, results.empty_weight),
+        graph_top_right=(86.82, values.max_gross_weight_input),
+    )
+    # draw x and Y axes and make them a little thicker
+    graph.draw_lines(
+        [
+            (78.7, results.empty_weight),
+            (86.82, results.empty_weight),
+            (78.7, results.empty_weight),
+            (78.7, values.max_gross_weight_input),
+        ],
+        color="black",
+        width=2,
+    )
+
+    # draw startng CG and label
+    graph.draw_circle(
+        (results.cg_location_begin, results.weight_begin), 0.05, fill_color="green"
+    )
+    graph.draw_text(
+        "Starting CG",
+        (results.cg_location_begin + 0.1, results.weight_begin),
+        text_location=sg.TEXT_LOCATION_LEFT,
+    )
+    # draw ending CG and label
+    graph.draw_circle(
+        (results.cg_location_end, results.weight_end), 0.05, fill_color="blue"
+    )
+    graph.draw_text(
+        "Ending CG",
+        (results.cg_location_end + 0.1, results.weight_end),
+        text_location=sg.TEXT_LOCATION_LEFT,
+    )
+    # Connect the dots from start to eng CG
+    graph.draw_line(
+        point_from=(results.cg_location_begin, results.weight_begin),
+        point_to=(results.cg_location_end, results.weight_end),
+    )
+    # draw zero fuel CG and label
+    graph.draw_circle(
+        (results.zero_fuel_cg, results.zero_fuel_weight), 0.05, fill_color="red"
+    )
+    graph.draw_text(
+        "Zero Fuel CG",
+        (results.zero_fuel_cg, results.zero_fuel_weight - 20),
+        text_location=sg.TEXT_LOCATION_TOP,
+    )
+    # Connect the end CG and ZFCG dots
+    graph.draw_line(
+        point_from=(results.cg_location_end, results.weight_end),
+        point_to=(results.zero_fuel_cg, results.zero_fuel_weight),
+        color="gray",
     )
