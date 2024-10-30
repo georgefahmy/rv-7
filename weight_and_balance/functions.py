@@ -122,6 +122,10 @@ def draw_graph(window, results, values):
 
     # Setup graph grid
     graph.erase()
+    graph.change_coordinates(
+        graph_bottom_left=(78.7, results.empty_weight),
+        graph_top_right=(86.82, values.max_gross_weight_input),
+    )
     x_markers = np.linspace(78.7, 86.82, 10)[1:]
     y_markers = np.linspace(results.empty_weight, values.max_gross_weight_input, 10)
     for x_val in x_markers:
@@ -148,7 +152,7 @@ def draw_graph(window, results, values):
             width=1,
         )
         graph.draw_text(
-            f"{round(y_val, 0)} lbs",
+            f"{int(y_val)} lbs",
             (78.7, y_val),
             text_location=sg.TEXT_LOCATION_BOTTOM_LEFT,
         )
@@ -164,13 +168,9 @@ def draw_graph(window, results, values):
         text_location=sg.TEXT_LOCATION_BOTTOM_RIGHT,
     )
     graph.draw_text(
-        f"{values.max_gross_weight_input} lbs",
+        f"{int(values.max_gross_weight_input)} lbs",
         (78.7, values.max_gross_weight_input),
         text_location=sg.TEXT_LOCATION_TOP_LEFT,
-    )
-    graph.change_coordinates(
-        graph_bottom_left=(78.7, results.empty_weight),
-        graph_top_right=(86.82, values.max_gross_weight_input),
     )
     # draw x and Y axes and make them a little thicker
     graph.draw_lines(

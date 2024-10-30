@@ -261,8 +261,8 @@ layout = [
             layout=[
                 [
                     sg.Graph(
-                        canvas_size=(605, 305),
-                        graph_bottom_left=(78.7, 1111),
+                        canvas_size=(600, 300),
+                        graph_bottom_left=(78.7, results.empty_weight),
                         graph_top_right=(86.82, params.Default.max_gross_weight_input),
                         background_color="light gray",
                         expand_x=True,
