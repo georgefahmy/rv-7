@@ -100,6 +100,8 @@ def calc_cg(
     zero_fuel_cg = divide(zero_fuel_moment, zero_fuel_weight)
 
     return DotMap(
+        aft_cg_limit_input=params.aft_cg_limit_input,
+        forward_cg_limit_input=params.forward_cg_limit_input,
         empty_weight=empty_weight,
         weight_begin=_round(start_weight),
         moment_begin=_round(start_moment),
@@ -119,14 +121,23 @@ def calc_cg(
 
 def draw_graph(window, results, values):
     graph = window["wb_graph"]
-
     # Setup graph grid
     graph.erase()
+    weight_ff = 50
+    cg_ff = 0.9
     graph.change_coordinates(
-        graph_bottom_left=(78.7, results.empty_weight),
-        graph_top_right=(86.82, values.max_gross_weight_input),
+        graph_bottom_left=(
+            results.forward_cg_limit_input - cg_ff,
+            results.empty_weight - weight_ff,
+        ),
+        graph_top_right=(
+            results.aft_cg_limit_input + cg_ff,
+            values.max_gross_weight_input + weight_ff,
+        ),
     )
-    x_markers = np.linspace(78.7, 86.82, 10)[1:]
+    x_markers = np.linspace(
+        results.forward_cg_limit_input, results.aft_cg_limit_input, 10
+    )
     y_markers = np.linspace(results.empty_weight, values.max_gross_weight_input, 10)
     for x_val in x_markers:
         graph.draw_lines(
@@ -138,47 +149,36 @@ def draw_graph(window, results, values):
             width=1,
         )
         graph.draw_text(
-            f"{round(x_val, 2)} in",
+            f'{round(x_val, 2)}"',
             (x_val, results.empty_weight),
-            text_location=sg.TEXT_LOCATION_BOTTOM_LEFT,
+            text_location=sg.TEXT_LOCATION_TOP_LEFT,
         )
     for y_val in y_markers:
         graph.draw_lines(
             [
-                (78.7, y_val),
-                (86.82, y_val),
+                (results.forward_cg_limit_input, y_val),
+                (results.aft_cg_limit_input, y_val),
             ],
             color="gray",
             width=1,
         )
         graph.draw_text(
-            f"{int(y_val)} lbs",
-            (78.7, y_val),
-            text_location=sg.TEXT_LOCATION_BOTTOM_LEFT,
+            f"{int(y_val)}lbs ",
+            (results.forward_cg_limit_input, y_val),
+            text_location=(
+                sg.TEXT_LOCATION_RIGHT
+                if y_val == y_markers[-1]
+                else sg.TEXT_LOCATION_BOTTOM_RIGHT
+            ),
         )
 
-    graph.draw_text(
-        f"{78.7} in\n",
-        (78.7, results.empty_weight),
-        text_location=sg.TEXT_LOCATION_BOTTOM_LEFT,
-    )
-    graph.draw_text(
-        "86.82 in\n",
-        (86.82, results.empty_weight),
-        text_location=sg.TEXT_LOCATION_BOTTOM_RIGHT,
-    )
-    graph.draw_text(
-        f"{int(values.max_gross_weight_input)} lbs",
-        (78.7, values.max_gross_weight_input),
-        text_location=sg.TEXT_LOCATION_TOP_LEFT,
-    )
     # draw x and Y axes and make them a little thicker
     graph.draw_lines(
         [
-            (78.7, results.empty_weight),
-            (86.82, results.empty_weight),
-            (78.7, results.empty_weight),
-            (78.7, values.max_gross_weight_input),
+            (results.forward_cg_limit_input, results.empty_weight),
+            (results.aft_cg_limit_input, results.empty_weight),
+            (results.forward_cg_limit_input, results.empty_weight),
+            (results.forward_cg_limit_input, values.max_gross_weight_input),
         ],
         color="black",
         width=2,
@@ -191,34 +191,41 @@ def draw_graph(window, results, values):
     graph.draw_text(
         "Starting CG",
         (results.cg_location_begin + 0.1, results.weight_begin),
-        text_location=sg.TEXT_LOCATION_LEFT,
+        text_location=(
+            sg.TEXT_LOCATION_LEFT
+            if results.weight_begin != results.zero_fuel_weight
+            else sg.TEXT_LOCATION_BOTTOM_LEFT
+        ),
     )
     # draw ending CG and label
-    graph.draw_circle(
-        (results.cg_location_end, results.weight_end), 0.05, fill_color="blue"
-    )
-    graph.draw_text(
-        "Ending CG",
-        (results.cg_location_end + 0.1, results.weight_end),
-        text_location=sg.TEXT_LOCATION_LEFT,
-    )
+    if results.fuel_use_weight > 0:
+        graph.draw_circle(
+            (results.cg_location_end, results.weight_end), 0.05, fill_color="blue"
+        )
+        graph.draw_text(
+            "Ending CG",
+            (results.cg_location_end + 0.1, results.weight_end),
+            text_location=sg.TEXT_LOCATION_LEFT,
+        )
     # Connect the dots from start to eng CG
     graph.draw_line(
         point_from=(results.cg_location_begin, results.weight_begin),
         point_to=(results.cg_location_end, results.weight_end),
     )
-    # draw zero fuel CG and label
-    graph.draw_circle(
-        (results.zero_fuel_cg, results.zero_fuel_weight), 0.05, fill_color="red"
-    )
-    graph.draw_text(
-        "Zero Fuel CG",
-        (results.zero_fuel_cg, results.zero_fuel_weight - 20),
-        text_location=sg.TEXT_LOCATION_TOP,
-    )
+    if results.zero_fuel_weight != results.weight_begin:
+        # draw zero fuel CG and label
+        graph.draw_circle(
+            (results.zero_fuel_cg, results.zero_fuel_weight), 0.05, fill_color="red"
+        )
+        graph.draw_text(
+            "Zero Fuel CG",
+            (results.zero_fuel_cg, results.zero_fuel_weight - 20),
+            text_location=sg.TEXT_LOCATION_TOP,
+        )
     # Connect the end CG and ZFCG dots
     graph.draw_line(
         point_from=(results.cg_location_end, results.weight_end),
         point_to=(results.zero_fuel_cg, results.zero_fuel_weight),
         color="gray",
     )
+    window.refresh()
