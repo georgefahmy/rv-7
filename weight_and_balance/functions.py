@@ -119,7 +119,7 @@ def calc_cg(
     )
 
 
-def draw_graph(window, results, values):
+def set_graph_grid(window, results, values):
     graph = window["wb_graph"]
     # Setup graph grid
     graph.erase()
@@ -183,10 +183,19 @@ def draw_graph(window, results, values):
         color="black",
         width=2,
     )
+    window.refresh()
 
+
+def draw_graph(window, results, values):
+    graph = window["wb_graph"]
+    circle_radius = round(
+        (results.aft_cg_limit_input - results.forward_cg_limit_input) / 100, 2
+    )
     # draw startng CG and label
     graph.draw_circle(
-        (results.cg_location_begin, results.weight_begin), 0.05, fill_color="green"
+        (results.cg_location_begin, results.weight_begin),
+        circle_radius,
+        fill_color="green",
     )
     graph.draw_text(
         "Starting CG",
@@ -200,7 +209,9 @@ def draw_graph(window, results, values):
     # draw ending CG and label
     if results.fuel_use_weight > 0:
         graph.draw_circle(
-            (results.cg_location_end, results.weight_end), 0.05, fill_color="blue"
+            (results.cg_location_end, results.weight_end),
+            circle_radius,
+            fill_color="blue",
         )
         graph.draw_text(
             "Ending CG",
@@ -215,7 +226,9 @@ def draw_graph(window, results, values):
     if results.zero_fuel_weight != results.weight_begin:
         # draw zero fuel CG and label
         graph.draw_circle(
-            (results.zero_fuel_cg, results.zero_fuel_weight), 0.05, fill_color="red"
+            (results.zero_fuel_cg, results.zero_fuel_weight),
+            circle_radius,
+            fill_color="red",
         )
         graph.draw_text(
             "Zero Fuel CG",

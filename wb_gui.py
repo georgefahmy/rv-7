@@ -3,7 +3,12 @@ import json
 import PySimpleGUI as sg
 from dotmap import DotMap
 
-from weight_and_balance.functions import calc_cg, draw_graph, load_params
+from weight_and_balance.functions import (
+    calc_cg,
+    draw_graph,
+    load_params,
+    set_graph_grid,
+)
 from weight_and_balance.gui_layout import layout
 
 # sg.theme("Reddit")
@@ -33,7 +38,8 @@ while True:
                     )
         for key in params[values["load_config_name"]].keys():
             sg.fill_form_with_values(window, params[values["load_config_name"]])
-            window.write_event_value(key, params[values["load_config_name"]][key])
+
+        window.write_event_value(key, params[values["load_config_name"]][key])
 
     if event == "save_params_button":
         if not values.save_config_name:
@@ -71,6 +77,7 @@ while True:
                     values[element.key] = 0
 
         results = calc_cg(values)
+        set_graph_grid(window, results, values)
         draw_graph(window, results, values)
 
         window["start_weight_output"].update(value=f"{results.weight_begin} lbs")
