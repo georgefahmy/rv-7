@@ -3,4 +3,5 @@ checklists/
 Software
 sw_folder_config.json
 __pycache__/
-weight_and_balance/__pycache__/
+*__pycache__*
+*params.json*
