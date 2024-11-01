@@ -4,4 +4,4 @@ Software
 sw_folder_config.json
 __pycache__/
 *__pycache__*
-*params.json*
+weight_and_balance/params.json
