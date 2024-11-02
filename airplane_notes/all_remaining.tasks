@@ -7,9 +7,6 @@
 cowl:
     ☐ install forward top skin with rivets
 baffle:
-    ✔ cover engine with plastic and use expanding foam for plenum shape @done(24-10-22)
-    ✔ add more plastic to top foam for fiberglass and core layup @done(24-10-22)
-    ✔ make planum on plastic using thin core and fiberglass/epoxy @done(24-10-22)
     ☐ add moutning provisions to baffle for plenum top
     ☐ create a gasket for plenum top so no air leaks (research this)
 fwf:
@@ -21,7 +18,7 @@ fwf:
     ☐ check for any rubbing/chafing between air hoses and fuel hoses and wiring and engine mount
     ☐ install blast tubes from aft baffle for PMAG ignitions cooling
     ☐ install blast tube from forward baffle for alternator cooling
-    ☐ torque and install safety wiring to prop bolts
+    ☐ torque and install safety wiring to prop bolts 66ft-lbs
     ☐ add all screws for spinner
 ☐ install entire interior of aircraft
 ☐ check propeller governer stops (with engine run)
@@ -29,6 +26,9 @@ fwf:
 ☐ do a complete dry run of DAR checklist
 
 Archive:
+    ✔ cover engine with plastic and use expanding foam for plenum shape @done(24-10-22) @project(baffle)
+    ✔ add more plastic to top foam for fiberglass and core layup @done(24-10-22) @project(baffle)
+    ✔ make planum on plastic using thin core and fiberglass/epoxy @done(24-10-22) @project(baffle)
     ✔ make top cowl spacers 4" tall to allow for marking baffle cut marks @done(24-10-06) @project(baffle)
     ✔ modify forward baffle ramp for airfilter and snorkel @done(24-10-06) @project(baffle)
     ✔ install engine baffles and trim for upper cowl fitment @done(24-10-06) @project(baffle)
