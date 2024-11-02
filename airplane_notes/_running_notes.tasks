@@ -55,10 +55,13 @@ On Deck:
 
     W&B:
         weigh main wheel in 3 point attitude
+            Front Left - 489.2 (TEST)
+            Right Front - 467.0 (TEST)
         weigh main wheel in longeron level attitude (tail high)
         weigh tailwheel in 3 point attitude
+            Tail - 122.7 (TEST)
         calc empty weight (main + main + tailwheel)
-        calc tailwheel weight (empty weight - (main horizontal + main horizontal))
+        calc tailwheel level weight (empty weight - (main horizontal + main horizontal))
         use main horizontal + main horizontal + calculated tailwheel for all W&B calcs
 
 
