@@ -7,7 +7,7 @@ from dotmap import DotMap
 
 o = xmltodict.parse(
     open(
-        "/Users/gfahmy/Documents/projects/dynon/rv-7n890gf.wordpress.2024-07-03.000.xml",
+        "/Users/gfahmy/Documents/projects/dynon/rv-7n890gf.wordpress.2024-11-05.000.xml",
         "rb",
     )
 )
