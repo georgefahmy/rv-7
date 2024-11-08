@@ -67,6 +67,8 @@ while True:
         window["save_config_name"].update(value="")
 
     if "input" in event:
+        if "slider" in event:
+            window[event[:-7]].update(value=values[event])
         # values.pprint()
         for element in window.element_list():
             if type(element.key) is str and "input" in element.key:
@@ -80,6 +82,9 @@ while True:
         set_graph_grid(window, results, values)
         draw_graph(window, results, values)
 
+        window["fuel_use_input_slider"].update(
+            range=(0, values.fuel_start_weight_input)
+        )
         window["start_weight_output"].update(value=f"{results.weight_begin} lbs")
         window["end_weight_output"].update(value=f"{results.weight_end} lbs")
         window["start_CG_output"].update(value=f"{results.cg_location_begin} in")

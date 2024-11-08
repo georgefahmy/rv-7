@@ -86,6 +86,21 @@ layout = [
                     ),
                 ],
                 [
+                    sg.Text("", expand_x=True),
+                    sg.Slider(
+                        size=(10, 12),
+                        key="pilot_weight_input_slider",
+                        enable_events=True,
+                        orientation="h",
+                        disable_number_display=True,
+                        range=(0, 300),
+                        pad=0,
+                        border_width=0,
+                        resolution=1,
+                    ),
+                    sg.Text(expand_x=True),
+                ],
+                [
                     sg.Text("Copilot:", expand_x=True),
                     sg.Input(
                         size=10,
@@ -97,6 +112,21 @@ layout = [
                         key="copilot_arm_input",
                         enable_events=True,
                     ),
+                ],
+                [
+                    sg.Text("", expand_x=True),
+                    sg.Slider(
+                        size=(10, 12),
+                        key="copilot_weight_input_slider",
+                        enable_events=True,
+                        orientation="h",
+                        disable_number_display=True,
+                        range=(0, 300),
+                        pad=0,
+                        border_width=0,
+                        resolution=1,
+                    ),
+                    sg.Text(expand_x=True),
                 ],
                 [
                     sg.Text("Baggage:", expand_x=True),
@@ -112,6 +142,21 @@ layout = [
                     ),
                 ],
                 [
+                    sg.Text("", expand_x=True),
+                    sg.Slider(
+                        size=(10, 12),
+                        key="baggage_weight_input_slider",
+                        enable_events=True,
+                        orientation="h",
+                        disable_number_display=True,
+                        range=(0, 100),
+                        pad=0,
+                        border_width=0,
+                        resolution=1,
+                    ),
+                    sg.Text(expand_x=True),
+                ],
+                [
                     sg.Text("Fuel Start (gal):", expand_x=True),
                     sg.Input(
                         size=10,
@@ -123,6 +168,21 @@ layout = [
                         key="fuel_arm_input",
                         enable_events=True,
                     ),
+                ],
+                [
+                    sg.Text("", expand_x=True),
+                    sg.Slider(
+                        size=(10, 12),
+                        key="fuel_start_weight_input_slider",
+                        enable_events=True,
+                        orientation="h",
+                        disable_number_display=True,
+                        range=(0, 42),
+                        pad=0,
+                        border_width=0,
+                        resolution=1,
+                    ),
+                    sg.Text(expand_x=True),
                 ],
                 [
                     sg.Text("Fuel Use (gal):", expand_x=True),
@@ -139,6 +199,21 @@ layout = [
                         pad=(6, 0),
                         key=None,
                     ),
+                ],
+                [
+                    sg.Text("", expand_x=True),
+                    sg.Slider(
+                        size=(10, 12),
+                        key="fuel_use_input_slider",
+                        enable_events=True,
+                        orientation="h",
+                        disable_number_display=True,
+                        range=(0, 42),
+                        pad=0,
+                        border_width=0,
+                        resolution=1,
+                    ),
+                    sg.Text(expand_x=True),
                 ],
                 [
                     sg.Text("Max Gross Weight:", expand_x=True),

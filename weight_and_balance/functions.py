@@ -17,10 +17,14 @@ def multiply(x, y):
 
 
 def divide(x, y):
+    if y == 0:
+        return 0
     return round(x / y, 2)
 
 
 def calc_cg_percent(cg, fwd_limit, aft_limit):
+    if (aft_limit - fwd_limit) == 0:
+        return 0
     return (cg - fwd_limit) / (aft_limit - fwd_limit) * 100
 
 
