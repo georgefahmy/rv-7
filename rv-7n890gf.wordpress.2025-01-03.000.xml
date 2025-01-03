@@ -17,13 +17,13 @@
  7. WordPress will then import each of the posts, pages, comments, categories, etc.
     contained in this file into your site.
 -->
-<!-- generator="WordPress.com" created="2024-11-05 21:28"-->
+<!-- generator="WordPress.com" created="2025-01-03 21:17"-->
 <rss version="2.0" xmlns:excerpt="http://wordpress.org/export/1.2/excerpt/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:wfw="http://wellformedweb.org/CommentAPI/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:wp="http://wordpress.org/export/1.2/">
   <channel>
 <title>RV-7 N890GF</title>
 <link>http://n890gf.com</link>
 <description>Build Log for George's RV-7 Project</description>
-<pubDate>Tue, 05 Nov 2024 21:28:51 +0000</pubDate>
+<pubDate>Fri, 03 Jan 2025 21:17:56 +0000</pubDate>
 <language>en</language>
 <wp:wxr_version>1.2</wp:wxr_version>
 <wp:base_site_url>http://wordpress.com/</wp:base_site_url>
@@ -40136,89 +40136,6 @@ Also thought I'd share a general update and include a short walkthrough of the s
   </wp:postmeta>
 </item>
 <item>
-  <title><![CDATA[Back at it (almost)]]></title>
-  <link>http://n890gf.com/2017/02/05/back-at-it-almost/</link>
-  <pubDate>Mon, 06 Feb 2017 04:52:11 +0000</pubDate>
-  <dc:creator>geofahm</dc:creator>
-  <guid isPermaLink="false">http://n890gf.com/2017/02/05/back-at-it-almost/</guid>
-  <description/>
-  <content:encoded><![CDATA[Yesterday I had the rare day where I could get away and get into the garage. After spending about 5 minutes looking at everything I realized I needed to spend the day cleaning the shop before attempting to do any work on the fuselage.&nbsp;
-
-Over the last 6 months or so, more and more junk started piling up, and it became more difficult even walk around. Now that the wings are done I decided to move everything out and do a full clean sweep.&nbsp;
-
-<a href="https://n890gf.com/wp-content/uploads/2017/02/img_2147.jpg"><img src="https://n890gf.com/wp-content/uploads/2017/02/img_2147.jpg" alt="" width="3264" height="2448" class="alignnone size-full wp-image-400"></a>
-With the plane in the driveway I got out the vacuum and broom and swept and cleaned all the leaves and junk out of the garage.&nbsp;<a href="https://n890gf.com/wp-content/uploads/2017/02/img_2148.jpg"><img src="https://n890gf.com/wp-content/uploads/2017/02/img_2148.jpg" alt="" width="3264" height="2448" class="alignnone size-full wp-image-401"></a>
-
-Also organized the benches and put everything away, I have a bad habit of leaving my tools and everything out on the tables, so I decided to clean those off as well.&nbsp;
-
-<a href="https://n890gf.com/wp-content/uploads/2017/02/img_2155.jpg"><img src="https://n890gf.com/wp-content/uploads/2017/02/img_2155.jpg" alt="" width="3264" height="2448" class="alignnone size-full wp-image-402"></a>
-The end result, plane back in the shop with plenty of room to begin work. Plan is to store the wings in the other garage to have nearly the whole garage to work on the fuse. Just need to build a fuse stand and then I'm good to go.
-
-I'll be doing more updates moving forward, I'm going to be working a lot more often on the project.&nbsp;]]></content:encoded>
-  <excerpt:encoded><![CDATA[]]></excerpt:encoded>
-  <wp:post_id>403</wp:post_id>
-  <wp:post_date>2017-02-05 20:52:11</wp:post_date>
-  <wp:post_date_gmt>2017-02-06 04:52:11</wp:post_date_gmt>
-  <wp:post_modified>2017-02-05 20:52:11</wp:post_modified>
-  <wp:post_modified_gmt>2017-02-06 04:52:11</wp:post_modified_gmt>
-  <wp:comment_status>open</wp:comment_status>
-  <wp:ping_status>open</wp:ping_status>
-  <wp:post_name>back-at-it-almost</wp:post_name>
-  <wp:status>publish</wp:status>
-  <wp:post_parent>0</wp:post_parent>
-  <wp:menu_order>0</wp:menu_order>
-  <wp:post_type>post</wp:post_type>
-  <wp:post_password/>
-  <wp:is_sticky>0</wp:is_sticky>
-  <category domain="category" nicename="fuselage"><![CDATA[Fuselage]]></category>
-  <category domain="category" nicename="wings"><![CDATA[Wings]]></category>
-  <category domain="category" nicename="workshop"><![CDATA[Workshop]]></category>
-  <wp:postmeta>
-    <wp:meta_key>_publicize_done_external</wp:meta_key>
-    <wp:meta_value><![CDATA[a:1:{s:7:"twitter";a:1:{i:14296058;s:54:"https://twitter.com/gfpilot7/status/828466324196192257";}}]]></wp:meta_value>
-  </wp:postmeta>
-  <wp:postmeta>
-    <wp:meta_key>_rest_api_published</wp:meta_key>
-    <wp:meta_value><![CDATA[1]]></wp:meta_value>
-  </wp:postmeta>
-  <wp:postmeta>
-    <wp:meta_key>_rest_api_client_id</wp:meta_key>
-    <wp:meta_value><![CDATA[11]]></wp:meta_value>
-  </wp:postmeta>
-  <wp:postmeta>
-    <wp:meta_key>_publicize_job_id</wp:meta_key>
-    <wp:meta_value><![CDATA[1545621838]]></wp:meta_value>
-  </wp:postmeta>
-  <wp:postmeta>
-    <wp:meta_key>_publicize_done_14388160</wp:meta_key>
-    <wp:meta_value><![CDATA[1]]></wp:meta_value>
-  </wp:postmeta>
-  <wp:postmeta>
-    <wp:meta_key>_wpas_done_14296058</wp:meta_key>
-    <wp:meta_value><![CDATA[1]]></wp:meta_value>
-  </wp:postmeta>
-  <wp:postmeta>
-    <wp:meta_key>publicize_twitter_user</wp:meta_key>
-    <wp:meta_value><![CDATA[gfpilot7]]></wp:meta_value>
-  </wp:postmeta>
-  <wp:postmeta>
-    <wp:meta_key>publicize_linkedin_url</wp:meta_key>
-    <wp:meta_value><![CDATA[https://www.linkedin.com/updates?discuss=&scope=75316498&stype=M&topic=6234232017937137664&type=U&a=Us2K]]></wp:meta_value>
-  </wp:postmeta>
-  <wp:postmeta>
-    <wp:meta_key>_publicize_done_14388166</wp:meta_key>
-    <wp:meta_value><![CDATA[1]]></wp:meta_value>
-  </wp:postmeta>
-  <wp:postmeta>
-    <wp:meta_key>_wpas_done_14296062</wp:meta_key>
-    <wp:meta_value><![CDATA[1]]></wp:meta_value>
-  </wp:postmeta>
-  <wp:postmeta>
-    <wp:meta_key>_elasticsearch_data_sharing_indexed_on</wp:meta_key>
-    <wp:meta_value><![CDATA[2024-07-22 23:58:28]]></wp:meta_value>
-  </wp:postmeta>
-</item>
-<item>
   <title><![CDATA[One-time donation]]></title>
   <link>http://n890gf.com/?jp_mem_plan=one-time-donation</link>
   <pubDate>Mon, 03 Oct 2022 17:41:03 +0000</pubDate>
@@ -41090,130 +41007,6 @@ I'll be doing more updates moving forward, I'm going to be working a lot more of
   </wp:postmeta>
 </item>
 <item>
-  <title><![CDATA[Aircraft Registration and Certification Process]]></title>
-  <link>http://n890gf.com/?page_id=1959</link>
-  <pubDate>Wed, 09 Oct 2024 17:49:39 +0000</pubDate>
-  <dc:creator>geofahm</dc:creator>
-  <guid isPermaLink="false">https://n890gf.com/?page_id=1959</guid>
-  <description/>
-  <content:encoded><![CDATA[<!-- wp:paragraph -->
-<p>This is the process by which I used to register and certify my Vans RV-7. Resources here are sourced from the EAA, the FAA, and the Vans Airforce Forums, as well as numerous blog posts that I have read throughout the years.</p>
-<!-- /wp:paragraph -->
-
-<!-- wp:page-list {"parentPageID":1959} /-->
-
-<!-- wp:paragraph -->
-<p></p>
-<!-- /wp:paragraph -->]]></content:encoded>
-  <excerpt:encoded><![CDATA[]]></excerpt:encoded>
-  <wp:post_id>1959</wp:post_id>
-  <wp:post_date>2024-10-09 10:49:39</wp:post_date>
-  <wp:post_date_gmt>2024-10-09 17:49:39</wp:post_date_gmt>
-  <wp:post_modified>2024-10-31 11:22:37</wp:post_modified>
-  <wp:post_modified_gmt>2024-10-31 18:22:37</wp:post_modified_gmt>
-  <wp:comment_status>closed</wp:comment_status>
-  <wp:ping_status>closed</wp:ping_status>
-  <wp:post_name>aircraft-registration-and-certification-process__trashed</wp:post_name>
-  <wp:status>trash</wp:status>
-  <wp:post_parent>0</wp:post_parent>
-  <wp:menu_order>0</wp:menu_order>
-  <wp:post_type>page</wp:post_type>
-  <wp:post_password/>
-  <wp:is_sticky>0</wp:is_sticky>
-  <wp:postmeta>
-    <wp:meta_key>_last_editor_used_jetpack</wp:meta_key>
-    <wp:meta_value><![CDATA[block-editor]]></wp:meta_value>
-  </wp:postmeta>
-  <wp:postmeta>
-    <wp:meta_key>advanced_seo_description</wp:meta_key>
-    <wp:meta_value><![CDATA[]]></wp:meta_value>
-  </wp:postmeta>
-  <wp:postmeta>
-    <wp:meta_key>jetpack_seo_html_title</wp:meta_key>
-    <wp:meta_value><![CDATA[]]></wp:meta_value>
-  </wp:postmeta>
-  <wp:postmeta>
-    <wp:meta_key>jetpack_seo_noindex</wp:meta_key>
-    <wp:meta_value><![CDATA[]]></wp:meta_value>
-  </wp:postmeta>
-  <wp:postmeta>
-    <wp:meta_key>_coblocks_attr</wp:meta_key>
-    <wp:meta_value><![CDATA[]]></wp:meta_value>
-  </wp:postmeta>
-  <wp:postmeta>
-    <wp:meta_key>_coblocks_dimensions</wp:meta_key>
-    <wp:meta_value><![CDATA[]]></wp:meta_value>
-  </wp:postmeta>
-  <wp:postmeta>
-    <wp:meta_key>_coblocks_responsive_height</wp:meta_key>
-    <wp:meta_value><![CDATA[]]></wp:meta_value>
-  </wp:postmeta>
-  <wp:postmeta>
-    <wp:meta_key>_coblocks_accordion_ie_support</wp:meta_key>
-    <wp:meta_value><![CDATA[]]></wp:meta_value>
-  </wp:postmeta>
-  <wp:postmeta>
-    <wp:meta_key>_jetpack_post_was_ever_published</wp:meta_key>
-    <wp:meta_value><![CDATA[]]></wp:meta_value>
-  </wp:postmeta>
-  <wp:postmeta>
-    <wp:meta_key>reader_suggested_tags</wp:meta_key>
-    <wp:meta_value><![CDATA[]]></wp:meta_value>
-  </wp:postmeta>
-  <wp:postmeta>
-    <wp:meta_key>_starter_page_template</wp:meta_key>
-    <wp:meta_value><![CDATA[blank]]></wp:meta_value>
-  </wp:postmeta>
-  <wp:postmeta>
-    <wp:meta_key>_wpcom_template_layout_category</wp:meta_key>
-    <wp:meta_value><![CDATA[a:1:{i:0;s:8:"featured";}]]></wp:meta_value>
-  </wp:postmeta>
-  <wp:postmeta>
-    <wp:meta_key>footnotes</wp:meta_key>
-    <wp:meta_value><![CDATA[]]></wp:meta_value>
-  </wp:postmeta>
-  <wp:postmeta>
-    <wp:meta_key>_publicize_pending</wp:meta_key>
-    <wp:meta_value><![CDATA[1]]></wp:meta_value>
-  </wp:postmeta>
-  <wp:postmeta>
-    <wp:meta_key>firehose_sent</wp:meta_key>
-    <wp:meta_value><![CDATA[1728496182]]></wp:meta_value>
-  </wp:postmeta>
-  <wp:postmeta>
-    <wp:meta_key>_rest_api_published</wp:meta_key>
-    <wp:meta_value><![CDATA[1]]></wp:meta_value>
-  </wp:postmeta>
-  <wp:postmeta>
-    <wp:meta_key>_rest_api_client_id</wp:meta_key>
-    <wp:meta_value><![CDATA[-1]]></wp:meta_value>
-  </wp:postmeta>
-  <wp:postmeta>
-    <wp:meta_key>_elasticsearch_data_sharing_indexed_on</wp:meta_key>
-    <wp:meta_value><![CDATA[2024-10-09 17:48:01]]></wp:meta_value>
-  </wp:postmeta>
-  <wp:postmeta>
-    <wp:meta_key>_edit_last</wp:meta_key>
-    <wp:meta_value><![CDATA[96034415]]></wp:meta_value>
-  </wp:postmeta>
-  <wp:postmeta>
-    <wp:meta_key>activitypub_canonical_url</wp:meta_key>
-    <wp:meta_value><![CDATA[https://n890gf.com/aircraft-registration-and-certification-process/]]></wp:meta_value>
-  </wp:postmeta>
-  <wp:postmeta>
-    <wp:meta_key>_wp_trash_meta_status</wp:meta_key>
-    <wp:meta_value><![CDATA[publish]]></wp:meta_value>
-  </wp:postmeta>
-  <wp:postmeta>
-    <wp:meta_key>_wp_trash_meta_time</wp:meta_key>
-    <wp:meta_value><![CDATA[1730398957]]></wp:meta_value>
-  </wp:postmeta>
-  <wp:postmeta>
-    <wp:meta_key>_wp_desired_post_slug</wp:meta_key>
-    <wp:meta_value><![CDATA[aircraft-registration-and-certification-process]]></wp:meta_value>
-  </wp:postmeta>
-</item>
-<item>
   <title><![CDATA[Aircraft Registration]]></title>
   <link>http://n890gf.com/aircraft-registration/</link>
   <pubDate>Wed, 09 Oct 2024 17:52:01 +0000</pubDate>
@@ -41365,71 +41158,6 @@ I'll be doing more updates moving forward, I'm going to be working a lot more of
   <wp:postmeta>
     <wp:meta_key>_thumbnail_id</wp:meta_key>
     <wp:meta_value><![CDATA[2031]]></wp:meta_value>
-  </wp:postmeta>
-</item>
-<item>
-  <title><![CDATA[]]></title>
-  <link>http://n890gf.com/2024/10/09/1964/</link>
-  <pubDate>Wed, 09 Oct 2024 17:49:39 +0000</pubDate>
-  <dc:creator>geofahm</dc:creator>
-  <guid isPermaLink="false">http://n890gf.com/2024/10/09/1964/</guid>
-  <description/>
-  <content:encoded><![CDATA[ ]]></content:encoded>
-  <excerpt:encoded><![CDATA[]]></excerpt:encoded>
-  <wp:post_id>1964</wp:post_id>
-  <wp:post_date>2024-10-09 10:49:39</wp:post_date>
-  <wp:post_date_gmt>2024-10-09 17:49:39</wp:post_date_gmt>
-  <wp:post_modified>2024-10-09 10:49:39</wp:post_modified>
-  <wp:post_modified_gmt>2024-10-09 17:49:39</wp:post_modified_gmt>
-  <wp:comment_status>closed</wp:comment_status>
-  <wp:ping_status>closed</wp:ping_status>
-  <wp:post_name>1964</wp:post_name>
-  <wp:status>publish</wp:status>
-  <wp:post_parent>0</wp:post_parent>
-  <wp:menu_order>11</wp:menu_order>
-  <wp:post_type>nav_menu_item</wp:post_type>
-  <wp:post_password/>
-  <wp:is_sticky>0</wp:is_sticky>
-  <category domain="nav_menu" nicename="menu-1"><![CDATA[Menu 1]]></category>
-  <wp:postmeta>
-    <wp:meta_key>_publicize_pending</wp:meta_key>
-    <wp:meta_value><![CDATA[1]]></wp:meta_value>
-  </wp:postmeta>
-  <wp:postmeta>
-    <wp:meta_key>_menu_item_type</wp:meta_key>
-    <wp:meta_value><![CDATA[post_type]]></wp:meta_value>
-  </wp:postmeta>
-  <wp:postmeta>
-    <wp:meta_key>_menu_item_menu_item_parent</wp:meta_key>
-    <wp:meta_value><![CDATA[0]]></wp:meta_value>
-  </wp:postmeta>
-  <wp:postmeta>
-    <wp:meta_key>_menu_item_object_id</wp:meta_key>
-    <wp:meta_value><![CDATA[1959]]></wp:meta_value>
-  </wp:postmeta>
-  <wp:postmeta>
-    <wp:meta_key>_menu_item_object</wp:meta_key>
-    <wp:meta_value><![CDATA[page]]></wp:meta_value>
-  </wp:postmeta>
-  <wp:postmeta>
-    <wp:meta_key>_menu_item_target</wp:meta_key>
-    <wp:meta_value><![CDATA[]]></wp:meta_value>
-  </wp:postmeta>
-  <wp:postmeta>
-    <wp:meta_key>_menu_item_classes</wp:meta_key>
-    <wp:meta_value><![CDATA[a:1:{i:0;s:0:"";}]]></wp:meta_value>
-  </wp:postmeta>
-  <wp:postmeta>
-    <wp:meta_key>_menu_item_xfn</wp:meta_key>
-    <wp:meta_value><![CDATA[]]></wp:meta_value>
-  </wp:postmeta>
-  <wp:postmeta>
-    <wp:meta_key>_menu_item_url</wp:meta_key>
-    <wp:meta_value><![CDATA[]]></wp:meta_value>
-  </wp:postmeta>
-  <wp:postmeta>
-    <wp:meta_key>_menu_item_content</wp:meta_key>
-    <wp:meta_value><![CDATA[]]></wp:meta_value>
   </wp:postmeta>
 </item>
 <item>
@@ -42075,6 +41803,188 @@ I'll be doing more updates moving forward, I'm going to be working a lot more of
   <wp:postmeta>
     <wp:meta_key>_wp_attachment_metadata</wp:meta_key>
     <wp:meta_value><![CDATA[a:6:{s:5:"width";i:4284;s:6:"height";i:5712;s:4:"file";s:85:"/home/wpcom/public_html/wp-content/blogs.dir/4da/100991476/files/2024/11/img_7749.jpg";s:8:"filesize";i:3907050;s:5:"sizes";a:0:{}s:10:"image_meta";a:12:{s:8:"aperture";s:4:"1.78";s:6:"credit";s:0:"";s:6:"camera";s:13:"iPhone 16 Pro";s:7:"caption";s:0:"";s:17:"created_timestamp";s:10:"1730561725";s:9:"copyright";s:0:"";s:12:"focal_length";s:15:"6.7649998656528";s:3:"iso";s:3:"100";s:13:"shutter_speed";s:18:"0.0082644628099174";s:5:"title";s:0:"";s:11:"orientation";s:1:"1";s:8:"keywords";a:0:{}}}]]></wp:meta_value>
+  </wp:postmeta>
+</item>
+<item>
+  <title><![CDATA[img_7961]]></title>
+  <link>http://n890gf.com/img_7961/</link>
+  <pubDate>Mon, 16 Dec 2024 19:16:48 +0000</pubDate>
+  <dc:creator>geofahm</dc:creator>
+  <guid isPermaLink="false">http://n890gf.files.wordpress.com/2024/12/img_7961.jpg</guid>
+  <description/>
+  <content:encoded><![CDATA[]]></content:encoded>
+  <excerpt:encoded><![CDATA[]]></excerpt:encoded>
+  <wp:post_id>2204</wp:post_id>
+  <wp:post_date>2024-12-16 11:16:48</wp:post_date>
+  <wp:post_date_gmt>2024-12-16 19:16:48</wp:post_date_gmt>
+  <wp:post_modified>2024-12-16 11:16:48</wp:post_modified>
+  <wp:post_modified_gmt>2024-12-16 19:16:48</wp:post_modified_gmt>
+  <wp:comment_status>open</wp:comment_status>
+  <wp:ping_status>closed</wp:ping_status>
+  <wp:post_name>img_7961</wp:post_name>
+  <wp:status>inherit</wp:status>
+  <wp:post_parent>0</wp:post_parent>
+  <wp:menu_order>0</wp:menu_order>
+  <wp:post_type>attachment</wp:post_type>
+  <wp:post_password/>
+  <wp:is_sticky>0</wp:is_sticky>
+  <wp:attachment_url>https://n890gf.com/wp-content/uploads/2024/12/img_7961.jpg</wp:attachment_url>
+  <wp:postmeta>
+    <wp:meta_key>_wp_attached_file</wp:meta_key>
+    <wp:meta_value><![CDATA[/home/wpcom/public_html/wp-content/blogs.dir/4da/100991476/files/2024/12/img_7961.jpg]]></wp:meta_value>
+  </wp:postmeta>
+  <wp:postmeta>
+    <wp:meta_key>_wp_attachment_metadata</wp:meta_key>
+    <wp:meta_value><![CDATA[a:6:{s:5:"width";i:4032;s:6:"height";i:3024;s:4:"file";s:85:"/home/wpcom/public_html/wp-content/blogs.dir/4da/100991476/files/2024/12/img_7961.jpg";s:8:"filesize";i:1413911;s:5:"sizes";a:0:{}s:10:"image_meta";a:12:{s:8:"aperture";s:3:"2.2";s:6:"credit";s:0:"";s:6:"camera";s:13:"iPhone 16 Pro";s:7:"caption";s:0:"";s:17:"created_timestamp";s:10:"1734280941";s:9:"copyright";s:0:"";s:12:"focal_length";s:15:"2.2200000286119";s:3:"iso";s:4:"1250";s:13:"shutter_speed";s:17:"0.016666666666667";s:5:"title";s:0:"";s:11:"orientation";s:1:"1";s:8:"keywords";a:0:{}}}]]></wp:meta_value>
+  </wp:postmeta>
+</item>
+<item>
+  <title><![CDATA[img_7963]]></title>
+  <link>http://n890gf.com/img_7963/</link>
+  <pubDate>Mon, 16 Dec 2024 19:16:48 +0000</pubDate>
+  <dc:creator>geofahm</dc:creator>
+  <guid isPermaLink="false">http://n890gf.files.wordpress.com/2024/12/img_7963.jpg</guid>
+  <description/>
+  <content:encoded><![CDATA[]]></content:encoded>
+  <excerpt:encoded><![CDATA[]]></excerpt:encoded>
+  <wp:post_id>2205</wp:post_id>
+  <wp:post_date>2024-12-16 11:16:48</wp:post_date>
+  <wp:post_date_gmt>2024-12-16 19:16:48</wp:post_date_gmt>
+  <wp:post_modified>2024-12-16 11:16:48</wp:post_modified>
+  <wp:post_modified_gmt>2024-12-16 19:16:48</wp:post_modified_gmt>
+  <wp:comment_status>open</wp:comment_status>
+  <wp:ping_status>closed</wp:ping_status>
+  <wp:post_name>img_7963</wp:post_name>
+  <wp:status>inherit</wp:status>
+  <wp:post_parent>0</wp:post_parent>
+  <wp:menu_order>0</wp:menu_order>
+  <wp:post_type>attachment</wp:post_type>
+  <wp:post_password/>
+  <wp:is_sticky>0</wp:is_sticky>
+  <wp:attachment_url>https://n890gf.com/wp-content/uploads/2024/12/img_7963.jpg</wp:attachment_url>
+  <wp:postmeta>
+    <wp:meta_key>_wp_attachment_metadata</wp:meta_key>
+    <wp:meta_value><![CDATA[a:6:{s:5:"width";i:3024;s:6:"height";i:4032;s:4:"file";s:85:"/home/wpcom/public_html/wp-content/blogs.dir/4da/100991476/files/2024/12/img_7963.jpg";s:8:"filesize";i:1831427;s:5:"sizes";a:0:{}s:10:"image_meta";a:12:{s:8:"aperture";s:3:"2.2";s:6:"credit";s:0:"";s:6:"camera";s:13:"iPhone 16 Pro";s:7:"caption";s:0:"";s:17:"created_timestamp";s:10:"1734280960";s:9:"copyright";s:0:"";s:12:"focal_length";s:15:"2.2200000286119";s:3:"iso";s:3:"800";s:13:"shutter_speed";s:17:"0.016666666666667";s:5:"title";s:0:"";s:11:"orientation";s:1:"1";s:8:"keywords";a:0:{}}}]]></wp:meta_value>
+  </wp:postmeta>
+  <wp:postmeta>
+    <wp:meta_key>_wp_attached_file</wp:meta_key>
+    <wp:meta_value><![CDATA[/home/wpcom/public_html/wp-content/blogs.dir/4da/100991476/files/2024/12/img_7963.jpg]]></wp:meta_value>
+  </wp:postmeta>
+</item>
+<item>
+  <title><![CDATA[img_7962]]></title>
+  <link>http://n890gf.com/img_7962/</link>
+  <pubDate>Mon, 16 Dec 2024 19:16:48 +0000</pubDate>
+  <dc:creator>geofahm</dc:creator>
+  <guid isPermaLink="false">http://n890gf.files.wordpress.com/2024/12/img_7962.jpg</guid>
+  <description/>
+  <content:encoded><![CDATA[]]></content:encoded>
+  <excerpt:encoded><![CDATA[]]></excerpt:encoded>
+  <wp:post_id>2206</wp:post_id>
+  <wp:post_date>2024-12-16 11:16:48</wp:post_date>
+  <wp:post_date_gmt>2024-12-16 19:16:48</wp:post_date_gmt>
+  <wp:post_modified>2024-12-16 11:16:48</wp:post_modified>
+  <wp:post_modified_gmt>2024-12-16 19:16:48</wp:post_modified_gmt>
+  <wp:comment_status>open</wp:comment_status>
+  <wp:ping_status>closed</wp:ping_status>
+  <wp:post_name>img_7962</wp:post_name>
+  <wp:status>inherit</wp:status>
+  <wp:post_parent>0</wp:post_parent>
+  <wp:menu_order>0</wp:menu_order>
+  <wp:post_type>attachment</wp:post_type>
+  <wp:post_password/>
+  <wp:is_sticky>0</wp:is_sticky>
+  <wp:attachment_url>https://n890gf.com/wp-content/uploads/2024/12/img_7962.jpg</wp:attachment_url>
+  <wp:postmeta>
+    <wp:meta_key>_wp_attached_file</wp:meta_key>
+    <wp:meta_value><![CDATA[/home/wpcom/public_html/wp-content/blogs.dir/4da/100991476/files/2024/12/img_7962.jpg]]></wp:meta_value>
+  </wp:postmeta>
+  <wp:postmeta>
+    <wp:meta_key>_wp_attachment_metadata</wp:meta_key>
+    <wp:meta_value><![CDATA[a:6:{s:5:"width";i:4032;s:6:"height";i:3024;s:4:"file";s:85:"/home/wpcom/public_html/wp-content/blogs.dir/4da/100991476/files/2024/12/img_7962.jpg";s:8:"filesize";i:1332472;s:5:"sizes";a:0:{}s:10:"image_meta";a:12:{s:8:"aperture";s:3:"2.2";s:6:"credit";s:0:"";s:6:"camera";s:13:"iPhone 16 Pro";s:7:"caption";s:0:"";s:17:"created_timestamp";s:10:"1734280947";s:9:"copyright";s:0:"";s:12:"focal_length";s:15:"2.2200000286119";s:3:"iso";s:4:"1250";s:13:"shutter_speed";s:17:"0.028571428571429";s:5:"title";s:0:"";s:11:"orientation";s:1:"1";s:8:"keywords";a:0:{}}}]]></wp:meta_value>
+  </wp:postmeta>
+</item>
+<item>
+  <title><![CDATA[Back at it (almost)]]></title>
+  <link>http://n890gf.com/2017/02/05/back-at-it-almost/</link>
+  <pubDate>Mon, 06 Feb 2017 04:52:11 +0000</pubDate>
+  <dc:creator>geofahm</dc:creator>
+  <guid isPermaLink="false">http://n890gf.com/2017/02/05/back-at-it-almost/</guid>
+  <description/>
+  <content:encoded><![CDATA[Yesterday I had the rare day where I could get away and get into the garage. After spending about 5 minutes looking at everything I realized I needed to spend the day cleaning the shop before attempting to do any work on the fuselage.&nbsp;
+
+Over the last 6 months or so, more and more junk started piling up, and it became more difficult even walk around. Now that the wings are done I decided to move everything out and do a full clean sweep.&nbsp;
+
+<a href="https://n890gf.com/wp-content/uploads/2017/02/img_2147.jpg"><img src="https://n890gf.com/wp-content/uploads/2017/02/img_2147.jpg" alt="" width="3264" height="2448" class="alignnone size-full wp-image-400"></a>
+With the plane in the driveway I got out the vacuum and broom and swept and cleaned all the leaves and junk out of the garage.&nbsp;<a href="https://n890gf.com/wp-content/uploads/2017/02/img_2148.jpg"><img src="https://n890gf.com/wp-content/uploads/2017/02/img_2148.jpg" alt="" width="3264" height="2448" class="alignnone size-full wp-image-401"></a>
+
+Also organized the benches and put everything away, I have a bad habit of leaving my tools and everything out on the tables, so I decided to clean those off as well.&nbsp;
+
+<a href="https://n890gf.com/wp-content/uploads/2017/02/img_2155.jpg"><img src="https://n890gf.com/wp-content/uploads/2017/02/img_2155.jpg" alt="" width="3264" height="2448" class="alignnone size-full wp-image-402"></a>
+The end result, plane back in the shop with plenty of room to begin work. Plan is to store the wings in the other garage to have nearly the whole garage to work on the fuse. Just need to build a fuse stand and then I'm good to go.
+
+I'll be doing more updates moving forward, I'm going to be working a lot more often on the project.&nbsp;]]></content:encoded>
+  <excerpt:encoded><![CDATA[]]></excerpt:encoded>
+  <wp:post_id>403</wp:post_id>
+  <wp:post_date>2017-02-05 20:52:11</wp:post_date>
+  <wp:post_date_gmt>2017-02-06 04:52:11</wp:post_date_gmt>
+  <wp:post_modified>2017-02-05 20:52:11</wp:post_modified>
+  <wp:post_modified_gmt>2017-02-06 04:52:11</wp:post_modified_gmt>
+  <wp:comment_status>open</wp:comment_status>
+  <wp:ping_status>open</wp:ping_status>
+  <wp:post_name>back-at-it-almost</wp:post_name>
+  <wp:status>publish</wp:status>
+  <wp:post_parent>0</wp:post_parent>
+  <wp:menu_order>0</wp:menu_order>
+  <wp:post_type>post</wp:post_type>
+  <wp:post_password/>
+  <wp:is_sticky>0</wp:is_sticky>
+  <category domain="category" nicename="fuselage"><![CDATA[Fuselage]]></category>
+  <category domain="category" nicename="wings"><![CDATA[Wings]]></category>
+  <category domain="category" nicename="workshop"><![CDATA[Workshop]]></category>
+  <wp:postmeta>
+    <wp:meta_key>_publicize_done_external</wp:meta_key>
+    <wp:meta_value><![CDATA[a:1:{s:7:"twitter";a:1:{i:14296058;s:54:"https://twitter.com/gfpilot7/status/828466324196192257";}}]]></wp:meta_value>
+  </wp:postmeta>
+  <wp:postmeta>
+    <wp:meta_key>_rest_api_published</wp:meta_key>
+    <wp:meta_value><![CDATA[1]]></wp:meta_value>
+  </wp:postmeta>
+  <wp:postmeta>
+    <wp:meta_key>_rest_api_client_id</wp:meta_key>
+    <wp:meta_value><![CDATA[11]]></wp:meta_value>
+  </wp:postmeta>
+  <wp:postmeta>
+    <wp:meta_key>_publicize_job_id</wp:meta_key>
+    <wp:meta_value><![CDATA[1545621838]]></wp:meta_value>
+  </wp:postmeta>
+  <wp:postmeta>
+    <wp:meta_key>_publicize_done_14388160</wp:meta_key>
+    <wp:meta_value><![CDATA[1]]></wp:meta_value>
+  </wp:postmeta>
+  <wp:postmeta>
+    <wp:meta_key>_wpas_done_14296058</wp:meta_key>
+    <wp:meta_value><![CDATA[1]]></wp:meta_value>
+  </wp:postmeta>
+  <wp:postmeta>
+    <wp:meta_key>publicize_twitter_user</wp:meta_key>
+    <wp:meta_value><![CDATA[gfpilot7]]></wp:meta_value>
+  </wp:postmeta>
+  <wp:postmeta>
+    <wp:meta_key>publicize_linkedin_url</wp:meta_key>
+    <wp:meta_value><![CDATA[https://www.linkedin.com/updates?discuss=&scope=75316498&stype=M&topic=6234232017937137664&type=U&a=Us2K]]></wp:meta_value>
+  </wp:postmeta>
+  <wp:postmeta>
+    <wp:meta_key>_publicize_done_14388166</wp:meta_key>
+    <wp:meta_value><![CDATA[1]]></wp:meta_value>
+  </wp:postmeta>
+  <wp:postmeta>
+    <wp:meta_key>_wpas_done_14296062</wp:meta_key>
+    <wp:meta_value><![CDATA[1]]></wp:meta_value>
+  </wp:postmeta>
+  <wp:postmeta>
+    <wp:meta_key>_elasticsearch_data_sharing_indexed_on</wp:meta_key>
+    <wp:meta_value><![CDATA[2024-07-22 23:58:28]]></wp:meta_value>
   </wp:postmeta>
 </item>
 <item>
@@ -53287,6 +53197,35 @@ Gui (RV7A from France)]]></wp:comment_content>
   </wp:postmeta>
 </item>
 <item>
+  <title><![CDATA[Custom Styles]]></title>
+  <link>http://n890gf.com/2022/09/23/wp-global-styles-pub%2fminnow/</link>
+  <pubDate>Fri, 23 Sep 2022 16:39:19 +0000</pubDate>
+  <dc:creator>geofahm</dc:creator>
+  <guid isPermaLink="false">https://n890gf.com/2022/09/23/wp-global-styles-pub%2fminnow/</guid>
+  <description/>
+  <content:encoded><![CDATA[{"version":2,"isGlobalStylesUserThemeJSON":true}]]></content:encoded>
+  <excerpt:encoded><![CDATA[]]></excerpt:encoded>
+  <wp:post_id>958</wp:post_id>
+  <wp:post_date>2022-09-23 09:39:19</wp:post_date>
+  <wp:post_date_gmt>2022-09-23 16:39:19</wp:post_date_gmt>
+  <wp:post_modified>2022-09-23 09:39:19</wp:post_modified>
+  <wp:post_modified_gmt>2022-09-23 16:39:19</wp:post_modified_gmt>
+  <wp:comment_status>closed</wp:comment_status>
+  <wp:ping_status>closed</wp:ping_status>
+  <wp:post_name>wp-global-styles-pub%2fminnow</wp:post_name>
+  <wp:status>publish</wp:status>
+  <wp:post_parent>0</wp:post_parent>
+  <wp:menu_order>0</wp:menu_order>
+  <wp:post_type>wp_global_styles</wp:post_type>
+  <wp:post_password/>
+  <wp:is_sticky>0</wp:is_sticky>
+  <category domain="wp_theme" nicename="minnow"><![CDATA[minnow]]></category>
+  <wp:postmeta>
+    <wp:meta_key>_publicize_pending</wp:meta_key>
+    <wp:meta_value><![CDATA[1]]></wp:meta_value>
+  </wp:postmeta>
+</item>
+<item>
   <title><![CDATA[Panel]]></title>
   <link>http://n890gf.com/2023/07/24/panel-3/</link>
   <pubDate>Mon, 24 Jul 2023 07:17:03 +0000</pubDate>
@@ -53436,35 +53375,6 @@ Gui (RV7A from France)]]></wp:comment_content>
   <wp:postmeta>
     <wp:meta_key>_elasticsearch_data_sharing_indexed_on</wp:meta_key>
     <wp:meta_value><![CDATA[2024-07-22 23:58:36]]></wp:meta_value>
-  </wp:postmeta>
-</item>
-<item>
-  <title><![CDATA[Custom Styles]]></title>
-  <link>http://n890gf.com/2022/09/23/wp-global-styles-pub%2fminnow/</link>
-  <pubDate>Fri, 23 Sep 2022 16:39:19 +0000</pubDate>
-  <dc:creator>geofahm</dc:creator>
-  <guid isPermaLink="false">https://n890gf.com/2022/09/23/wp-global-styles-pub%2fminnow/</guid>
-  <description/>
-  <content:encoded><![CDATA[{"version":2,"isGlobalStylesUserThemeJSON":true}]]></content:encoded>
-  <excerpt:encoded><![CDATA[]]></excerpt:encoded>
-  <wp:post_id>958</wp:post_id>
-  <wp:post_date>2022-09-23 09:39:19</wp:post_date>
-  <wp:post_date_gmt>2022-09-23 16:39:19</wp:post_date_gmt>
-  <wp:post_modified>2022-09-23 09:39:19</wp:post_modified>
-  <wp:post_modified_gmt>2022-09-23 16:39:19</wp:post_modified_gmt>
-  <wp:comment_status>closed</wp:comment_status>
-  <wp:ping_status>closed</wp:ping_status>
-  <wp:post_name>wp-global-styles-pub%2fminnow</wp:post_name>
-  <wp:status>publish</wp:status>
-  <wp:post_parent>0</wp:post_parent>
-  <wp:menu_order>0</wp:menu_order>
-  <wp:post_type>wp_global_styles</wp:post_type>
-  <wp:post_password/>
-  <wp:is_sticky>0</wp:is_sticky>
-  <category domain="wp_theme" nicename="minnow"><![CDATA[minnow]]></category>
-  <wp:postmeta>
-    <wp:meta_key>_publicize_pending</wp:meta_key>
-    <wp:meta_value><![CDATA[1]]></wp:meta_value>
   </wp:postmeta>
 </item>
 <item>
@@ -57356,10 +57266,6 @@ https://videopress.com/v/Q1fo12ek?resizeToParent=true&amp;cover=true&amp;preload
       <wp:meta_value><![CDATA[a:3:{s:4:"time";d:1729527074.258906;s:5:"event";s:9:"check-ham";s:4:"user";s:7:"geofahm";}]]></wp:meta_value>
     </wp:commentmeta>
     <wp:commentmeta>
-      <wp:meta_key>akismet_as_submitted</wp:meta_key>
-      <wp:meta_value><![CDATA[a:15:{s:7:"user_ID";i:96034415;s:14:"comment_author";s:6:"George";s:20:"comment_author_email";s:17:"geofahm@gmail.com";s:18:"comment_author_url";s:27:"http://n890gf.wordpress.com";s:15:"comment_content";s:82:"https://store.vansaircraft.com/avionics-bay-access-panel-kit-access-panel-kit.html";s:12:"comment_type";s:7:"comment";s:7:"user_id";i:96034415;s:17:"comment_author_IP";s:14:"71.198.141.162";s:13:"comment_agent";s:117:"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36";s:7:"user_ip";s:14:"71.198.141.162";s:10:"user_agent";s:117:"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36";s:4:"blog";s:17:"http://n890gf.com";s:9:"blog_lang";s:2:"en";s:12:"blog_charset";s:5:"UTF-8";s:9:"permalink";s:51:"http://n890gf.com/2024/08/04/began-work-on-cowling/";}]]></wp:meta_value>
-    </wp:commentmeta>
-    <wp:commentmeta>
       <wp:meta_key>akismet_guid</wp:meta_key>
       <wp:meta_value><![CDATA[1a5a819ec49ade9da1d5d6b06a589120]]></wp:meta_value>
     </wp:commentmeta>
@@ -57408,16 +57314,6 @@ https://videopress.com/v/Q1fo12ek?resizeToParent=true&amp;cover=true&amp;preload
     <wp:commentmeta>
       <wp:meta_key>akismet_guid</wp:meta_key>
       <wp:meta_value><![CDATA[a389d1220b3def95dc012470f8ca975b]]></wp:meta_value>
-    </wp:commentmeta>
-    <wp:commentmeta>
-      <wp:meta_key>akismet_as_submitted</wp:meta_key>
-      <wp:meta_value><![CDATA[a:31:{s:14:"comment_author";s:23:"inquisitivelycf7b5d0787";s:20:"comment_author_email";s:18:"s804ever@gmail.com";s:18:"comment_author_url";s:0:"";s:15:"comment_content";s:138:"<!-- wp:paragraph -->
-<p>thank you for the help</p>
-<!-- /wp:paragraph -->
-
-<!-- wp:paragraph -->
-<p>Greg</p>
-<!-- /wp:paragraph -->";s:12:"comment_type";s:0:"";s:7:"user_id";i:256964481;s:7:"user_ID";i:256964481;s:17:"comment_author_IP";s:14:"47.184.232.211";s:13:"comment_agent";s:117:"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.6 Safari/605.1.15";s:7:"user_ip";s:14:"47.184.232.211";s:10:"user_agent";s:117:"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.6 Safari/605.1.15";s:4:"blog";s:27:"http://n890gf.wordpress.com";s:9:"blog_lang";s:2:"en";s:12:"blog_charset";s:5:"UTF-8";s:9:"permalink";s:62:"https://n890gf.wordpress.com/2024/08/04/began-work-on-cowling/";s:19:"POST_ak_hp_textarea";s:0:"";s:10:"POST_ak_js";s:13:"1729528638736";s:11:"POST_ak_bib";s:13:"1729528643930";s:11:"POST_ak_bfs";s:13:"1729528678061";s:12:"POST_ak_bkpc";s:1:"0";s:11:"POST_ak_bkp";s:0:"";s:11:"POST_ak_bmc";s:10:"2;2,36884;";s:12:"POST_ak_bmcc";s:1:"2";s:11:"POST_ak_bmk";s:0:"";s:11:"POST_ak_bck";s:0:"";s:12:"POST_ak_bmmc";s:1:"0";s:12:"POST_ak_btmc";s:1:"1";s:11:"POST_ak_bsc";s:1:"4";s:11:"POST_ak_bte";s:21:"43;189,34175;91,2454;";s:12:"POST_ak_btec";s:1:"3";s:11:"POST_ak_bmm";s:0:"";}]]></wp:meta_value>
     </wp:commentmeta>
     <wp:commentmeta>
       <wp:meta_key>akismet_result</wp:meta_key>
@@ -57480,24 +57376,6 @@ Greg
     <wp:commentmeta>
       <wp:meta_key>akismet_history</wp:meta_key>
       <wp:meta_value><![CDATA[a:3:{s:4:"time";d:1729515609.518958;s:5:"event";s:9:"check-ham";s:4:"user";s:23:"inquisitivelycf7b5d0787";}]]></wp:meta_value>
-    </wp:commentmeta>
-    <wp:commentmeta>
-      <wp:meta_key>akismet_as_submitted</wp:meta_key>
-      <wp:meta_value><![CDATA[a:31:{s:14:"comment_author";s:23:"inquisitivelycf7b5d0787";s:20:"comment_author_email";s:18:"s804ever@gmail.com";s:18:"comment_author_url";s:0:"";s:15:"comment_content";s:301:"<!-- wp:paragraph -->
-<p>where did you get the access panels for the top forward skin?</p>
-<!-- /wp:paragraph -->
-
-<!-- wp:paragraph -->
-<p></p>
-<!-- /wp:paragraph -->
-
-<!-- wp:paragraph -->
-<p>thanks </p>
-<!-- /wp:paragraph -->
-
-<!-- wp:paragraph -->
-<p>Greg </p>
-<!-- /wp:paragraph -->";s:12:"comment_type";s:0:"";s:7:"user_id";i:256964481;s:7:"user_ID";i:256964481;s:17:"comment_author_IP";s:14:"47.184.232.211";s:13:"comment_agent";s:117:"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.6 Safari/605.1.15";s:7:"user_ip";s:14:"47.184.232.211";s:10:"user_agent";s:117:"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.6 Safari/605.1.15";s:4:"blog";s:27:"http://n890gf.wordpress.com";s:9:"blog_lang";s:2:"en";s:12:"blog_charset";s:5:"UTF-8";s:9:"permalink";s:62:"https://n890gf.wordpress.com/2024/08/04/began-work-on-cowling/";s:19:"POST_ak_hp_textarea";s:0:"";s:10:"POST_ak_js";s:13:"1729515386395";s:11:"POST_ak_bib";s:13:"1729515487344";s:11:"POST_ak_bfs";s:13:"1729515579290";s:12:"POST_ak_bkpc";s:2:"23";s:11:"POST_ak_bkp";s:155:"18;12,1041;12,305;13,521;11,1205;11,662;16,290;11,201;14,756;12,403;13,446;12,413;13,479;12,338;14,263;14,695;14,435;14,420;34;10,218;11,189;11,264;14,297;";s:11:"POST_ak_bmc";s:43:"2;3,52777;59,65966;18,11119;3,13880;2,9386;";s:12:"POST_ak_bmcc";s:1:"6";s:11:"POST_ak_bmk";s:0:"";s:11:"POST_ak_bck";s:0:"";s:12:"POST_ak_bmmc";s:1:"0";s:12:"POST_ak_btmc";s:2:"25";s:11:"POST_ak_bsc";s:2:"27";s:11:"POST_ak_bte";s:285:"71;456,2519;465,-456;177,556;2132,2863;2139,-2132;237,456;814,2545;831,-814;338,370;103,239;230,1671;336,18262;345,-336;1839,2163;12,488;44,7242;77,14687;370,3599;702,7384;118,4817;27,8368;105,1254;71,3881;1687,62455;35,1825;61,11109;328,3199;987,496;486,6667;77,1632;963,2681;92,5686;";s:12:"POST_ak_btec";s:2:"33";s:11:"POST_ak_bmm";s:0:"";}]]></wp:meta_value>
     </wp:commentmeta>
   </wp:comment>
 </item>
@@ -58712,6 +58590,62 @@ Greg
     <wp:meta_key>reader_suggested_tags</wp:meta_key>
     <wp:meta_value><![CDATA[["Aviation","History","Riveting","Articles","Experimental"]]]></wp:meta_value>
   </wp:postmeta>
+  <wp:comment>
+    <wp:comment_id>1002</wp:comment_id>
+    <wp:comment_author><![CDATA[John Kelsall]]></wp:comment_author>
+    <wp:comment_author_email>jk@prodec-precision.com</wp:comment_author_email>
+    <wp:comment_author_url/>
+    <wp:comment_author_IP>81.131.7.123</wp:comment_author_IP>
+    <wp:comment_date>2025-01-01 07:27:43</wp:comment_date>
+    <wp:comment_date_gmt>2025-01-01 15:27:43</wp:comment_date_gmt>
+    <wp:comment_content><![CDATA[<!-- wp:paragraph -->
+<p>Brilliant most helpfull </p>
+<!-- /wp:paragraph --><!-- wp:paragraph -->
+<p>John Kelsall  G-XERK UK</p>
+<!-- /wp:paragraph -->]]></wp:comment_content>
+    <wp:comment_approved>1</wp:comment_approved>
+    <wp:comment_type/>
+    <wp:comment_parent>0</wp:comment_parent>
+    <wp:comment_user_id>0</wp:comment_user_id>
+    <wp:commentmeta>
+      <wp:meta_key>akismet_guid</wp:meta_key>
+      <wp:meta_value><![CDATA[ed4dd145df63b5414e820695e683c17b]]></wp:meta_value>
+    </wp:commentmeta>
+    <wp:commentmeta>
+      <wp:meta_key>email_notification_notqueued</wp:meta_key>
+      <wp:meta_value><![CDATA[1735749232]]></wp:meta_value>
+    </wp:commentmeta>
+    <wp:commentmeta>
+      <wp:meta_key>jabber_published</wp:meta_key>
+      <wp:meta_value><![CDATA[1735749232]]></wp:meta_value>
+    </wp:commentmeta>
+    <wp:commentmeta>
+      <wp:meta_key>akismet_history</wp:meta_key>
+      <wp:meta_value><![CDATA[a:3:{s:4:"time";d:1735749233.048725;s:5:"event";s:15:"status-approved";s:4:"user";s:7:"geofahm";}]]></wp:meta_value>
+    </wp:commentmeta>
+    <wp:commentmeta>
+      <wp:meta_key>firehose_sent</wp:meta_key>
+      <wp:meta_value><![CDATA[1735749234]]></wp:meta_value>
+    </wp:commentmeta>
+    <wp:commentmeta>
+      <wp:meta_key>akismet_result</wp:meta_key>
+      <wp:meta_value><![CDATA[false]]></wp:meta_value>
+    </wp:commentmeta>
+    <wp:commentmeta>
+      <wp:meta_key>akismet_history</wp:meta_key>
+      <wp:meta_value><![CDATA[a:2:{s:4:"time";d:1735745263.766033;s:5:"event";s:9:"check-ham";}]]></wp:meta_value>
+    </wp:commentmeta>
+    <wp:commentmeta>
+      <wp:meta_key>akismet_as_submitted</wp:meta_key>
+      <wp:meta_value><![CDATA[a:31:{s:14:"comment_author";s:12:"John Kelsall";s:20:"comment_author_email";s:23:"jk@prodec-precision.com";s:18:"comment_author_url";s:0:"";s:15:"comment_content";s:159:"<!-- wp:paragraph -->
+<p>Brilliant most helpfull </p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>John Kelsall  G-XERK UK</p>
+<!-- /wp:paragraph -->";s:12:"comment_type";s:0:"";s:7:"user_id";i:0;s:7:"user_ID";i:0;s:17:"comment_author_IP";s:12:"81.131.7.123";s:13:"comment_agent";s:111:"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";s:7:"user_ip";s:12:"81.131.7.123";s:10:"user_agent";s:111:"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";s:4:"blog";s:18:"https://n890gf.com";s:9:"blog_lang";s:2:"en";s:12:"blog_charset";s:5:"UTF-8";s:9:"permalink";s:47:"https://n890gf.com/2024/09/15/finished-cowling/";s:19:"POST_ak_hp_textarea";s:0:"";s:10:"POST_ak_js";s:13:"1735735776506";s:11:"POST_ak_bib";s:13:"1735745193295";s:11:"POST_ak_bfs";s:13:"1735745261995";s:12:"POST_ak_bkpc";s:1:"4";s:11:"POST_ak_bkp";s:22:"119;136,71;1,1143;1,0;";s:11:"POST_ak_bmc";s:88:"181;58,3331;101,384295;108,8959322;855,55250;71,5360;140,3685;107,1390;40,1813;101,6476;";s:12:"POST_ak_bmcc";s:2:"10";s:11:"POST_ak_bmk";s:0:"";s:11:"POST_ak_bck";s:0:"";s:12:"POST_ak_bmmc";s:3:"142";s:12:"POST_ak_btmc";s:1:"0";s:11:"POST_ak_bsc";s:2:"85";s:11:"POST_ak_bte";s:0:"";s:12:"POST_ak_btec";s:1:"0";s:11:"POST_ak_bmm";s:785:"439,296;1222,524;193,121;351,2;62,75;1726,83;157,335;46,241;925,2920;144,326;350,4;22,1;68,5;208,1;176,4175;327,399;217,1;910,125;1347,7319;218,6;155,1;1785,8488;704,637;2522,7084;35,7712;775,7779;63,7362;28,24;433,7362;983,819;791,189;52,1490;462,326;33,72;271,203;279,131;36,122;530,36;134,69;514,580;1970,406;1606,99;177,127;37,200;556,313;45,332;506,697;189,183;1352,1389;1851,77;16,1;781,1296;613,1605;1110,5648;1610,5693;128,4;1352,13;874,6;209,4;588,8;341,178;193,201;19,1;593,404;220,1;171,1;1498,111;717,6;646,3667;22,100;876,4067;548,4223;719,3665;1291,803;1074,178;36,1601;268,248;855,4322;75,3;631,4257;582,189;633,14;1101,6916;858,579;2264,539;207,6612;1046,554;2605,347;404,213;263,7521;67,10;3112,7539;1988,7017;411,7046;114,33;17,43;383,7463;391,7148;772,528;1737,7045;";}]]></wp:meta_value>
+    </wp:commentmeta>
+  </wp:comment>
 </item>
 <item>
   <title><![CDATA[Began Fitting Baffles]]></title>
@@ -60189,32 +60123,32 @@ Greg
 <p>Here is the front flange after trimming and drilling. I'll need to figure out the best method for screw installation once the prop and starter ring are installed.</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:image {"id":2190,"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large"><img src="https://n890gf.com/wp-content/uploads/2024/11/img_7740.jpg?w=1024" alt="" class="wp-image-2190" /></figure>
+<!-- wp:image {"id":2190,"sizeSlug":"large","linkDestination":"media"} -->
+<figure class="wp-block-image size-large"><a href="https://n890gf.com/wp-content/uploads/2024/11/img_7740.jpg"><img src="https://n890gf.com/wp-content/uploads/2024/11/img_7740.jpg?w=1024" alt="" class="wp-image-2190" /></a></figure>
 <!-- /wp:image -->
 
 <!-- wp:paragraph -->
 <p>The rear layup was similar to the forward in that I had to split the glass in the middle around the rear support bracket. I also needed to accommodate the part around the oil cooler mount. </p>
 <!-- /wp:paragraph -->
 
-<!-- wp:image {"id":2191,"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large"><img src="https://n890gf.com/wp-content/uploads/2024/11/img_7741.jpg?w=768" alt="" class="wp-image-2191" /></figure>
+<!-- wp:image {"id":2191,"sizeSlug":"large","linkDestination":"media"} -->
+<figure class="wp-block-image size-large"><a href="https://n890gf.com/wp-content/uploads/2024/11/img_7741.jpg"><img src="https://n890gf.com/wp-content/uploads/2024/11/img_7741.jpg?w=768" alt="" class="wp-image-2191" /></a></figure>
 <!-- /wp:image -->
 
 <!-- wp:paragraph -->
 <p>I added the peel-ply to absorb extra epoxy.</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:image {"id":2189,"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large"><img src="https://n890gf.com/wp-content/uploads/2024/11/img_7742.jpg?w=1024" alt="" class="wp-image-2189" /></figure>
+<!-- wp:image {"id":2189,"sizeSlug":"large","linkDestination":"media"} -->
+<figure class="wp-block-image size-large"><a href="https://n890gf.com/wp-content/uploads/2024/11/img_7742.jpg"><img src="https://n890gf.com/wp-content/uploads/2024/11/img_7742.jpg?w=1024" alt="" class="wp-image-2189" /></a></figure>
 <!-- /wp:image -->
 
 <!-- wp:paragraph -->
 <p>Once this cured, I trimmed all the excess and drilled the mounting holes. </p>
 <!-- /wp:paragraph -->
 
-<!-- wp:image {"id":2197,"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large"><img src="https://n890gf.com/wp-content/uploads/2024/11/img_7750.jpg?w=1024" alt="" class="wp-image-2197" /></figure>
+<!-- wp:image {"id":2197,"sizeSlug":"large","linkDestination":"media"} -->
+<figure class="wp-block-image size-large"><a href="https://n890gf.com/wp-content/uploads/2024/11/img_7750.jpg"><img src="https://n890gf.com/wp-content/uploads/2024/11/img_7750.jpg?w=1024" alt="" class="wp-image-2197" /></a></figure>
 <!-- /wp:image -->
 
 <!-- wp:paragraph -->
@@ -60228,8 +60162,8 @@ Greg
   <wp:post_id>2186</wp:post_id>
   <wp:post_date>2024-11-02 20:00:05</wp:post_date>
   <wp:post_date_gmt>2024-11-03 03:00:05</wp:post_date_gmt>
-  <wp:post_modified>2024-11-02 20:00:05</wp:post_modified>
-  <wp:post_modified_gmt>2024-11-03 03:00:05</wp:post_modified_gmt>
+  <wp:post_modified>2024-11-07 14:15:26</wp:post_modified>
+  <wp:post_modified_gmt>2024-11-07 22:15:26</wp:post_modified_gmt>
   <wp:comment_status>open</wp:comment_status>
   <wp:ping_status>open</wp:ping_status>
   <wp:post_name>finished-plenum-flanges</wp:post_name>
@@ -60293,6 +60227,111 @@ Greg
   <wp:postmeta>
     <wp:meta_key>_publicize_shares</wp:meta_key>
     <wp:meta_value><![CDATA[a:9:{s:6:"status";s:7:"success";s:7:"message";s:69:"https://www.linkedin.com/feed/update/urn:li:share:7258674300830834689";s:9:"timestamp";i:1730602813;s:7:"service";s:8:"linkedin";s:13:"connection_id";i:25429116;s:11:"external_id";s:10:"cwdDo1oVEN";s:13:"external_name";s:12:"George Fahmy";s:15:"profile_picture";s:210:"https://media.licdn.com/dms/image/v2/C4D03AQEwB3yEoOpeEQ/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1516935538164?e=1736380800&v=beta&t=rUAMyzDCjCUGqwxx75BvgEhVL0y2CVRk4jI3ntF3BS8";s:12:"profile_link";s:0:"";}]]></wp:meta_value>
+  </wp:postmeta>
+  <wp:postmeta>
+    <wp:meta_key>_publicize_done_25429116</wp:meta_key>
+    <wp:meta_value><![CDATA[1]]></wp:meta_value>
+  </wp:postmeta>
+  <wp:postmeta>
+    <wp:meta_key>_wpas_done_30769825</wp:meta_key>
+    <wp:meta_value><![CDATA[1]]></wp:meta_value>
+  </wp:postmeta>
+</item>
+<item>
+  <title><![CDATA[Riveted Plenum Nutplates]]></title>
+  <link>http://n890gf.com/2024/12/16/riveted-plenum-nutplates/</link>
+  <pubDate>Tue, 17 Dec 2024 01:00:00 +0000</pubDate>
+  <dc:creator>geofahm</dc:creator>
+  <guid isPermaLink="false">https://n890gf.com/?p=2202</guid>
+  <description/>
+  <content:encoded><![CDATA[<!-- wp:paragraph -->
+<p>I finally had some time to get back to working on the plane. I wrapped up the plenum installation by drilling K1000-8 nutplates to the baffles and counter sinking for some countersunk washers. </p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":2206,"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="https://n890gf.com/wp-content/uploads/2024/12/img_7962.jpg?w=1024" alt="" class="wp-image-2206" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Now that the plenum is fully drilled, I can paint it and prep it for final installation. Here is the plenum with one of the screws installed.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":2204,"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="https://n890gf.com/wp-content/uploads/2024/12/img_7961.jpg?w=1024" alt="" class="wp-image-2204" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Another angle. I decided to counter sink and use the washers to help distribute the load of the pressure within the plenum. The total force inside the plenum could be a couple hundred pounds when I am in cruise, so I wanted to ensure that the plenum is securely attached to the baffles.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":2205,"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="https://n890gf.com/wp-content/uploads/2024/12/img_7963.jpg?w=768" alt="" class="wp-image-2205" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Once the plenum is painted, I will put a bead of high-temp silicone caulking on the inside, where the lip of the baffles are, to create an air-tight seal when the plenum gets installed.</p>
+<!-- /wp:paragraph -->]]></content:encoded>
+  <excerpt:encoded><![CDATA[]]></excerpt:encoded>
+  <wp:post_id>2202</wp:post_id>
+  <wp:post_date>2024-12-16 17:00:00</wp:post_date>
+  <wp:post_date_gmt>2024-12-17 01:00:00</wp:post_date_gmt>
+  <wp:post_modified>2024-12-16 11:24:11</wp:post_modified>
+  <wp:post_modified_gmt>2024-12-16 19:24:11</wp:post_modified_gmt>
+  <wp:comment_status>open</wp:comment_status>
+  <wp:ping_status>open</wp:ping_status>
+  <wp:post_name>riveted-plenum-nutplates</wp:post_name>
+  <wp:status>publish</wp:status>
+  <wp:post_parent>0</wp:post_parent>
+  <wp:menu_order>0</wp:menu_order>
+  <wp:post_type>post</wp:post_type>
+  <wp:post_password/>
+  <wp:is_sticky>0</wp:is_sticky>
+  <category domain="post_tag" nicename="airplane"><![CDATA[airplane]]></category>
+  <category domain="post_tag" nicename="avgeek"><![CDATA[avgeek]]></category>
+  <category domain="post_tag" nicename="aviation"><![CDATA[aviation]]></category>
+  <category domain="category" nicename="baffles"><![CDATA[Baffles]]></category>
+  <category domain="post_tag" nicename="experimental"><![CDATA[experimental]]></category>
+  <category domain="post_tag" nicename="fiberglass"><![CDATA[fiberglass]]></category>
+  <category domain="category" nicename="firewall-forward"><![CDATA[Firewall Forward]]></category>
+  <category domain="post_tag" nicename="homebuilt"><![CDATA[homebuilt]]></category>
+  <category domain="category" nicename="plenum"><![CDATA[Plenum]]></category>
+  <category domain="post_tag" nicename="rv-7"><![CDATA[RV-7]]></category>
+  <category domain="post_tag" nicename="vansaircraft"><![CDATA[vansaircraft]]></category>
+  <wp:postmeta>
+    <wp:meta_key>_last_editor_used_jetpack</wp:meta_key>
+    <wp:meta_value><![CDATA[block-editor]]></wp:meta_value>
+  </wp:postmeta>
+  <wp:postmeta>
+    <wp:meta_key>_thumbnail_id</wp:meta_key>
+    <wp:meta_value><![CDATA[2205]]></wp:meta_value>
+  </wp:postmeta>
+  <wp:postmeta>
+    <wp:meta_key>activitypub_status</wp:meta_key>
+    <wp:meta_value><![CDATA[federate]]></wp:meta_value>
+  </wp:postmeta>
+  <wp:postmeta>
+    <wp:meta_key>firehose_sent</wp:meta_key>
+    <wp:meta_value><![CDATA[1734400512]]></wp:meta_value>
+  </wp:postmeta>
+  <wp:postmeta>
+    <wp:meta_key>_publicize_job_id</wp:meta_key>
+    <wp:meta_value><![CDATA[100235338668]]></wp:meta_value>
+  </wp:postmeta>
+  <wp:postmeta>
+    <wp:meta_key>_elasticsearch_data_sharing_indexed_on</wp:meta_key>
+    <wp:meta_value><![CDATA[2024-12-16 19:24:30]]></wp:meta_value>
+  </wp:postmeta>
+  <wp:postmeta>
+    <wp:meta_key>timeline_notification</wp:meta_key>
+    <wp:meta_value><![CDATA[1734400515]]></wp:meta_value>
+  </wp:postmeta>
+  <wp:postmeta>
+    <wp:meta_key>_publicize_done_external</wp:meta_key>
+    <wp:meta_value><![CDATA[a:1:{s:8:"linkedin";a:1:{i:30769825;s:69:"https://www.linkedin.com/feed/update/urn:li:share:7274603020141649921";}}]]></wp:meta_value>
+  </wp:postmeta>
+  <wp:postmeta>
+    <wp:meta_key>_publicize_shares</wp:meta_key>
+    <wp:meta_value><![CDATA[a:9:{s:6:"status";s:7:"success";s:7:"message";s:69:"https://www.linkedin.com/feed/update/urn:li:share:7274603020141649921";s:9:"timestamp";i:1734400515;s:7:"service";s:8:"linkedin";s:13:"connection_id";i:25429116;s:11:"external_id";s:10:"cwdDo1oVEN";s:13:"external_name";s:12:"George Fahmy";s:15:"profile_picture";s:210:"https://media.licdn.com/dms/image/v2/C4D03AQEwB3yEoOpeEQ/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1516935538164?e=1736380800&v=beta&t=rUAMyzDCjCUGqwxx75BvgEhVL0y2CVRk4jI3ntF3BS8";s:12:"profile_link";s:0:"";}]]></wp:meta_value>
   </wp:postmeta>
   <wp:postmeta>
     <wp:meta_key>_publicize_done_25429116</wp:meta_key>
