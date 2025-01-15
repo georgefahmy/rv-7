@@ -31,7 +31,7 @@ On Deck:
         add blast tube holes for ignitions
         install blast tubes for P-Mags
         fabricate the conical gussets for the interior of the inlet ramps
-        fabricate baffle underside linking using Safety Wire and a washer
+        fabricate baffle underside linking using Safety Wire and a washer (or normal threaded way)
         seal with caulking
 
     Plenum:
@@ -58,9 +58,10 @@ On Deck:
             Front Right -
         weigh tailwheel in 3 point attitude
             Tail - 122.7 (TEST)
-        calc empty weight (main + main + tailwheel)
-        calc tailwheel level weight (empty weight - (main horizontal + main horizontal))
-        use main horizontal + main horizontal + calculated tailwheel for all W&B calcs
+            Tail -
+        calc empty weight (L main + R main + tailwheel)
+        calc tailwheel level weight (empty weight - (L main horizontal + R main horizontal))
+        use L main horizontal + R main horizontal + calculated tailwheel for all W&B calcs
 
 
 ################################################
@@ -72,7 +73,7 @@ they have been added to the build log
     ✔ installed all nutplates for plenum @done(24-12-16)
 
 11/20/2024:
-    ✔ received aircrat registration 890GF! @done(24-11-21)
+    ✔ received aircrat registration N890GF! @done(24-11-21)
 
 11/2/2024:
     ✔ started drilling nut plates on baffles @done(24-11-03)
