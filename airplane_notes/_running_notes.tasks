@@ -45,27 +45,27 @@ Daily Updates are collected below this line
 Updates are moved to the archive section after
 they have been added to the build log
 9/6/2025:
-    Right Front weight average over 5 weights 474.36 horizontal
-    Right Front weight average over 3 weights 464.2 three point
-    Left Front Weight average over 5 weights 477.48 horizontal
-    Left Front Weight average over 3 weights 460.5 three point
-    tail wheel average over 5 weights 100.4 three point
+    ✔ Right Front weight average over 5 weights 474.36 horizontal @done(25-09-07)
+    ✔ Right Front weight average over 3 weights 464.2 three point @done(25-09-07)
+    ✔ Left Front Weight average over 5 weights 477.48 horizontal @done(25-09-07)
+    ✔ Left Front Weight average over 3 weights 460.5 three point @done(25-09-07)
+    ✔ tail wheel average over 5 weights 100.4 three point @done(25-09-07)
 
-    empty weight (three point)= 464.2 + 460.5 + 100.4 = 1025.1
+    ✔ empty weight (three point)= 464.2 + 460.5 + 100.4 = 1025.1 @done(25-09-07)
 
-    Tail wheel horizontal = 1025.1 - (474.26 + 477.48) = 73.26
+    ✔ Tail wheel horizontal = 1025.1 - (474.26 + 477.48) = 73.26 @done(25-09-07)
 
-    WB uses horizontal calcsl (3% adjustments) [arm]
-    LF = 474.36 (488.59) [68.45]
-    RF = 477.48 (491.8) [68.45]
-    TW = 73.26 (75.45) [249.19]
+    ✔ WB uses horizontal calcsl (3% adjustments) [arm] @done(25-09-07)
+    ✔ LF = 474.36 (488.59) [68.45] @done(25-09-07)
+    ✔ RF = 477.48 (491.8) [68.45] @done(25-09-07)
+    ✔ TW = 73.26 (75.45) [249.19] @done(25-09-07)
 
-    EW = 1025.1 (1055.84) lbs
-    Empty CG = 81.37" (32.88% of envelope)
+    ✔ EW = 1025.1 (1055.84) lbs @done(25-09-07)
+    ✔ Empty CG = 81.37" (32.88% of envelope) @done(25-09-07)
 
 8/22/2025:
     ✔ 3d scan of plane by Bruce's custom covers @done(25-08-22)
-    
+
 8/15/2025:
     ✔ reworked ELT @done(25-08-16)
     ✔ secured ELT antenna @done(25-08-16)
