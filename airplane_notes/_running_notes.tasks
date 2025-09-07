@@ -13,8 +13,6 @@ Backlog:
 On Deck:
     ☐ Finish Program Letter
     ☐ Do W&B documentat
-    ☐ Notorize Eligibility Statement
-    ☐ Three View Drawing/photograph
 
     ☐ Install wing cover panels
     ☐ Install flap push rod cover panels
@@ -41,27 +39,38 @@ On Deck:
     FWF:
         safety wire all FWF bolts where needed
 
-    W&B:
-        weigh main wheel in 3 point attitude
-            Front Left - 489.2 (TEST)
-            Right Front - 467.0 (TEST)
-        weigh main wheel in longeron level attitude (tail high)
-            Front Left -
-            Front Right -
-        weigh tailwheel in 3 point attitude
-            Tail - 122.7 (TEST)
-            Tail -
-
-        Formula:
-            calc empty weight (L main + R main + tailwheel)
-            calc tailwheel level weight (empty weight - (L main horizontal + R main horizontal))
-            use L main horizontal + R main horizontal + calculated tailwheel for all W&B calcs
-
 
 ################################################
 Daily Updates are collected below this line
 Updates are moved to the archive section after
 they have been added to the build log
+9/6/2025:
+    Right Front weight average over 5 weights 474.36 horizontal
+    Right Front weight average over 3 weights 464.2 three point
+    Left Front Weight average over 5 weights 477.48 horizontal
+    Left Front Weight average over 3 weights 460.5 three point
+    tail wheel average over 5 weights 100.4 three point
+
+    empty weight (three point)= 464.2 + 460.5 + 100.4 = 1025.1
+
+    Tail wheel horizontal = 1025.1 - (474.26 + 477.48) = 73.26
+
+    WB uses horizontal calcsl (3% adjustments) [arm]
+    LF = 474.36 (488.59) [68.45]
+    RF = 477.48 (491.8) [68.45]
+    TW = 73.26 (75.45) [249.19]
+
+    EW = 1025.1 (1055.84) lbs
+    Empty CG = 81.37" (32.88% of envelope)
+
+8/22/2025:
+    ✔ 3d scan of plane by Bruce's custom covers @done(25-08-22)
+    
+8/15/2025:
+    ✔ reworked ELT @done(25-08-16)
+    ✔ secured ELT antenna @done(25-08-16)
+    ✔ finished torquing FWF bolts and hoses @done(25-08-16)
+
 7/26/2025:
     ✔ installed crotch straps for pilot and copilot @done(25-07-27)
     ✔ fabricated new ELT antenna cable @done(25-07-27)
