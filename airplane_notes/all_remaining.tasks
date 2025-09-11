@@ -3,22 +3,8 @@
 ☐ baggage area rear panel interior cover
 ☐ rewire panel dimmer to PFD
 ☐ vacuum all interior of the aircraft
-☐ add filler to forward top skin after riveting to blend with canopy skin
-cowl:
-    ☐ install forward top skin with rivets
-baffle:
-    ☐ add moutning provisions to baffle for plenum top
-    ☐ create a gasket for plenum top so no air leaks (research this)
 fwf:
-    ✔ install oil cooler on rear baffle @done(24-12-30)
-    ✔ install oil cooler hoses to oil cooler @done(24-12-30)
-    ☐ torque all FWF hoses
     ☐ install top spark plugs and ignition harnesses
-    ☐ add adel clamps everywhere for wiring support
-    ☐ check for any rubbing/chafing between air hoses and fuel hoses and wiring and engine mount
-    ☐ install blast tubes from aft baffle for PMAG ignitions cooling
-    ☐ install blast tube from forward baffle for alternator cooling
-    ☐ torque and install safety wiring to prop bolts 66ft-lbs
     ☐ add all screws for spinner
 ☐ install entire interior of aircraft
 ☐ check propeller governer stops (with engine run)
@@ -26,6 +12,18 @@ fwf:
 ☐ do a complete dry run of DAR checklist
 
 Archive:
+    ✔ add filler to forward top skin after riveting to blend with canopy skin @done(25-09-10)
+    ✔ install forward top skin with rivets @done(25-09-10) @project(cowl)
+    ✔ add moutning provisions to baffle for plenum top @done(25-09-10) @project(baffle)
+    ✔ create a gasket for plenum top so no air leaks (research this) @done(25-09-10) @project(baffle)
+    ✔ install oil cooler on rear baffle @done(24-12-30) @project(fwf)
+    ✔ install oil cooler hoses to oil cooler @done(24-12-30) @project(fwf)
+    ✔ torque all FWF hoses @done(25-09-09) @project(fwf)
+    ✔ add adel clamps everywhere for wiring support @done(25-09-09) @project(fwf)
+    ✔ check for any rubbing/chafing between air hoses and fuel hoses and wiring and engine mount @done(25-09-09) @project(fwf)
+    ✔ install blast tubes from aft baffle for PMAG ignitions cooling @done(25-09-09) @project(fwf)
+    ✔ install blast tube from forward baffle for alternator cooling @done(25-09-09) @project(fwf)
+    ✔ torque and install safety wiring to prop bolts 66ft-lbs @done(25-09-10) @project(fwf)
     ✔ cover engine with plastic and use expanding foam for plenum shape @done(24-10-22) @project(baffle)
     ✔ add more plastic to top foam for fiberglass and core layup @done(24-10-22) @project(baffle)
     ✔ make planum on plastic using thin core and fiberglass/epoxy @done(24-10-22) @project(baffle)
