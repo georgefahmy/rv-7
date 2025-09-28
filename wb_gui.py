@@ -86,6 +86,7 @@ while True:
             range=(0, values.fuel_start_weight_input)
         )
         window["start_weight_output"].update(value=f"{results.weight_begin} lbs")
+        window["empty_weight_output"].update(value=f"{results.empty_weight} lbs")
         window["end_weight_output"].update(value=f"{results.weight_end} lbs")
         window["start_CG_output"].update(value=f"{results.cg_location_begin} in")
         window["start_cg_percent_output"].update(value=f"{results.cg_percent_begin}%")

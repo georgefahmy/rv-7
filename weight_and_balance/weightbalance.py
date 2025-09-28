@@ -137,6 +137,7 @@ def calc_cg(
     results = DotMap(
         weight_begin=f"{_round(start_weight)} lbs",
         moment_begin=f"{_round(start_moment)} in-lbs",
+        empty_weight=f"{_round(empty_weight)} lbs",
         cg_location_begin=f"{_round(start_cg)} inches",
         cg_percent_begin=f"{_round(start_cg_percent)}%{chord_limit}",
     )

@@ -4,6 +4,7 @@ from weight_and_balance.functions import calc_cg, load_params
 
 params = load_params()
 results = calc_cg(params.Default)
+print(results)
 sg.theme("Reddit")
 sg.set_options(font=("Arial", 16))
 
@@ -272,6 +273,12 @@ layout = [
             background_color="white",
             key="output_frame",
             layout=[
+                [
+                    sg.Text("Empty Weight:", expand_x=True),
+                    sg.Text(
+                        text=f"{results.empty_weight} lbs", key="empty_weight_output"
+                    ),
+                ],
                 [
                     sg.Text("Start Weight:", expand_x=True),
                     sg.Text(
