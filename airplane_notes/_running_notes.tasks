@@ -18,7 +18,7 @@ On Deck:
     ☐ Install Pitot Tube screws
     ☐ Install flap push rod cover panels
     ☐ Torque rudder cable bolts and tailwheel spring
-    ☐ Paint horizontal/vertical stab tips
+    ✔ Paint horizontal/vertical stab tips @done(25-10-19)
     ☐ Use Pink foam to make a mold for the tail camera housing
     ☐ fabricate rudder stop extensions and rivet to existing rudder stops
 
@@ -34,8 +34,8 @@ On Deck:
         fabricate the conical gussets for the interior of the inlet ramps
 
     Plenum:
-        shape inlets around baffle (custom inlet ducts using fiberglass?)
-        fabricate seals around inlet ducts to baffles
+        ✔ shape inlets around baffle (custom inlet ducts using fiberglass?) @done(25-10-19)
+        ✔ fabricate seals around inlet ducts to baffles @done(25-10-19)
 
     FWF:
         safety wire all FWF bolts where needed
@@ -43,13 +43,24 @@ On Deck:
 
     Wings:
         Mark fuel tanks with Fuel Capacity and Min grade
-        21Gal UL94 | 100LL
+        21GAL min UL91 | 100LL AVGAS
 
 
 ################################################
 Daily Updates are collected below this line
 Updates are moved to the archive section after
 they have been added to the build log
+10/9/2025:
+    ✔ trimmed duct seals @done(25-10-19)
+    ✔ drilled pilot holes through seals @done(25-10-19)
+    ✔ test fit seals to inlets @done(25-10-19)
+10/8/2025:
+    ✔ second pass with baffle seal 1/6" offset for the fiberglass @done(25-10-19)
+    ✔ molded to inlets + baffle seal @done(25-10-19)
+
+10/6/2025:
+    ✔ first pass at inlet duct seals out of fiberglass @done(25-10-19)
+
 9/6/2025:
     ✔ Right Front weight average over 5 weights 474.36 horizontal @done(25-09-07)
     ✔ Right Front weight average over 3 weights 464.2 three point @done(25-09-07)
@@ -57,7 +68,7 @@ they have been added to the build log
     ✔ Left Front Weight average over 3 weights 460.5 three point @done(25-09-07)
     ✔ tail wheel average over 5 weights 100.4 three point @done(25-09-07)
 
-    ✔ empty weight (three point)= 464.2 + 460.5 + 100.4 = 1025.1 @done(25-09-07)
+    ✔ empty weight (three point) = 464.2 + 460.5 + 100.4 = 1025.1 @done(25-09-07)
 
     ✔ Tail wheel horizontal = 1025.1 - (474.26 + 477.48) = 73.26 @done(25-09-07)
 
@@ -69,32 +80,31 @@ they have been added to the build log
     ✔ EW = 1025.1 (1055.84) lbs @done(25-09-07)
     ✔ Empty CG = 81.37" (32.88% of envelope) @done(25-09-07)
 
-8/22/2025:
-    ✔ 3d scan of plane by Bruce's custom covers @done(25-08-22)
-
-8/15/2025:
-    ✔ reworked ELT @done(25-08-16)
-    ✔ secured ELT antenna @done(25-08-16)
-    ✔ finished torquing FWF bolts and hoses @done(25-08-16)
-
-7/26/2025:
-    ✔ installed crotch straps for pilot and copilot @done(25-07-27)
-    ✔ fabricated new ELT antenna cable @done(25-07-27)
-    ✔ secured oil breather tube FWF @done(25-07-27)
-    ✔ installed angle brace leather covers with 3m adhesive @done(25-07-27)
-    ✔ reattached baggage bulkhead covers velcro blocks @done(25-07-27)
-
-7/6/2025:
-    ✔ Heat shielding added to lower cowl @done(25-07-07)
-    ✔ RTV the baffles @done(25-07-07)
-    ✔ N number application @done(25-07-07)
-    ✔ Installed blast tubes for ignitions @done(25-07-07)
-
-
 #########################################
 Below items have been updated in the blog
 
 Archive:
+    8/22/2025:
+        ✔ 3d scan of plane by Bruce's custom covers @done(25-08-22)
+
+    8/15/2025:
+        ✔ reworked ELT @done(25-08-16)
+        ✔ secured ELT antenna @done(25-08-16)
+        ✔ finished torquing FWF bolts and hoses @done(25-08-16)
+
+    7/26/2025:
+        ✔ installed crotch straps for pilot and copilot @done(25-07-27)
+        ✔ fabricated new ELT antenna cable @done(25-07-27)
+        ✔ secured oil breather tube FWF @done(25-07-27)
+        ✔ installed angle brace leather covers with 3m adhesive @done(25-07-27)
+        ✔ reattached baggage bulkhead covers velcro blocks @done(25-07-27)
+
+    7/6/2025:
+        ✔ Heat shielding added to lower cowl @done(25-07-07)
+        ✔ RTV the baffles @done(25-07-07)
+        ✔ N number application @done(25-07-07)
+        ✔ Installed blast tubes for ignitions @done(25-07-07)
+
     6/1/2025:
         ✔ added alternator blast tube and adel clamps @done(25-06-01)
         ✔ installed throttle cable firewall eyeball @done(25-06-01)
