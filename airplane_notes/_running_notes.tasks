@@ -34,11 +34,11 @@ On Deck:
     ☐ Install wing cover panels
     ✔ Install Pitot Tube screws @done(25-11-05)
     ☐ Install flap push rod cover panels
-    ☐ Torque rudder cable bolts and tailwheel spring
-    ☐ Use Pink foam to make a mold for the tail camera housing
-    ☐ Fabricate rudder stop extensions and rivet to existing rudder stops
+    ✔ Torque rudder cable bolts and tailwheel spring @done(25-11-07)
+    ☐ Fabricate rudder stop extensions and rivet/bolt to existing rudder stops
     ☐ Install autopilot safety brackets
     ✔ Install top spark plugs @done(25-11-05)
+    ☐ Change data logging to 1/s from 4/s - too high a rate
 
 
     interior:
@@ -63,10 +63,19 @@ On Deck:
 Daily Updates are collected below this line
 Updates are moved to the archive section after
 they have been added to the build log
+11/7/2025:
+    ✔ fixed oil leaks @done(25-11-07)
+    ✔ fixed and torqued fuel pump outlet and firewall attachment lines @done(25-11-07)
+    ✔ tightened and torqued oil temperature sensor fitting @done(25-11-07)
+    ✔ torqued oil cooler engine fittings @done(25-11-07)
+    ✔ torqued engine control cables @done(25-11-07)
+    ✔ added cotter pin to elevator trim @done(25-11-07)
+
+
 11/6/2025:
     ✔ First Engine Run! @done(25-11-06)
     ✔ found oil leak from oil pressure sensor line - FIXED @done(25-11-06)
-    ☐ @critical fuel leak in the cabin from firewall and pump outlet connections - NOT FIXED
+    ✔ fuel leak in the cabin from firewall and pump outlet connections - FIXED @done(25-11-07)
 
 10/25/2025 - 10/29/2025:
     ✔ cleaned the workbenches @done(25-10-29)
