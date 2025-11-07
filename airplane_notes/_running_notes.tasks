@@ -10,17 +10,35 @@ Backlog:
     ☐ @interior Installation instructions interior_installation.tasks
     ☐ @interior Fix paint chip on panel
 
-On Deck:
-    ✔ Finish Program Letter @done(25-09-27)
-    ✔ Do W&B documentat @done(25-09-27)
 
+November 8th:
+    ✔ finish cleaning hangar @done(25-11-05)
+    organize parker's crap surf boards and cover the corner with tarp
+    bring boxes home
+    ✔ bring chairs to hangar @done(25-11-04)
+    ✔ get waters, and beer @done(25-11-04)
+    chips
+    install forward carpet
+    install front spar covers
+    make plane shiny
+    finish cowl inlets and prime
+    ✔ torque rudder cable bolts @done(25-11-06)
+    ✔ Install Pitot Tube screws @done(25-11-05)
+    rudder stop extensions
+    ✔ install top spark plugs @done(25-11-05)
+    ✔ run the engine @done(25-11-06)
+    taxi the plane
+
+
+On Deck:
     ☐ Install wing cover panels
-    ☐ Install Pitot Tube screws
+    ✔ Install Pitot Tube screws @done(25-11-05)
     ☐ Install flap push rod cover panels
     ☐ Torque rudder cable bolts and tailwheel spring
-    ✔ Paint horizontal/vertical stab tips @done(25-10-19)
     ☐ Use Pink foam to make a mold for the tail camera housing
-    ☐ fabricate rudder stop extensions and rivet to existing rudder stops
+    ☐ Fabricate rudder stop extensions and rivet to existing rudder stops
+    ☐ Install autopilot safety brackets
+    ✔ Install top spark plugs @done(25-11-05)
 
 
     interior:
@@ -28,14 +46,9 @@ On Deck:
         install forward carpet
         install forward and side panels
         secure bolts for seatbelts
-        install crotch strap (remove interior to do this)
 
     baffle:
         fabricate the conical gussets for the interior of the inlet ramps
-
-    Plenum:
-        ✔ shape inlets around baffle (custom inlet ducts using fiberglass?) @done(25-10-19)
-        ✔ fabricate seals around inlet ducts to baffles @done(25-10-19)
 
     FWF:
         safety wire all FWF bolts where needed
@@ -50,6 +63,23 @@ On Deck:
 Daily Updates are collected below this line
 Updates are moved to the archive section after
 they have been added to the build log
+11/6/2025:
+    ✔ First Engine Run! @done(25-11-06)
+    ✔ found oil leak from oil pressure sensor line - FIXED @done(25-11-06)
+    ☐ @critical fuel leak in the cabin from firewall and pump outlet connections - NOT FIXED
+
+10/25/2025 - 10/29/2025:
+    ✔ cleaned the workbenches @done(25-10-29)
+    ✔ cleaned the hangar @done(25-10-29)
+    ✔ lubricated the piano wire for the elevator trim @done(25-10-29)
+    ✔ test fit the landing gear fairing on the right side @done(25-10-29)
+    ✔ installed and connected the battery @done(25-10-29)
+    ✔ charged the battery @done(25-10-29)
+    ✔ filled the plane with 40 gal of 94UL @done(25-10-29)
+✔ @done(25-10-29)
+10/23/2025:
+    ✔ filled and fared the cowl inlets @done(25-10-27)
+
 10/9/2025:
     ✔ trimmed duct seals @done(25-10-19)
     ✔ drilled pilot holes through seals @done(25-10-19)
@@ -61,29 +91,30 @@ they have been added to the build log
 10/6/2025:
     ✔ first pass at inlet duct seals out of fiberglass @done(25-10-19)
 
-9/6/2025:
-    ✔ Right Front weight average over 5 weights 474.36 horizontal @done(25-09-07)
-    ✔ Right Front weight average over 3 weights 464.2 three point @done(25-09-07)
-    ✔ Left Front Weight average over 5 weights 477.48 horizontal @done(25-09-07)
-    ✔ Left Front Weight average over 3 weights 460.5 three point @done(25-09-07)
-    ✔ tail wheel average over 5 weights 100.4 three point @done(25-09-07)
-
-    ✔ empty weight (three point) = 464.2 + 460.5 + 100.4 = 1025.1 @done(25-09-07)
-
-    ✔ Tail wheel horizontal = 1025.1 - (474.26 + 477.48) = 73.26 @done(25-09-07)
-
-    ✔ WB uses horizontal calcsl (3% adjustments) [arm] @done(25-09-07)
-    ✔ LF = 474.36 (488.59) [68.45] @done(25-09-07)
-    ✔ RF = 477.48 (491.8) [68.45] @done(25-09-07)
-    ✔ TW = 73.26 (75.45) [249.19] @done(25-09-07)
-
-    ✔ EW = 1025.1 (1055.84) lbs @done(25-09-07)
-    ✔ Empty CG = 81.37" (32.88% of envelope) @done(25-09-07)
 
 #########################################
 Below items have been updated in the blog
 
 Archive:
+    9/6/2025:
+        ✔ Right Front weight average over 5 weights 474.36 horizontal @done(25-09-07)
+        ✔ Right Front weight average over 3 weights 464.2 three point @done(25-09-07)
+        ✔ Left Front Weight average over 5 weights 477.48 horizontal @done(25-09-07)
+        ✔ Left Front Weight average over 3 weights 460.5 three point @done(25-09-07)
+        ✔ tail wheel average over 5 weights 100.4 three point @done(25-09-07)
+
+        ✔ empty weight (three point) = 464.2 + 460.5 + 100.4 = 1025.1 @done(25-09-07)
+
+        ✔ Tail wheel horizontal = 1025.1 - (474.26 + 477.48) = 73.26 @done(25-09-07)
+
+        ✔ WB uses horizontal calcsl (3% adjustments) [arm] @done(25-09-07)
+        ✔ LF = 474.36 (488.59) [68.45] @done(25-09-07)
+        ✔ RF = 477.48 (491.8) [68.45] @done(25-09-07)
+        ✔ TW = 73.26 (75.45) [249.19] @done(25-09-07)
+
+        ✔ EW = 1025.1 (1055.84) lbs @done(25-09-07)
+        ✔ Empty CG = 81.37" (32.88% of envelope) @done(25-09-07)
+
     8/22/2025:
         ✔ 3d scan of plane by Bruce's custom covers @done(25-08-22)
 

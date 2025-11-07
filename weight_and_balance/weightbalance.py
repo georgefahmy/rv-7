@@ -1,4 +1,5 @@
 from dotmap import DotMap
+from functions import load_params
 
 # Designed CG envelope - 15% - 29% of chord - 8.7" -16.82" aft of LE - 78.7" - 86.82" of datum
 
@@ -152,10 +153,11 @@ def calc_cg(
 
 
 if __name__ == "__main__":
+    params = load_params()
     input_flag = 1
-    left_front_weight = 522.89
-    right_front_weight = 522.89
-    tailwheel_weight = 65.22
+    left_front_weight = params.Empty.left_main_weight_input
+    right_front_weight = params.Empty.right_main_weight_input
+    tailwheel_weight = params.Empty.tailwheel_weight_input
     empty_weight = sum(left_front_weight, right_front_weight, tailwheel_weight)
     fuel_gal_start = 0
     fuel_gal_use = 0
@@ -173,7 +175,7 @@ if __name__ == "__main__":
         passenger_weight = input("Passenger Weight: ") or passenger_weight
         baggage_weight = input("Baggage Weight: ") or baggage_weight
         config_name = input("Config name: ") or config_name
-        chord_flag = bool(input("Chord Flag: "))
+        # chord_flag = bool(input("Chord Flag: "))
 
     result = DotMap(
         {
