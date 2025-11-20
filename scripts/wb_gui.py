@@ -2,7 +2,6 @@ import json
 
 import PySimpleGUI as sg
 from dotmap import DotMap
-
 from weight_and_balance.functions import (
     calc_cg,
     draw_graph,
