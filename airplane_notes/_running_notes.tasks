@@ -10,23 +10,9 @@ Backlog:
     ☐ @interior Installation instructions interior_installation.tasks
     ☐ @interior Fix paint chip on panel
 
-
-November 8th:
-    ✔ finish cleaning hangar @done(25-11-05)
-    ✔ bring chairs to hangar @done(25-11-04)
-    ✔ get waters, and beer @done(25-11-04)
-    ✔ torque rudder cable bolts @done(25-11-06)
-    ✔ Install Pitot Tube screws @done(25-11-05)
-    ✔ install top spark plugs @done(25-11-05)
-    ✔ run the engine @done(25-11-06)
-
-
 On Deck:
     ☐ Fabricate rudder stop extensions and rivet/bolt to existing rudder stops
     ☐ Install autopilot safety brackets
-    ☐ Change data logging to 1/s from 4/s - too high a rate
-    ☐ Fix fuel leak at pump
-
 
     interior:
         install baggage area cover panels
@@ -39,7 +25,6 @@ On Deck:
 
     FWF:
         safety wire all FWF bolts where needed
-        Fuel Flow Test
 
     Wings:
         Mark fuel tanks with Fuel Capacity and Min grade
@@ -50,6 +35,26 @@ On Deck:
 Daily Updates are collected below this line
 Updates are moved to the archive section after
 they have been added to the build log
+11/24/2025:
+    ✔ had visit from FAA safety inspectors - both advised ready for inspection @done(25-11-26)
+    ✔ contacted DAR Adam Valdez @done(25-11-26)
+
+11/22/2025:
+    ✔ second engine run @done(25-11-23)
+    ✔ fuel flow established @done(25-11-23)
+    ✔ fixed oil leaks @done(25-11-23)
+    ✔ fixed fuel leak in cabin @done(25-11-23)
+
+
+11/8/2025:
+    ✔ finish cleaning hangar @done(25-11-05)
+    ✔ bring chairs to hangar @done(25-11-04)
+    ✔ get waters, and beer @done(25-11-04)
+    ✔ torque rudder cable bolts @done(25-11-06)
+    ✔ Install Pitot Tube screws @done(25-11-05)
+    ✔ install top spark plugs @done(25-11-05)
+    ✔ run the engine @done(25-11-06)
+
 11/7/2025:
     ✔ fixed oil leaks @done(25-11-07)
     ✔ fixed and torqued fuel pump outlet and firewall attachment lines @done(25-11-07)

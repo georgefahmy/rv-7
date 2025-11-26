@@ -23,9 +23,9 @@ Step 3 Items to have before Airworthiness Inspection:
     ✔ FAA Form 8050-3 aircraft registration certificate must be in the plane (Do not submit with the other forms) this is issued after registration @done(24-11-25)
     ✔ Complete W&B - Empty weight, Gross weight, forward CG, aft CG, W&B for initial flight @done(25-09-10)
     ✔ Flight controls free and clear @done(25-09-10)
-    ☐ OPTIONAL but Recommended - fuel flow test AC 90-89B for details
+    ✔ OPTIONAL but Recommended - fuel flow test AC 90-89B for details @done(25-11-23)
     ✔ Finish aircraft - must be flyable (see example checklist) @done(25-09-10)
-    ☐ Logbook entry - "I certify this aircraft has been inspected in accordance with the scope and detail of Appendix D to part 43 and has been found to be in condition for safe operation" - owner of aircraft
+    ✔ Logbook entry - "I certify this aircraft has been inspected in accordance with the scope and detail of Appendix D to part 43 and has been found to be in condition for safe operation" - owner of aircraft @done(25-11-23)
 
 Step 4 Airworthiness Certification:
     Submit forms online - FAA AWC
