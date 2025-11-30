@@ -35,6 +35,33 @@ On Deck:
 Daily Updates are collected below this line
 Updates are moved to the archive section after
 they have been added to the build log
+11/29/2025:
+    ✔ re-ran engine, observed very cold #4. engine died while idling at full rich - black smoke observed indicating idle mixture is too rich @done(25-11-29)
+    ✔ restarted engine, #4 cylinder came up and was hotter than other cylinders when leaning the engine out  @done(25-11-29)
+    ✔ tested insta360 camera and cockpit audio successfully @done(25-11-29)
+    ☐ @critical observed a continued fuel leak at the pump pipe fitting. i need to remove and clean the fuel pump to fix the issue.
+    observed oil pressure above 86 psi
+        max oil pressure is 95psi min is 50psi for 1800 - 2700 rpm (20 psi minimum at idle)
+        need to run engine at 2000 rpm with oil temps in normal range and observe oil pressure and adjust as necessary
+    Idle fuel mixture
+        with engine at idle and full rich, slowly and smoothly pull back mixture and observe RPM
+        if it rises more than ~50rpm then I need to lean the idle mixture, if it just quits i need to richen it.
+        Likely need to lean based on observed run
+
+    CHT temp limits
+        500F never exceed
+        430F high performance cruise
+        400F economy cruise
+        300F - 400F optimal temperatures
+    Oil Temperatures
+        120F - 220F in cruise flights
+        130F - 200F optimal
+        240F Never exceed
+    Oil Pressure Limits (1800 - 2700 RPM)
+        50psi - Minimum
+        95psi - maximum
+
+
 11/24/2025:
     ✔ had visit from FAA safety inspectors - both advised ready for inspection @done(25-11-26)
     ✔ contacted DAR Adam Valdez @done(25-11-26)
