@@ -18,13 +18,9 @@ On Deck:
         install baggage area cover panels
         install forward carpet
         install forward and side panels
-        secure bolts for seatbelts
 
     baffle:
         fabricate the conical gussets for the interior of the inlet ramps
-
-    FWF:
-        safety wire all FWF bolts where needed
 
     Wings:
         Mark fuel tanks with Fuel Capacity and Min grade
@@ -35,11 +31,43 @@ On Deck:
 Daily Updates are collected below this line
 Updates are moved to the archive section after
 they have been added to the build log
+12/18/2025:
+    ✔ 5 takeoffs and landings in the rv6 @done(25-12-19)
+    ✔ installed plenum on engine @done(25-12-19)
+
+12/13/2025:
+    ✔ AIRWORTHY! @done(25-12-14)
+    todo list:
+        ✔ change seat belt buckles to 4-7A bolts (larger) @done(25-12-19)
+        ✔ tighten shoulder strap bolts @done(25-12-19)
+        ☐ re-grease main gear and add cotter pins
+        ✔ safety wire starter bolt @done(25-12-19)
+        ✔ safety wire alternator bolt @done(25-12-19)
+        ☐ fuel line abraison RTV
+        ☐ fuel tank labels (before first flight)
+        ☐ add two missing AN3-4A bolts to left wing fuel tank bracket
+
+12/12/2025:
+    prep for inspection
+    autopilot servo serial numbers
+        SN-7500 pitch
+        SN-9251 roll
+
+    ELT battery expiration 8/29/2030 - set reminder
+    ✔ Dynon back up battery test complete @done(25-12-12)
+    ✔ airmate charts and plates loaded onto USBs @done(25-12-12)
+    ✔ torqued and cotter pinned the rear spar bolts @done(25-12-12)
+12/9/2025:
+    ✔ flight in the rv-6 with taylor - performed basic maneuvers and stalls - systems management and approach @done(25-12-11)
+
+12/7/2025:
+    ✔ initial ops lims reported. @done(25-12-10)
+
 11/29/2025:
     ✔ re-ran engine, observed very cold #4. engine died while idling at full rich - black smoke observed indicating idle mixture is too rich @done(25-11-29)
     ✔ restarted engine, #4 cylinder came up and was hotter than other cylinders when leaning the engine out  @done(25-11-29)
     ✔ tested insta360 camera and cockpit audio successfully @done(25-11-29)
-    ☐ @critical observed a continued fuel leak at the pump pipe fitting. i need to remove and clean the fuel pump to fix the issue.
+    ✔ observed a continued fuel leak at the pump pipe fitting. i need to remove and clean the fuel pump to fix the issue - FIXED. @done(25-12-10)
     observed oil pressure above 86 psi
         max oil pressure is 95psi min is 50psi for 1800 - 2700 rpm (20 psi minimum at idle)
         need to run engine at 2000 rpm with oil temps in normal range and observe oil pressure and adjust as necessary
