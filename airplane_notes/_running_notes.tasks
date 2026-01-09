@@ -1,31 +1,56 @@
 # Archive items after updating blog
 
 Backlog:
-    ☐ @critical Check all control system bolts
+    ✔ @critical Check all control system bolts @done(26-01-08)
     ☐ @critical Perform Transponder and Pitot Static check in accordance with FAR 91.217 91.413 and 91.411 - this needs to be performed not by me - page 340 of installation guide for SV
 
     ☐ @avionics Install double usb power supply
     ☐ @avionics Change avionics dimmer lighting to same as PFD power (solved with interface board)
     ☐ @interior Add Ram mount to rear of roll bar for GoPro?
-    ☐ @interior Installation instructions interior_installation.tasks
     ☐ @interior Fix paint chip on panel
+
+    @future Paint/Wrap:
+        ☐ Aviationwraps.com got back to me ~15k for full custom wrap + cost for travel + per diem during installation + transport so probably closer to 20k
+        ☐ 35k for evoke (Plus ~ 3 year waiting)
+
+    @future Landing Height System:
+        Landing Height System Lidar Altimeter
+        ☐ 1 amp (VPX J1.2 2A) circuit for power (unit uses <150mA of current)
+            ☐ two wire sheilded for power
+            ☐ one wire shielded for audio - connect to non-muting audio input on SV-INT D25.17
+            ☐ one wire shielded for gps rs232
+        ☐ Use Left wing access panel
+        ☐ Feed 3 wire harness through wing to access panel
+
+    @future PMAG controller:
+        PMAG EI Controller - see advance angle on skyview
+        ☐ Fabricate Tx/Rx harness for Left/Right PMAG to D15 connector
+        ☐ power VPX J1.1 (2amp max),
+        ☐ Ground to ground tab on Firewall
+        ☐ EMS GPIO1, GPIO5, GPIO7, GPIO8 available (after changing Trim to VPX) Left/Right advance and temperature monitor
+        ☐ change trim position to as follows on VPX J1
+            ☐ J1.3 roll trim 2.5v ref
+            ☐ J1.4 roll trim ground
+            ☐ J1.5 roll trim position
+            ☐ J1.8 pitch trim 2.5v ref
+            ☐ J1.9 pitch trim ground
+            ☐ J1.10 pitch trim position
+            ☐ Set VPX Endpoints to 1 - do calibration on Skyview for Trim motors
+
+    @future O2 Sensor:
+        ✔ Wire harness routing @done(26-01-08)
+        ✔ Mount O2 monitor on panel @done(26-01-08)
+        ☐ Power wire from VPX "Hobbs" wiring - change to 5A CB value (up from 3)
+        ☐ Drill 20mm hole in #4 exhaust
+        ☐ Weld bung (ask Norio)
+        ☐ Chase threads M18 tap and install with anti sieze
 
 On Deck:
     ☐ Fabricate rudder stop extensions and rivet/bolt to existing rudder stops
     ☐ Install autopilot safety brackets
 
-    interior:
-        install baggage area cover panels
-        install forward carpet
-        install forward and side panels
-
     baffle:
-        fabricate the conical gussets for the interior of the inlet ramps
-
-    Wings:
-        Mark fuel tanks with Fuel Capacity and Min grade
-        21GAL min UL91 | 100LL AVGAS
-
+        fabricate the conical gussets for the interior of the inlet ramps (optional)
 
 ################################################
 Daily Updates are collected below this line
