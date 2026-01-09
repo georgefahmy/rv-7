@@ -1,13 +1,24 @@
 # Archive items after updating blog
 
 Backlog:
-    ✔ @critical Check all control system bolts @done(26-01-08)
     ☐ @critical Perform Transponder and Pitot Static check in accordance with FAR 91.217 91.413 and 91.411 - this needs to be performed not by me - page 340 of installation guide for SV
 
-    ☐ @avionics Install double usb power supply
-    ☐ @avionics Change avionics dimmer lighting to same as PFD power (solved with interface board)
-    ☐ @interior Add Ram mount to rear of roll bar for GoPro?
-    ☐ @interior Fix paint chip on panel
+    @future Accessories/Misc:
+        ☐ Double USB Power Supply - add to accessory bus
+        ☐ Change avionics dimmer power wire from accessory bus to PFD power splice
+        ☐ Ram mount to roll bar
+        ☐ Clean up paint on panel and other spots inside cabin
+        ☐ Wing mount for insta360
+        ☐ FWF cool air exit optimization (BIG PROJECT)
+        ☐ Oil cooler temperature optimization
+        ☐ Install autopilot safety brackets
+        ☐ Cowl Inlet conical gussets for cooling optimization
+
+    @future Control Approach Rudder Pedals:
+        ☐ https://controlapproach.com/product/rv14-14-6-7-and-9-rudder-pedal-system-kits/
+        ☐ Remove existing rudder pedals and hoses
+        ☐ Install new rudder pedals
+        ☐ Fabricate new rudder cable extension attach pieces
 
     @future Paint/Wrap:
         ☐ Aviationwraps.com got back to me ~15k for full custom wrap + cost for travel + per diem during installation + transport so probably closer to 20k
@@ -45,12 +56,14 @@ Backlog:
         ☐ Weld bung (ask Norio)
         ☐ Chase threads M18 tap and install with anti sieze
 
+Future Project Order:
+    1. O2 Sensor
+    2. Dimmer power line change
+    3. usb power supply
+    4. the other projects
+
 On Deck:
     ☐ Fabricate rudder stop extensions and rivet/bolt to existing rudder stops
-    ☐ Install autopilot safety brackets
-
-    baffle:
-        fabricate the conical gussets for the interior of the inlet ramps (optional)
 
 ################################################
 Daily Updates are collected below this line
