@@ -13,7 +13,8 @@ Backlog:
         ☐ Oil cooler temperature optimization
         ☐ Install autopilot safety brackets
         ☐ Cowl Inlet conical gussets for cooling optimization
-        ☐ Oil pressure switch instsall on firewall for hobbs meter on panel
+        ☐ Oil pressure switch instsall on firewall for hobbs meter on panel - accessory bus to the switch to the hobbs to ground
+        ☐ Remove starter enable and add a secret kill switch to the VPX Batt/Alt distribution ground under panel/cowl?
 
     @future Control Approach Rudder Pedals ( ~$2500):
         ☐ https://controlapproach.com/product/rv14-14-6-7-and-9-rudder-pedal-system-kits/
@@ -37,7 +38,7 @@ Backlog:
     @future PMAG controller (~$500):
         PMAG EI Controller - see advance angle on skyview
         ☐ Fabricate Tx/Rx harness for Left/Right PMAG to D15 connector
-        ☐ power VPX J1.1 (2amp max),
+        ☐ Power VPX J1.1 (2amp max),
         ☐ Ground to ground tab on Firewall
         ☐ EMS GPIO1, GPIO5, GPIO7, GPIO8 available (after changing Trim to VPX) Left/Right advance and temperature monitor
         ☐ change trim position to as follows on VPX J1
@@ -62,8 +63,8 @@ Backlog:
         ✔ Mount O2 monitor on panel @done(26-01-08)
         ☐ Power wire from VPX "Hobbs" wiring - change to 5A CB value (up from 3)
         ☐ Drill 20mm hole in #4 exhaust
-        ☐ Weld bung (ask Norio)
-        ☐ Chase threads M18 tap and install with anti sieze
+        ☐ Weld bung to #4 exhaust (ask Norio)
+        ☐ Chase threads M18 tap and install sensor with anti sieze
 
 Future Project Order:
     1. O2 Sensor
