@@ -187,6 +187,24 @@ def set_graph_grid(window, results, values):
         color="black",
         width=2,
     )
+    # aerobatic limits
+    graph.draw_line(
+        point_from=(results.forward_cg_limit_input, 1600),
+        point_to=(84.5, 1600),
+        color="red",
+        width=2,
+    )
+    graph.draw_line(
+        point_from=(84.5, 1600),
+        point_to=(84.5, results.empty_weight),
+        color="red",
+        width=2,
+    )
+    graph.draw_text(
+        text="Aerobatic Limits",
+        location=(results.forward_cg_limit_input + 1, 1625),
+        color="red",
+    )
     window.refresh()
 
 
@@ -195,6 +213,7 @@ def draw_graph(window, results, values):
     circle_radius = round(
         (results.aft_cg_limit_input - results.forward_cg_limit_input) / 100, 2
     )
+
     # draw startng CG and label
     graph.draw_circle(
         (results.cg_location_begin, results.weight_begin),

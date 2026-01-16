@@ -2,19 +2,38 @@
 
 Backlog:
     ☐ @critical Perform Transponder and Pitot Static check in accordance with FAR 91.217 91.413 and 91.411 - this needs to be performed not by me - page 340 of installation guide for SV
-
+    ☐ crankshaft serial numbers that have an AD against it:
+        Part Numbers:
+            SL36500-A20
+            SL36500-A31
+            82976-01; 82976-02
+            SP12-0003 through SP12-0089, inclusive;
+            SP13-0034 through SP13-0150, inclusive;
+            SP14-0151 through SP14-0202, inclusive
     @future Accessories/Misc:
-        ☐ Double USB Power Supply - add to accessory bus
+        ☐ Add safety wire to elevator trim tab hinge
+        ☐ Double USB Power Supply - add to accessory bus with 10A fuse
         ☐ Change avionics dimmer power wire from accessory bus to PFD power splice
         ☐ Ram mount to roll bar
         ☐ Clean up paint on panel and other spots inside cabin
         ☐ Wing mount for insta360
-        ☐ FWF cool air exit optimization (BIG PROJECT)
-        ☐ Oil cooler temperature optimization
+        ☐ Oil cooler temperature optimization (tape/flap/something)
         ☐ Install autopilot safety brackets
-        ☐ Cowl Inlet conical gussets for cooling optimization
         ☐ Oil pressure switch instsall on firewall for hobbs meter on panel - accessory bus to the switch to the hobbs to ground
         ☐ Remove starter enable and add a secret kill switch to the VPX Batt/Alt distribution ground under panel/cowl?
+            ☐ very easy to do - unplug ground wire from right most access panel from firewall passthrough
+            ☐ move wire to switch mounted under cowl near the oil door
+            ☐ route new wire to ground block (either side of firewall)
+
+        ☐ improve weight on tail - JD air lightweight tailwheel
+
+    @future FWF cool air exit optimization (BIG PROJECT):
+        ☐ add smoothing to exit above exhausts
+        ☐ optimize routing of things in lower cowl to minimize obstruction
+        ☐ add additional lower cowl baffling to cylinders?
+        ☐ utilize exhaust flow to reduce lower cowl pressure
+        ☐ seal behind starter gear to reduce lower cowl pressure
+        ☐ Cowl Inlet conical gussets for cooling optimization
 
     @future Control Approach Rudder Pedals ( ~$2500):
         ☐ https://controlapproach.com/product/rv14-14-6-7-and-9-rudder-pedal-system-kits/
@@ -29,8 +48,8 @@ Backlog:
     @future Landing Height System (~$1100):
         Landing Height System Lidar Altimeter
         ☐ 1 amp (VPX J1.2 2A) circuit for power (unit uses <150mA of current)
-            ☐ two wire sheilded for power
-            ☐ one wire shielded for audio - connect to non-muting audio input on SV-INT D25.17
+            ☐ two wire shielded for power
+            ☐ one wire shielded for audio - connect to non-muting audio input on SV-INT D25.17, ground one side
             ☐ one wire shielded for gps rs232
         ☐ Use Left wing access panel
         ☐ Feed 3 wire harness through wing to access panel
@@ -51,9 +70,9 @@ Backlog:
             ☐ Set VPX Endpoints to 1 - do calibration on Skyview for Trim motors
 
     @future Dynon Heated Pitot (~$500):
-        ☐ access panel mounting of the heater controller
-        ☐ pull wire through wing for heater controller
-        ☐ vpx pin for power - 10A?
+        ☐ access panel mounting of the heater controller (on left wing)
+        ☐ pull wire through wing for heater controller (shielded multi-core)
+        ☐ vpx pin for power - 10A? pin J12.12
         ☐ switch on the panel (or digital only switch from vpx?)
         ☐ indicator on panel (or digital only on hdx screen)
 
@@ -61,24 +80,55 @@ Backlog:
     @future O2 Sensor (~$150 - paid):
         ✔ Wire harness routing @done(26-01-08)
         ✔ Mount O2 monitor on panel @done(26-01-08)
-        ☐ Power wire from VPX "Hobbs" wiring - change to 5A CB value (up from 3)
+        ☐ Power wire from VPX "Hobbs" wiring - change to 5A CB value on vpx (up from 3)
+        ☐ finish sensor-to-controller harness
         ☐ Drill 20mm hole in #4 exhaust
         ☐ Weld bung to #4 exhaust (ask Norio)
         ☐ Chase threads M18 tap and install sensor with anti sieze
 
+    @future Landing gear fairings and wheel pants:
+        Gear Leg Fairings:
+            ☐ Cut left gear leg fairing to size using template
+            ☐ Fit fairings to landing gear
+            ☐ Add piano hinge to trailing edge - 1/16" hinge pin size 1.5" spacing for rivets
+            ☐ Align with offset centerline
+            ☐ Secure with wormgear hose clamp
+            ☐ Cut out notch for brake line
+        Wheel Pants:
+            ☐ Smooth out interface between forward and aft halves
+            ☐ Open lower hole for wheel clearance
+            ☐ Secure outer wheel pant bracket
+            ☐ Align with offset centerline
+            ☐ Align vertically forward aft
+            ☐ Align in roll symmetrically between left right (lower hole parallel to wheel)
+            ☐ Rivet nutplates to inner aft half
+            ☐ Rivet nutplates to aluminum brackets
+            ☐ Add intersection fairing and align to gear leg fairing offset centerline
+
+
 Future Project Order:
-    1. O2 Sensor
-    2. Dimmer power line change
-    3. usb power supply
-    4. the other projects
+    -  Fairings (gear and wheels)
+    -  O2 Sensor
+    -  Dimmer power line change
+    -  starter enable kill switch under cowl
+    -  usb power supply
+    - oil cooler temp optimization
+    - fwf cooling optimization (exit air)
 
 On Deck:
     ☐ Fabricate rudder stop extensions and rivet/bolt to existing rudder stops
+    ☐ weather stripping for forward canopy skin and aft canopy rollbar
+    https://www.mcmaster.com/products/weatherstripping/edge-seals-1~/water-and-weather-resistant-hollow-foam-rubber-push-on-seals-with-bulb-on-side/
 
 ################################################
 Daily Updates are collected below this line
 Updates are moved to the archive section after
 they have been added to the build log
+1/10/2026:
+    ✔ Cowled the aircraft @done(26-01-10)
+    ✔ full engine power run up to 2740RPM @done(26-01-10)
+    ✔ taxi and brake testing @done(26-01-10)
+
 1/4/2026:
     ✔ Dissassembled #4 fuel injector - found debris in the restrictor - cleaned and reassembled @done(26-01-06)
     ✔ Engine ground run - successful up to 1800 RPM, mag checks and prop cycle. all good @done(26-01-06)

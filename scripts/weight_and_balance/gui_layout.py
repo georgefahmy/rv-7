@@ -1,5 +1,4 @@
 import PySimpleGUI as sg
-
 from weight_and_balance.functions import calc_cg, load_params
 
 params = load_params()
