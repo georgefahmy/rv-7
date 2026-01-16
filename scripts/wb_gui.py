@@ -1,4 +1,6 @@
+import base64
 import json
+import os
 
 import PySimpleGUI as sg
 from dotmap import DotMap
@@ -13,12 +15,26 @@ from weight_and_balance.gui_layout import layout
 # sg.theme("Reddit")
 # sg.set_options(font=("Arial", 16))
 
+WD = os.getcwd()
 
 params = load_params()
 results = calc_cg(params.Default)
+icon_file = f"{WD}/weight_and_balance/wb_logo.png"
+sg.set_options(icon=base64.b64encode(open(str(icon_file), "rb").read()))
+
 window = sg.Window("Weight & Balance", layout=layout, finalize=True)
+with open("weight_and_balance/params.json", "r") as fp:
+    params = DotMap(json.load(fp))
+    for config in params:
+        for key in params[config].keys():
+            params[config][key] = (
+                float(params[config][key]) if params[config][key] else 0
+            )
+for key in params["Empty"].keys():
+    sg.fill_form_with_values(window, params["Empty"])
 
-
+window.write_event_value(key, params["Empty"][key])
+window["load_config_name"].update(value="Empty")
 while True:
     event, values = window.read()
     values = DotMap(values)
@@ -53,7 +69,7 @@ while True:
         del save_params["load_config_name"]
         del save_params["save_config_name"]
         params[values["save_config_name"]] = save_params.toDict()
-        with open("weight_and_balance/params.json", "w") as fp:
+        with open("resources/params.json", "w") as fp:
             json.dump(
                 params,
                 fp,
