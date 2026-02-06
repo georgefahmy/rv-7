@@ -112,8 +112,8 @@ Future Project Order:
     -  Dimmer power line change
     -  starter enable kill switch under cowl
     -  usb power supply
-    - oil cooler temp optimization
-    - fwf cooling optimization (exit air)
+    -  oil cooler temp optimization
+    -  fwf cooling optimization (exit air)
 
 On Deck:
     ☐ Fabricate rudder stop extensions and rivet/bolt to existing rudder stops
@@ -124,6 +124,10 @@ On Deck:
 Daily Updates are collected below this line
 Updates are moved to the archive section after
 they have been added to the build log
+1/31/2026:
+    ✔ first flight! engine trouble - partial power loss. investigation indicated clogged injectors and/or clogged fuel lines post fuel pump/filter @done(26-02-05)
+    ✔ flushed lines. removed any visible debris @done(26-02-05)
+    ☐ still need to clean out fuel pump and filter
 1/23/2026:
     ✔ high speed taxis in the RV-6 @done(26-01-23)
 
