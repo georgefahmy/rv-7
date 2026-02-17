@@ -15,26 +15,35 @@ def load_data(filepath):
         return None
 
 
-def group_flights(df):
+def process_flights(df):
     """
-    Groups data into flights based on Session Time resets.
-    A new flight is detected when Session Time decreases compared to the previous row.
+    Groups data into flights and marks if the engine was run.
     """
-    # Calculate the difference between consecutive Session Time values
-    # If the difference is negative (time reset), it marks the start of a new flight.
-    # cumsum() increments the ID each time a reset is found.
-    flight_ids = (df["Session Time"].diff() < 0).cumsum()
-    df["Flight ID"] = flight_ids
+    # 1. Identify Flights based on Session Time resets
+    df["Flight ID"] = (df["Session Time"].diff() < 0).cumsum()
+
+    # 2. Determine if Engine was Run for each flight
+    # Calculate max RPM for each flight
+    flight_max_rpm = df.groupby("Flight ID")[["RPM L", "RPM R"]].max()
+
+    # Create a boolean Series: True if any RPM > 0
+    flights_with_engine = (flight_max_rpm["RPM L"] > 0) | (flight_max_rpm["RPM R"] > 0)
+
+    # Map this status back to the original DataFrame
+    df["Engine Run"] = df["Flight ID"].map(flights_with_engine)
+
     return df
 
 
 def list_flights(df):
-    """Prints a summary of all detected flights."""
+    """Prints a summary of all detected flights with Engine Run status."""
     stats = df.groupby("Flight ID").agg(
         Start_Time=("Session Time", "min"),
         End_Time=("Session Time", "max"),
         Duration=("Session Time", lambda x: x.max() - x.min()),
         Data_Points=("Session Time", "count"),
+        Engine_Run=("Engine Run", "first"),  # All rows in a flight have the same value
+        Max_RPM=("RPM L", "max"),  # showing RPM L as an example
     )
     print("\n--- Detected Flights ---")
     print(stats)
@@ -43,7 +52,11 @@ def list_flights(df):
 
 def list_signals(df):
     """Lists all available signal columns."""
-    columns = [col for col in df.columns if col not in ["Flight ID", "Unnamed: 103"]]
+    columns = [
+        col
+        for col in df.columns
+        if col not in ["Flight ID", "Unnamed: 103", "Engine Run"]
+    ]
     print("\n--- Available Signals ---")
     for i, col in enumerate(columns):
         print(f"{i}: {col}")
@@ -58,7 +71,6 @@ def plot_flight(df, flight_id, signal_names):
         print(f"No data found for Flight ID {flight_id}")
         return
 
-    # specific plotting
     num_signals = len(signal_names)
     fig, axes = plt.subplots(num_signals, 1, figsize=(12, 4 * num_signals), sharex=True)
 
@@ -72,22 +84,23 @@ def plot_flight(df, flight_id, signal_names):
         ax.set_title(f"{signal} over Time")
 
     axes[-1].set_xlabel("Session Time (seconds)")
-    fig.suptitle(f"Flight {flight_id} Analysis", fontsize=16)
+    fig.suptitle(
+        f"Flight {flight_id} Analysis (Engine Run: {flight_data['Engine Run'].iloc[0]})",
+        fontsize=16,
+    )
     plt.tight_layout()
     plt.show()
 
 
 def main():
-    # Allow passing filename as command line argument
     if len(sys.argv) > 1:
         filename = sys.argv[1]
     else:
-        # Default filename or prompt
         filename = input("Enter the path to your CSV file: ")
 
     df = load_data(filename)
     if df is not None:
-        df = group_flights(df)
+        df = process_flights(df)
 
         while True:
             list_flights(df)
