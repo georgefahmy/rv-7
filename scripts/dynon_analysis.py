@@ -697,7 +697,7 @@ def main():
                 f"Flight ID: {fid}\n"
                 f"Start Time: {stats['Start_Time']}\n"
                 f"End Time: {stats['End_Time']}\n"
-                f"Duration: {stats['Duration']} sec - {stats['Duration'] / 60} min\n"
+                f"Duration: {stats['Duration']} sec - {round(stats['Duration'] / 60 , 2)} min\n"
                 f"Data Points: {stats['Data_Points']}\n"
                 f"Max RPM: {stats['Max_RPM']}\n"
                 f"Max CHT: {stats['Max_CHT']}\n"
