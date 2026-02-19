@@ -21,6 +21,17 @@ def process_flights(df):
     """
     Groups data into flights and marks if the engine was run.
     """
+    # Convert all CHT and EGT temperatures from deg C to deg F
+    temp_columns = [
+        col for col in df.columns
+        if (col.startswith("CHT") or col.startswith("EGT")) and "(deg C)" in col
+    ]
+
+    for col in temp_columns:
+        df[col] = df[col] * 9.0 / 5.0 + 32.0
+        new_name = col.replace("(deg C)", "(deg F)")
+        df.rename(columns={col: new_name}, inplace=True)
+
     # 1. Identify Flights based on Session Time resets
     df["Flight ID"] = (df["Session Time"].diff() < 0).cumsum()
 
@@ -28,7 +39,12 @@ def process_flights(df):
     # Calculate max RPM for each flight
     flight_max_rpm = df.groupby("Flight ID")[["RPM L", "RPM R"]].max()
     flight_max_cht = df.groupby("Flight ID")[
-        ["CHT 1 (deg C)", "CHT 2 (deg C)", "CHT 3 (deg C)", "CHT 4 (deg C)"]
+        [
+            "CHT 1 (deg F)",
+            "CHT 2 (deg F)",
+            "CHT 3 (deg F)",
+            "CHT 4 (deg F)",
+        ]
     ].max()
     df["Max CHT"] = df["Flight ID"].map(flight_max_cht.max(axis=1))
 
@@ -86,10 +102,10 @@ def plot_flight(df, flight_id, left_signal, right_signal, canvas):
     if left_signal:
         if left_signal == "CHT":
             cht_columns = [
-                "CHT 1 (deg C)",
-                "CHT 2 (deg C)",
-                "CHT 3 (deg C)",
-                "CHT 4 (deg C)",
+                "CHT 1 (deg F)",
+                "CHT 2 (deg F)",
+                "CHT 3 (deg F)",
+                "CHT 4 (deg F)",
             ]
             for col in cht_columns:
                 if col in flight_data.columns:
@@ -98,13 +114,13 @@ def plot_flight(df, flight_id, left_signal, right_signal, canvas):
                         flight_data[col],
                         label=col,
                     )
-            ax_left.set_ylabel("CHT (deg C)")
+            ax_left.set_ylabel("CHT (deg F)")
         elif left_signal == "EGT":
             egt_columns = [
-                "EGT 1 (deg C)",
-                "EGT 2 (deg C)",
-                "EGT 3 (deg C)",
-                "EGT 4 (deg C)",
+                "EGT 1 (deg F)",
+                "EGT 2 (deg F)",
+                "EGT 3 (deg F)",
+                "EGT 4 (deg F)",
             ]
             for col in egt_columns:
                 if col in flight_data.columns:
@@ -113,7 +129,7 @@ def plot_flight(df, flight_id, left_signal, right_signal, canvas):
                         flight_data[col],
                         label=col,
                     )
-            ax_left.set_ylabel("EGT (deg C)")
+            ax_left.set_ylabel("EGT (deg F)")
         else:
             ax_left.plot(
                 flight_data["Session Time"],
@@ -126,10 +142,10 @@ def plot_flight(df, flight_id, left_signal, right_signal, canvas):
     if right_signal:
         if right_signal == "CHT":
             cht_columns = [
-                "CHT 1 (deg C)",
-                "CHT 2 (deg C)",
-                "CHT 3 (deg C)",
-                "CHT 4 (deg C)",
+                "CHT 1 (deg F)",
+                "CHT 2 (deg F)",
+                "CHT 3 (deg F)",
+                "CHT 4 (deg F)",
             ]
             for col in cht_columns:
                 if col in flight_data.columns:
@@ -139,13 +155,13 @@ def plot_flight(df, flight_id, left_signal, right_signal, canvas):
                         linestyle="dashed",
                         label=col,
                     )
-            ax_right.set_ylabel("CHT (deg C)")
+            ax_right.set_ylabel("CHT (deg F)")
         elif right_signal == "EGT":
             egt_columns = [
-                "EGT 1 (deg C)",
-                "EGT 2 (deg C)",
-                "EGT 3 (deg C)",
-                "EGT 4 (deg C)",
+                "EGT 1 (deg F)",
+                "EGT 2 (deg F)",
+                "EGT 3 (deg F)",
+                "EGT 4 (deg F)",
             ]
             for col in egt_columns:
                 if col in flight_data.columns:
@@ -155,7 +171,7 @@ def plot_flight(df, flight_id, left_signal, right_signal, canvas):
                         linestyle="dashed",
                         label=col,
                     )
-            ax_right.set_ylabel("EGT (deg C)")
+            ax_right.set_ylabel("EGT (deg F)")
         else:
             ax_right.plot(
                 flight_data["Session Time"],
@@ -187,15 +203,17 @@ def plot_flight(df, flight_id, left_signal, right_signal, canvas):
     widget = figure_canvas.get_tk_widget()
     widget.pack(fill="both", expand=1)
 
-    # Add scrubbable vertical cursor
-    cursor_line = ax_left.axvline(x=flight_data["Session Time"].iloc[0], linestyle="--")
+    # Add click-to-move vertical cursor
+    cursor_line = ax_left.axvline(
+        x=flight_data["Session Time"].iloc[0], linestyle="--"
+    )
 
-    def on_mouse_move(event):
-        if event.inaxes == ax_left:
+    def on_click(event):
+        if event.inaxes == ax_left and event.xdata is not None:
             cursor_line.set_xdata(event.xdata)
             figure_canvas.draw_idle()
 
-    fig.canvas.mpl_connect("motion_notify_event", on_mouse_move)
+    fig.canvas.mpl_connect("button_press_event", on_click)
 
 
 def main():
