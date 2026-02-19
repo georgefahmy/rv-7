@@ -5,6 +5,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import pandas as pd
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.widgets import RectangleSelector
 
 matplotlib.use("TkAgg")
 
@@ -214,9 +215,11 @@ def plot_flight(df, flight_id, left_signal, right_signal, canvas):
     widget.pack(fill="both", expand=1)
 
     # Add real-time hover vertical cursor with value display
-    ylim = ax_left.get_ylim()
+    ylim_left = ax_left.get_ylim()
+    ylim_right = ax_right.get_ylim()
+    xlim = ax_left.get_xlim()
     (cursor_line,) = ax_left.plot(
-        [flight_data["Session Time"].iloc[0]] * 2, ylim, linestyle="--"
+        [flight_data["Session Time"].iloc[0]] * 2, ylim_left, linestyle="--"
     )
 
     # Text box for displaying values
@@ -313,6 +316,167 @@ def plot_flight(df, flight_id, left_signal, right_signal, canvas):
             figure_canvas.draw_idle()
 
     figure_canvas.mpl_connect("motion_notify_event", on_motion)
+
+    # --- Add RectangleSelector for click-and-drag zoom ---
+    def on_select(eclick, erelease):
+        # eclick and erelease are matplotlib events at press and release
+        x1, y1 = eclick.xdata, eclick.ydata
+        x2, y2 = erelease.xdata, erelease.ydata
+        if x1 is None or x2 is None or y1 is None or y2 is None:
+            return
+        # Set new X limits for both axes
+        new_xlim = (min(x1, x2), max(x1, x2))
+
+        # --- Compute new Y-limits for left axis based on the selected left signal(s) ---
+        if left_signal:
+            if left_signal == "CHT":
+                left_cols = [
+                    "CHT 1 (deg F)",
+                    "CHT 2 (deg F)",
+                    "CHT 3 (deg F)",
+                    "CHT 4 (deg F)",
+                ]
+                ydata_left = []
+                mask = (flight_data["Session Time"] >= new_xlim[0]) & (
+                    flight_data["Session Time"] <= new_xlim[1]
+                )
+                for col in left_cols:
+                    if col in flight_data.columns:
+                        ydata_left.extend(flight_data.loc[mask, col].values.tolist())
+                if ydata_left:
+                    new_ylim_left = (min(ydata_left), max(ydata_left))
+                else:
+                    new_ylim_left = ax_left.get_ylim()
+            elif left_signal == "EGT":
+                left_cols = [
+                    "EGT 1 (deg F)",
+                    "EGT 2 (deg F)",
+                    "EGT 3 (deg F)",
+                    "EGT 4 (deg F)",
+                ]
+                ydata_left = []
+                mask = (flight_data["Session Time"] >= new_xlim[0]) & (
+                    flight_data["Session Time"] <= new_xlim[1]
+                )
+                for col in left_cols:
+                    if col in flight_data.columns:
+                        ydata_left.extend(flight_data.loc[mask, col].values.tolist())
+                if ydata_left:
+                    new_ylim_left = (min(ydata_left), max(ydata_left))
+                else:
+                    new_ylim_left = ax_left.get_ylim()
+            else:
+                mask = (flight_data["Session Time"] >= new_xlim[0]) & (
+                    flight_data["Session Time"] <= new_xlim[1]
+                )
+                ydata_left = flight_data.loc[mask, left_signal].values
+                if len(ydata_left) > 0:
+                    new_ylim_left = (min(ydata_left), max(ydata_left))
+                else:
+                    new_ylim_left = ax_left.get_ylim()
+        else:
+            new_ylim_left = ax_left.get_ylim()
+
+        # --- Compute new Y-limits for right axis based on the selected right signal(s) ---
+        if right_signal:
+            if right_signal == "CHT":
+                right_cols = [
+                    "CHT 1 (deg F)",
+                    "CHT 2 (deg F)",
+                    "CHT 3 (deg F)",
+                    "CHT 4 (deg F)",
+                ]
+                ydata_right = []
+                mask = (flight_data["Session Time"] >= new_xlim[0]) & (
+                    flight_data["Session Time"] <= new_xlim[1]
+                )
+                for col in right_cols:
+                    if col in flight_data.columns:
+                        ydata_right.extend(flight_data.loc[mask, col].values.tolist())
+                if ydata_right:
+                    new_ylim_right = (min(ydata_right), max(ydata_right))
+                else:
+                    new_ylim_right = ax_right.get_ylim()
+            elif right_signal == "EGT":
+                right_cols = [
+                    "EGT 1 (deg F)",
+                    "EGT 2 (deg F)",
+                    "EGT 3 (deg F)",
+                    "EGT 4 (deg F)",
+                ]
+                ydata_right = []
+                mask = (flight_data["Session Time"] >= new_xlim[0]) & (
+                    flight_data["Session Time"] <= new_xlim[1]
+                )
+                for col in right_cols:
+                    if col in flight_data.columns:
+                        ydata_right.extend(flight_data.loc[mask, col].values.tolist())
+                if ydata_right:
+                    new_ylim_right = (min(ydata_right), max(ydata_right))
+                else:
+                    new_ylim_right = ax_right.get_ylim()
+            else:
+                mask = (flight_data["Session Time"] >= new_xlim[0]) & (
+                    flight_data["Session Time"] <= new_xlim[1]
+                )
+                ydata_right = flight_data.loc[mask, right_signal].values
+                if len(ydata_right) > 0:
+                    new_ylim_right = (min(ydata_right), max(ydata_right))
+                else:
+                    new_ylim_right = ax_right.get_ylim()
+        else:
+            new_ylim_right = ax_right.get_ylim()
+
+        # Avoid identical y-limits (singularity), expand by small epsilon if needed
+        def fix_ylim(lim):
+            if lim[0] == lim[1]:
+                eps = 1e-6
+                return (lim[0] - eps, lim[1] + eps)
+            return lim
+
+        new_ylim_left = fix_ylim(new_ylim_left)
+        new_ylim_right = fix_ylim(new_ylim_right)
+        ax_left.set_xlim(*new_xlim)
+        ax_left.set_ylim(*new_ylim_left)
+        ax_right.set_xlim(*new_xlim)
+        ax_right.set_ylim(*new_ylim_right)
+        figure_canvas.draw_idle()
+
+    # RectangleSelector for zoom
+    # Connect to the axes, set interactive=True, do not use useblit for TkAgg
+    selector = RectangleSelector(
+        ax_left,  # connect to the axes, not the figure canvas
+        on_select,
+        button=[1],  # Left mouse button
+        spancoords="data",
+        interactive=False,
+        props=dict(facecolor="blue", alpha=0.3),
+    )
+    # Make sure selector is not garbage-collected: attach to the figure or canvas
+    # Attach to the underlying Tk widget so it persists as long as the plot is visible
+    widget.selector = selector
+    # Explicitly draw the canvas after creating the selector to ensure it appears
+    figure_canvas.draw_idle()
+
+    # Add right-click to reset zoom
+    def on_press(event):
+        # Respond to right-clicks (button 3) anywhere on the figure
+        if event.button == 3:
+            # Reset both axes (left and right) to full x/y range
+            x_min = flight_data["Session Time"].min()
+            x_max = flight_data["Session Time"].max()
+            # Left axis
+            ax_left.set_xlim(x_min, x_max)
+            ax_left.set_ylim(ylim_left)
+            # Right axis
+            ax_right.set_xlim(x_min, x_max)
+            ax_right.set_ylim(ylim_right)
+            figure_canvas.draw_idle()
+            # Hide rectangle after selection so it does not block right-clicks
+            selector.set_visible(False)
+
+    # Connect to button_press_event to detect right-clicks
+    figure_canvas.mpl_connect("button_press_event", on_press)
 
 
 def main():
