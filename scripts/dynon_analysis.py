@@ -45,10 +45,10 @@ def process_flights(df):
     df["System Time"] = pd.to_numeric(df["System Time"], errors="coerce").fillna(0)
 
     # Ensure RPM L and RPM R are numeric and fill NaNs with 0
-    for col in ['RPM L', 'RPM R']:
-        df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
+    for col in ["RPM L", "RPM R"]:
+        df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
     # Create combined RPM signal as average of left and right
-    df['RPM'] = (df['RPM L'] + df['RPM R']) / 2
+    df["RPM"] = (df["RPM L"] + df["RPM R"]) / 2
 
     # 2. Determine if Engine was Run for each flight
     # Calculate max RPM for each flight
