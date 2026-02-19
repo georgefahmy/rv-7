@@ -70,27 +70,113 @@ def list_signals(df):
     return columns
 
 
-def plot_flight(df, flight_id, signal_names, canvas):
-    """Plots the selected signals for a specific flight inside the GUI canvas."""
+def plot_flight(df, flight_id, left_signal, right_signal, canvas):
+    """Plots two selected signals on dual y-axes inside the GUI canvas."""
     flight_data = df[df["Flight ID"] == flight_id]
 
     if flight_data.empty:
         return
 
     fig = plt.Figure(figsize=(8, 4), dpi=100)
-    ax = fig.add_subplot(111)
+    fig.subplots_adjust(right=0.85)
+    ax_left = fig.add_subplot(111)
+    ax_right = ax_left.twinx()
 
-    for signal in signal_names:
-        ax.plot(flight_data["Session Time"], flight_data[signal], label=signal)
+    # Plot left axis signal
+    if left_signal:
+        if left_signal == "CHT":
+            cht_columns = [
+                "CHT 1 (deg C)",
+                "CHT 2 (deg C)",
+                "CHT 3 (deg C)",
+                "CHT 4 (deg C)",
+            ]
+            for col in cht_columns:
+                if col in flight_data.columns:
+                    ax_left.plot(
+                        flight_data["Session Time"],
+                        flight_data[col],
+                        label=col,
+                    )
+            ax_left.set_ylabel("CHT (deg C)")
+        elif left_signal == "EGT":
+            egt_columns = [
+                "EGT 1 (deg C)",
+                "EGT 2 (deg C)",
+                "EGT 3 (deg C)",
+                "EGT 4 (deg C)",
+            ]
+            for col in egt_columns:
+                if col in flight_data.columns:
+                    ax_left.plot(
+                        flight_data["Session Time"],
+                        flight_data[col],
+                        label=col,
+                    )
+            ax_left.set_ylabel("EGT (deg C)")
+        else:
+            ax_left.plot(
+                flight_data["Session Time"],
+                flight_data[left_signal],
+                label=left_signal,
+            )
+            ax_left.set_ylabel(left_signal)
 
-    ax.set_xlabel("Session Time (seconds)")
-    ax.set_ylabel("Signal Value")
-    ax.set_title(
+    # Plot right axis signal
+    if right_signal:
+        if right_signal == "CHT":
+            cht_columns = [
+                "CHT 1 (deg C)",
+                "CHT 2 (deg C)",
+                "CHT 3 (deg C)",
+                "CHT 4 (deg C)",
+            ]
+            for col in cht_columns:
+                if col in flight_data.columns:
+                    ax_right.plot(
+                        flight_data["Session Time"],
+                        flight_data[col],
+                        linestyle="dashed",
+                        label=col,
+                    )
+            ax_right.set_ylabel("CHT (deg C)")
+        elif right_signal == "EGT":
+            egt_columns = [
+                "EGT 1 (deg C)",
+                "EGT 2 (deg C)",
+                "EGT 3 (deg C)",
+                "EGT 4 (deg C)",
+            ]
+            for col in egt_columns:
+                if col in flight_data.columns:
+                    ax_right.plot(
+                        flight_data["Session Time"],
+                        flight_data[col],
+                        linestyle="dashed",
+                        label=col,
+                    )
+            ax_right.set_ylabel("EGT (deg C)")
+        else:
+            ax_right.plot(
+                flight_data["Session Time"],
+                flight_data[right_signal],
+                linestyle="dashed",
+                label=right_signal,
+                color="red",
+            )
+            ax_right.set_ylabel(right_signal)
+
+    ax_left.set_xlabel("Session Time (seconds)")
+    ax_left.set_title(
         f"Flight {flight_id} Analysis "
         f"(Engine Run: {flight_data['Engine Run'].iloc[0]})"
     )
-    ax.grid(True)
-    ax.legend()
+    ax_left.grid(True)
+
+    # Combine legends
+    lines_left, labels_left = ax_left.get_legend_handles_labels()
+    lines_right, labels_right = ax_right.get_legend_handles_labels()
+    ax_left.legend(lines_left + lines_right, labels_left + labels_right)
 
     # Clear previous canvas content
     for child in canvas.winfo_children():
@@ -98,7 +184,18 @@ def plot_flight(df, flight_id, signal_names, canvas):
 
     figure_canvas = FigureCanvasTkAgg(fig, master=canvas)
     figure_canvas.draw()
-    figure_canvas.get_tk_widget().pack(fill="both", expand=1)
+    widget = figure_canvas.get_tk_widget()
+    widget.pack(fill="both", expand=1)
+
+    # Add scrubbable vertical cursor
+    cursor_line = ax_left.axvline(x=flight_data["Session Time"].iloc[0], linestyle="--")
+
+    def on_mouse_move(event):
+        if event.inaxes == ax_left:
+            cursor_line.set_xdata(event.xdata)
+            figure_canvas.draw_idle()
+
+    fig.canvas.mpl_connect("motion_notify_event", on_mouse_move)
 
 
 def main():
@@ -129,22 +226,34 @@ def main():
     )
 
     flight_ids = sorted(df["Flight ID"].unique())
-    available_signals = [
-        col
-        for col in df.columns
-        if col not in ["Flight ID", "Unnamed: 103", "Engine Run"]
-    ]
+    available_signals = sorted(
+        [
+            col
+            for col in df.columns
+            if col
+            not in [
+                "Flight ID",
+                "Unnamed: 103",
+                "Engine Run",
+                "Max CHT",
+                "AP Yaw Force",
+                "AP Yaw Position",
+                "AP Yaw Slip (bool)",
+                "Session Time",
+            ]
+        ]
+    )
+
+    # Add synthetic combined CHT signal
+    if "CHT" not in available_signals:
+        available_signals.append("CHT")
+        available_signals = sorted(available_signals)
+        # Add synthetic combined CHT signal
+    if "EGT" not in available_signals:
+        available_signals.append("EGT")
+        available_signals = sorted(available_signals)
 
     layout = [
-        [sg.Text("Flight Summary:")],
-        [
-            sg.Multiline(
-                size=(100, 6),
-                key="-SUMMARY-",
-                disabled=True,
-                autoscroll=False,
-            )
-        ],
         [
             sg.Text("Select Flight ID:"),
             sg.Combo(
@@ -153,21 +262,56 @@ def main():
                 readonly=True,
                 enable_events=True,
             ),
+            sg.Button("Exit"),
         ],
-        [sg.Text("Select Signals to Plot:")],
+        [sg.Text("Flight Summary:", font=("Arial", 16))],
+        [sg.Text(size=(50, 8), key="-SUMMARY-")],
         [
-            sg.Listbox(
+            sg.Text("Select Left Axis Signal:"),
+            sg.Combo(
                 available_signals,
-                select_mode=sg.SELECT_MODE_MULTIPLE,
-                size=(50, 8),
-                key="-SIGNALS-",
-            )
+                key="-LEFT_SIGNAL_1-",
+                readonly=True,
+                enable_events=True,
+                size=(30, 1),
+            ),
+            sg.VerticalSeparator(),
+            sg.Text("Select Right Axis Signal:"),
+            sg.Combo(
+                available_signals,
+                key="-RIGHT_SIGNAL_1-",
+                readonly=True,
+                enable_events=True,
+                size=(30, 1),
+            ),
         ],
-        [sg.Button("Plot"), sg.Button("Exit")],
-        [sg.Canvas(key="-CANVAS-", expand_x=True, expand_y=True)],
+        [sg.Canvas(key="-CANVAS_1-", expand_x=True, expand_y=True)],
+        [
+            sg.Text("Select Left Axis Signal:"),
+            sg.Combo(
+                available_signals,
+                key="-LEFT_SIGNAL_2-",
+                readonly=True,
+                enable_events=True,
+                size=(30, 1),
+            ),
+            sg.VerticalSeparator(),
+            sg.Text("Select Right Axis Signal:"),
+            sg.Combo(
+                available_signals,
+                key="-RIGHT_SIGNAL_2-",
+                readonly=True,
+                enable_events=True,
+                size=(30, 1),
+            ),
+        ],
+        [sg.Canvas(key="-CANVAS_2-", expand_x=True, expand_y=True)],
     ]
 
-    window = sg.Window("Dynon Flight Analyzer", layout)
+    window = sg.Window(
+        "Dynon Flight Analyzer", layout=layout, resizable=True, finalize=True
+    )
+    window.maximize()
 
     while True:
         event, values = window.read()
@@ -189,23 +333,45 @@ def main():
             )
             window["-SUMMARY-"].update(summary_text)
 
-        if event == "Plot":
+        if event in ("-LEFT_SIGNAL_1-", "-RIGHT_SIGNAL_1-"):
             flight_id = values["-FLIGHT-"]
-            selected_signals = values["-SIGNALS-"]
+            left_signal_1 = values["-LEFT_SIGNAL_1-"]
+            right_signal_1 = values["-RIGHT_SIGNAL_1-"]
 
             if flight_id is None:
-                sg.popup_warning("Please select a Flight ID.")
+                sg.popup("Please select a Flight ID.")
                 continue
 
-            if not selected_signals:
-                sg.popup_warning("Please select at least one signal.")
+            if not left_signal_1 and not right_signal_1:
+                sg.popup("Please select at least one signal.")
                 continue
 
             plot_flight(
                 df,
                 flight_id,
-                selected_signals,
-                window["-CANVAS-"].TKCanvas,
+                left_signal_1,
+                right_signal_1,
+                window["-CANVAS_1-"].TKCanvas,
+            )
+        if event in ("-LEFT_SIGNAL_2-", "-RIGHT_SIGNAL_2-"):
+            flight_id = values["-FLIGHT-"]
+            left_signal_2 = values["-LEFT_SIGNAL_2-"]
+            right_signal_2 = values["-RIGHT_SIGNAL_2-"]
+
+            if flight_id is None:
+                sg.popup("Please select a Flight ID.")
+                continue
+
+            if not left_signal_2 and not right_signal_2:
+                sg.popup("Please select at least one signal.")
+                continue
+
+            plot_flight(
+                df,
+                flight_id,
+                left_signal_2,
+                right_signal_2,
+                window["-CANVAS_2-"].TKCanvas,
             )
 
     window.close()
