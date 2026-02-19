@@ -27,6 +27,10 @@ def process_flights(df):
     """
     # Remove rows where System Time is NaN or blank
     df = df[df["System Time"].notna() & (df["System Time"] != "")]
+
+    # Remove rows where GPS Date & Time is NaN or blank
+    df = df[df["GPS Date & Time"].notna() & (df["GPS Date & Time"] != "")]
+
     # Convert all CHT and EGT temperatures from deg C to deg F
     temp_columns = [
         col
@@ -50,6 +54,32 @@ def process_flights(df):
     # Create combined RPM signal as average of left and right
     df["RPM"] = (df["RPM L"] + df["RPM R"]) / 2
 
+    # --- Compute Fuel Flow Integral (gallons) per flight ---
+    # Ensure Fuel Flow 1 is numeric
+    if "Fuel Flow 1 (gal/hr)" in df.columns:
+        df["Fuel Flow 1 (gal/hr)"] = pd.to_numeric(
+            df["Fuel Flow 1 (gal/hr)"], errors="coerce"
+        ).fillna(0)
+
+        # Compute integral (gallons) per flight using trapezoidal rule over Session Time
+        df["Fuel Flow Integral"] = 0.0
+
+        for fid, group in df.groupby("_orig_flight_num"):
+            times = group["Session Time"].values
+            flow = group["Fuel Flow 1 (gal/hr)"].values
+
+            if len(times) > 1:
+                # Convert gal/hr to gal/sec before integrating
+                flow_gps = flow / 3600.0
+                integral = [0.0]
+                for i in range(1, len(times)):
+                    dt = times[i] - times[i - 1]
+                    area = 0.5 * (flow_gps[i] + flow_gps[i - 1]) * dt
+                    integral.append(integral[-1] + area)
+                df.loc[group.index, "Fuel Flow Integral"] = integral
+            else:
+                df.loc[group.index, "Fuel Flow Integral"] = 0.0
+
     # 2. Determine if Engine was Run for each flight
     # Calculate max RPM for each flight
     flight_max_rpm = df.groupby("_orig_flight_num")[["RPM L", "RPM R"]].max()
@@ -66,18 +96,25 @@ def process_flights(df):
     # Create a boolean Series: True if any RPM > 0
     flights_with_engine = (flight_max_rpm["RPM L"] > 0) | (flight_max_rpm["RPM R"] > 0)
 
+    # Compute first GPS Date & Time for each flight
+    flight_start_gps = df.groupby("_orig_flight_num")["GPS Date & Time"].first()
+
     # Map this status back to the original DataFrame
     df["Engine Run"] = df["_orig_flight_num"].map(flights_with_engine)
 
-    # Assign sequential numeric Flight IDs for engine-run flights, starting from 1
-    # Non-engine-run flights get NaN
+    # Assign sequential Flight IDs as "<seq> - <GPS Date & Time>" for engine-run flights, else NaN
     engine_flight_ids = [
         fid
         for fid in df["_orig_flight_num"].unique()
         if flights_with_engine.get(fid, False)
     ]
-    # Map: _orig_flight_num -> sequential integer (starting at 1)
-    flightid_map = {fid: idx + 1 for idx, fid in enumerate(engine_flight_ids)}
+
+    # Map: _orig_flight_num -> "<seq> - <GPS Date & Time>"
+    flightid_map = {
+        fid: f"{idx + 1} - {flight_start_gps.get(fid, '')}"
+        for idx, fid in enumerate(engine_flight_ids)
+    }
+
     df["Flight ID"] = df["_orig_flight_num"].map(lambda x: flightid_map.get(x, None))
     df.drop(columns=["_orig_flight_num"], inplace=True)
 
@@ -129,7 +166,7 @@ def plot_flight(df, flight_id, left_signal, right_signal, canvas):
     ax_right = ax_left.twinx()
 
     # Plot left axis signal
-    if left_signal:
+    if left_signal and left_signal != "None":
         if left_signal == "CHT":
             cht_columns = [
                 "CHT 1 (deg F)",
@@ -169,7 +206,7 @@ def plot_flight(df, flight_id, left_signal, right_signal, canvas):
             ax_left.set_ylabel(left_signal)
 
     # Plot right axis signal
-    if right_signal:
+    if right_signal and right_signal != "None":
         if right_signal == "CHT":
             cht_columns = [
                 "CHT 1 (deg F)",
@@ -272,7 +309,7 @@ def plot_flight(df, flight_id, left_signal, right_signal, canvas):
             display_lines = [f"Time: {session_time[idx]:.2f} sec"]
 
             # Left axis signals
-            if left_signal:
+            if left_signal and left_signal != "None":
                 if left_signal == "CHT":
                     for col in [
                         "CHT 1 (deg F)",
@@ -301,7 +338,7 @@ def plot_flight(df, flight_id, left_signal, right_signal, canvas):
                     )
 
             # Right axis signals
-            if right_signal:
+            if right_signal and right_signal != "None":
                 if right_signal == "CHT":
                     for col in [
                         "CHT 1 (deg F)",
@@ -353,7 +390,7 @@ def plot_flight(df, flight_id, left_signal, right_signal, canvas):
         new_xlim = (min(x1, x2), max(x1, x2))
 
         # --- Compute new Y-limits for left axis based on the selected left signal(s) ---
-        if left_signal:
+        if left_signal and left_signal != "None":
             if left_signal == "CHT":
                 left_cols = [
                     "CHT 1 (deg F)",
@@ -403,7 +440,7 @@ def plot_flight(df, flight_id, left_signal, right_signal, canvas):
             new_ylim_left = ax_left.get_ylim()
 
         # --- Compute new Y-limits for right axis based on the selected right signal(s) ---
-        if right_signal:
+        if right_signal and right_signal != "None":
             if right_signal == "CHT":
                 right_cols = [
                     "CHT 1 (deg F)",
@@ -532,7 +569,7 @@ def main():
     )
 
     # Only include flights where Engine_Run is True
-    flight_ids = sorted(flight_stats[flight_stats["Engine_Run"] == True].index.tolist())
+    flight_ids = sorted(flight_stats[flight_stats["Engine_Run"]].index.tolist())
     available_signals = sorted(
         [
             col
@@ -547,6 +584,9 @@ def main():
                 "AP Yaw Position",
                 "AP Yaw Slip (bool)",
                 "Session Time",
+                "RPM L",
+                "RPM R",
+                "Fuel Flow 2 (gal/hr)",
             ]
         ]
     )
@@ -559,7 +599,9 @@ def main():
     if "EGT" not in available_signals:
         available_signals.append("EGT")
         available_signals = sorted(available_signals)
-
+    # Add explicit None option to allow clearing an axis
+    if "None" not in available_signals:
+        available_signals = ["None"] + available_signals
     layout = [
         [
             sg.Text("Select Flight ID:", font=("Arial", 16)),
@@ -569,6 +611,7 @@ def main():
                 readonly=True,
                 enable_events=True,
                 font=("Arial", 16),
+                default_value=flight_ids[-1],
             ),
             sg.Button("Exit", font=("Arial", 16)),
         ],
@@ -583,6 +626,7 @@ def main():
                 enable_events=True,
                 size=(30, 1),
                 font=("Arial", 16),
+                default_value="CHT",
             ),
             sg.VerticalSeparator(),
             sg.Text("Select Right Axis Signal:", font=("Arial", 16)),
@@ -593,37 +637,18 @@ def main():
                 enable_events=True,
                 size=(30, 1),
                 font=("Arial", 16),
+                default_value="EGT",
             ),
         ],
         [sg.Canvas(key="-CANVAS_1-", expand_x=True, expand_y=True)],
-        [
-            sg.Text("Select Left Axis Signal:", font=("Arial", 16)),
-            sg.Combo(
-                available_signals,
-                key="-LEFT_SIGNAL_2-",
-                readonly=True,
-                enable_events=True,
-                size=(30, 1),
-                font=("Arial", 16),
-            ),
-            sg.VerticalSeparator(),
-            sg.Text("Select Right Axis Signal:", font=("Arial", 16)),
-            sg.Combo(
-                available_signals,
-                key="-RIGHT_SIGNAL_2-",
-                readonly=True,
-                enable_events=True,
-                size=(30, 1),
-                font=("Arial", 16),
-            ),
-        ],
-        [sg.Canvas(key="-CANVAS_2-", expand_x=True, expand_y=True)],
     ]
 
     window = sg.Window(
         "Dynon Flight Analyzer", layout=layout, resizable=True, finalize=True
     )
     window.maximize()
+    window.write_event_value(key="-FLIGHT-", value=flight_ids[-1])
+    window.write_event_value(key="-LEFT_SIGNAL_1-", value="CHT")
 
     while True:
         event, values = window.read()
@@ -654,10 +679,6 @@ def main():
                 sg.popup("Please select a Flight ID.")
                 continue
 
-            if not left_signal_1 and not right_signal_1:
-                sg.popup("Please select at least one signal.")
-                continue
-
             plot_flight(
                 df,
                 flight_id,
@@ -672,10 +693,6 @@ def main():
 
             if flight_id is None:
                 sg.popup("Please select a Flight ID.")
-                continue
-
-            if not left_signal_2 and not right_signal_2:
-                sg.popup("Please select at least one signal.")
                 continue
 
             plot_flight(
