@@ -111,7 +111,7 @@ def process_flights(df):
 
     # Map: _orig_flight_num -> "<seq> - <GPS Date & Time>"
     flightid_map = {
-        fid: f"{idx + 1} - {flight_start_gps.get(fid, '')}"
+        fid: f"{flight_start_gps.get(fid, '')} - Flight {idx + 1}"
         for idx, fid in enumerate(engine_flight_ids)
     }
 
@@ -151,6 +151,25 @@ def list_signals(df):
     # for i, col in enumerate(columns):
     #     print(f"{i}: {col}")
     return columns
+
+
+# --- Helper function to export each flight to its own CSV file ---
+def save_flights_to_csv(df, output_dir):
+    """Saves each flight (Engine Run == True) to its own CSV file."""
+    import os
+
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
+    # Only keep valid flight IDs
+    flight_ids = [fid for fid in df["Flight ID"].unique() if fid not in (None, 0, "")]
+
+    for fid in flight_ids:
+        flight_data = df[df["Flight ID"] == fid]
+        if not flight_data.empty:
+            safe_name = str(fid).replace("/", "-").replace(":", "-")
+            filepath = os.path.join(output_dir, f"{safe_name}.csv")
+            flight_data.to_csv(filepath, index=False)
 
 
 def plot_flight(df, flight_id, left_signal, right_signal, canvas):
@@ -613,6 +632,8 @@ def main():
                 font=("Arial", 16),
                 default_value=flight_ids[-1],
             ),
+            sg.Text(expand_x=True),
+            sg.Button("Export Flights", font=("Arial", 16)),
             sg.Button("Exit", font=("Arial", 16)),
         ],
         [sg.Text("Flight Summary:", font=("Arial", 16))],
@@ -628,7 +649,7 @@ def main():
                 font=("Arial", 16),
                 default_value="CHT",
             ),
-            sg.VerticalSeparator(),
+            sg.Text(expand_x=True),
             sg.Text("Select Right Axis Signal:", font=("Arial", 16)),
             sg.Combo(
                 available_signals,
@@ -655,6 +676,12 @@ def main():
         if event in (sg.WINDOW_CLOSED, "Exit"):
             break
 
+        if event == "Export Flights":
+            folder = sg.popup_get_folder("Select folder to save flight CSV files")
+            if folder:
+                save_flights_to_csv(df, folder)
+                sg.popup("Flights exported successfully.")
+
         if event == "-FLIGHT-" and values["-FLIGHT-"] is not None:
             fid = values["-FLIGHT-"]
             stats = flight_stats.loc[fid]
@@ -670,7 +697,7 @@ def main():
             )
             window["-SUMMARY-"].update(summary_text)
 
-        if event in ("-LEFT_SIGNAL_1-", "-RIGHT_SIGNAL_1-"):
+        if event in ("-LEFT_SIGNAL_1-", "-RIGHT_SIGNAL_1-", "-FLIGHT-"):
             flight_id = values["-FLIGHT-"]
             left_signal_1 = values["-LEFT_SIGNAL_1-"]
             right_signal_1 = values["-RIGHT_SIGNAL_1-"]
