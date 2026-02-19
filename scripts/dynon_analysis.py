@@ -72,8 +72,8 @@ def list_flights(df):
         Max_RPM=("RPM L", "max"),  # showing RPM L as an example
         Max_CHT=("Max CHT", "max"),  # showing RPM L as an example
     )
-    print("\n--- Detected Flights ---")
-    print(stats)
+    # print("\n--- Detected Flights ---")
+    # print(stats)
     return stats
 
 
@@ -84,9 +84,9 @@ def list_signals(df):
         for col in df.columns
         if col not in ["Flight ID", "Unnamed: 103", "Engine Run"]
     ]
-    print("\n--- Available Signals ---")
-    for i, col in enumerate(columns):
-        print(f"{i}: {col}")
+    # print("\n--- Available Signals ---")
+    # for i, col in enumerate(columns):
+    #     print(f"{i}: {col}")
     return columns
 
 
@@ -212,19 +212,107 @@ def plot_flight(df, flight_id, left_signal, right_signal, canvas):
     figure_canvas.draw()
     widget = figure_canvas.get_tk_widget()
     widget.pack(fill="both", expand=1)
-    print("DEBUG: Matplotlib canvas initialized and packed")
 
-    # Add real-time hover vertical cursor
+    # Add real-time hover vertical cursor with value display
     ylim = ax_left.get_ylim()
-    cursor_line, = ax_left.plot([flight_data["Session Time"].iloc[0]] * 2, ylim, linestyle="--")
+    (cursor_line,) = ax_left.plot(
+        [flight_data["Session Time"].iloc[0]] * 2, ylim, linestyle="--"
+    )
+
+    # Text box for displaying values
+    value_text = ax_left.text(
+        0,
+        1,
+        "",
+        transform=ax_left.transData,
+        verticalalignment="top",
+        horizontalalignment="left",
+        bbox=dict(boxstyle="round", facecolor="white", alpha=0.8),
+    )
+
+    session_time = flight_data["Session Time"].values
 
     def on_motion(event):
         if event.inaxes in (ax_left, ax_right) and event.xdata is not None:
+            # Move vertical line
             cursor_line.set_xdata([event.xdata, event.xdata])
+
+            # Find nearest index
+            idx = (abs(session_time - event.xdata)).argmin()
+
+            # Prepare display string
+            display_lines = [f"Time: {session_time[idx]:.2f} sec"]
+
+            # Left axis signals
+            if left_signal:
+                if left_signal == "CHT":
+                    for col in [
+                        "CHT 1 (deg F)",
+                        "CHT 2 (deg F)",
+                        "CHT 3 (deg F)",
+                        "CHT 4 (deg F)",
+                    ]:
+                        if col in flight_data.columns:
+                            display_lines.append(
+                                f"{col}: {flight_data[col].iloc[idx]:.1f}"
+                            )
+                elif left_signal == "EGT":
+                    for col in [
+                        "EGT 1 (deg F)",
+                        "EGT 2 (deg F)",
+                        "EGT 3 (deg F)",
+                        "EGT 4 (deg F)",
+                    ]:
+                        if col in flight_data.columns:
+                            display_lines.append(
+                                f"{col}: {flight_data[col].iloc[idx]:.1f}"
+                            )
+                else:
+                    display_lines.append(
+                        f"{left_signal}: {flight_data[left_signal].iloc[idx]:.2f}"
+                    )
+
+            # Right axis signals
+            if right_signal:
+                if right_signal == "CHT":
+                    for col in [
+                        "CHT 1 (deg F)",
+                        "CHT 2 (deg F)",
+                        "CHT 3 (deg F)",
+                        "CHT 4 (deg F)",
+                    ]:
+                        if col in flight_data.columns:
+                            display_lines.append(
+                                f"{col}: {flight_data[col].iloc[idx]:.1f}"
+                            )
+                elif right_signal == "EGT":
+                    for col in [
+                        "EGT 1 (deg F)",
+                        "EGT 2 (deg F)",
+                        "EGT 3 (deg F)",
+                        "EGT 4 (deg F)",
+                    ]:
+                        if col in flight_data.columns:
+                            display_lines.append(
+                                f"{col}: {flight_data[col].iloc[idx]:.1f}"
+                            )
+                else:
+                    display_lines.append(
+                        f"{right_signal}: {flight_data[right_signal].iloc[idx]:.2f}"
+                    )
+
+            # Update text box to appear on the right side of the cursor, slightly below the top of the axis
+            x = event.xdata
+            ylim_top = ax_left.get_ylim()[1]
+            y = ylim_top - 0.05 * (ylim_top - ax_left.get_ylim()[0])  # 5% below top
+            value_text.set_position(
+                (x + 0.01 * (ax_left.get_xlim()[1] - ax_left.get_xlim()[0]), y)
+            )
+            value_text.set_text("\n".join(display_lines))
+
             figure_canvas.draw_idle()
 
-    cid = figure_canvas.mpl_connect("motion_notify_event", on_motion)
-    print(f"DEBUG: mpl_connect registered with id {cid}")
+    figure_canvas.mpl_connect("motion_notify_event", on_motion)
 
 
 def main():
