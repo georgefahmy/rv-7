@@ -1,9 +1,11 @@
 import sys
 
-import FreeSimpleGUI as sg
 import matplotlib
 import matplotlib.pyplot as plt
 import pandas as pd
+
+# import FreeSimpleGUI as sg
+import PySimpleGUI as sg
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.widgets import RectangleSelector
 
@@ -14,7 +16,7 @@ def load_data(filepath):
     """Loads the CSV file."""
     try:
         # Skip metadata rows if necessary, but standard read_csv usually works
-        df = pd.read_csv(filepath)
+        df = pd.read_csv(filepath, low_memory=False)
         return df
     except Exception as e:
         print(f"Error loading file: {e}")
@@ -515,6 +517,8 @@ def plot_flight(df, flight_id, left_signal, right_signal, canvas):
             if lim[0] == lim[1]:
                 eps = 1e-6
                 return (lim[0] - eps, lim[1] + eps)
+            else:
+                return (lim[0] - (lim[0] * 0.01), lim[1] + (lim[1] * 0.01))
             return lim
 
         new_ylim_left = fix_ylim(new_ylim_left)
@@ -625,21 +629,23 @@ def main():
         available_signals = ["None"] + available_signals
     layout = [
         [
-            sg.Text("Select Flight ID:", font=("Arial", 16)),
+            sg.Text("Select Flight ID:", font=("Arial", 22)),
             sg.Combo(
                 flight_ids,
                 key="-FLIGHT-",
                 readonly=True,
                 enable_events=True,
-                font=("Arial", 16),
+                font=("Arial", 22),
                 default_value=flight_ids[-1],
             ),
             sg.Text(expand_x=True),
             sg.Button("Export Flights", font=("Arial", 16)),
             sg.Button("Exit", font=("Arial", 16)),
         ],
-        [sg.Text("Flight Summary:", font=("Arial", 16))],
-        [sg.Text(size=(50, 8), key="-SUMMARY-", font=("Arial", 16))],
+        [sg.HorizontalSeparator()],
+        [sg.Text("Flight Summary:", font=("Arial", 18))],
+        [sg.Text(size=(50, 8), key="-SUMMARY-", font=("Arial", 14))],
+        [sg.HorizontalSeparator()],
         [
             sg.Text("Select Left Axis Signal:", font=("Arial", 16)),
             sg.Combo(
@@ -691,9 +697,8 @@ def main():
                 f"Flight ID: {fid}\n"
                 f"Start Time: {stats['Start_Time']}\n"
                 f"End Time: {stats['End_Time']}\n"
-                f"Duration: {stats['Duration']} sec\n"
+                f"Duration: {stats['Duration']} sec - {stats['Duration'] / 60} min\n"
                 f"Data Points: {stats['Data_Points']}\n"
-                f"Engine Run: {stats['Engine_Run']}\n"
                 f"Max RPM: {stats['Max_RPM']}\n"
                 f"Max CHT: {stats['Max_CHT']}\n"
             )

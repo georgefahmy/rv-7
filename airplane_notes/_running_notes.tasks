@@ -7,8 +7,8 @@ Backlog:
             SL36500-A20
             SL36500-A31
             82976-01; 82976-02
-            SP12-0003 through SP12-0089, inclusive;
-            SP13-0034 through SP13-0150, inclusive;
+            SP12-0003 through SP12-0089, inclusive
+            SP13-0034 through SP13-0150, inclusive
             SP14-0151 through SP14-0202, inclusive
     @future Accessories/Misc:
         ☐ Add safety wire to elevator trim tab hinge
@@ -35,15 +35,16 @@ Backlog:
         ☐ seal behind starter gear to reduce lower cowl pressure
         ☐ Cowl Inlet conical gussets for cooling optimization
 
-    @future Control Approach Rudder Pedals ( ~$2500):
+    @future Control Approach Rudder Pedals ( ~$5500):
         ☐ https://controlapproach.com/product/rv14-14-6-7-and-9-rudder-pedal-system-kits/
         ☐ Remove existing rudder pedals and hoses
         ☐ Install new rudder pedals
         ☐ Fabricate new rudder cable extension attach pieces
+        ☐ purchase all new brake lines and cylinders etc that work with the control approach pedals
 
     @future Paint/Wrap (~$15k-$30k):
         ☐ Aviationwraps.com got back to me ~15k for full custom wrap + cost for travel + per diem during installation + transport so probably closer to 20k
-        ☐ 35k for evoke (Plus ~ 3 year waiting)
+        ☐ 35k for evoke (Plus ~ 3 year waiting) leave airplane there
 
     @future Landing Height System (~$1100):
         Landing Height System Lidar Altimeter
@@ -77,7 +78,7 @@ Backlog:
         ☐ indicator on panel (or digital only on hdx screen)
 
 
-    @future O2 Sensor (~$150 - paid):
+    @future O2 Sensor:
         ✔ Wire harness routing @done(26-01-08)
         ✔ Mount O2 monitor on panel @done(26-01-08)
         ☐ Power wire from VPX "Hobbs" wiring - change to 5A CB value on vpx (up from 3)
@@ -87,6 +88,11 @@ Backlog:
         ☐ Chase threads M18 tap and install sensor with anti sieze
 
     @future Landing gear fairings and wheel pants:
+        Jacks:
+            Drill holes in second jack for ancoring
+            fabricate remaining support tubes
+            cut to length pipe clamp
+            
         Gear Leg Fairings:
             ☐ Cut left gear leg fairing to size using template
             ☐ Fit fairings to landing gear
