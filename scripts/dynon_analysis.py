@@ -23,7 +23,8 @@ def process_flights(df):
     """
     # Convert all CHT and EGT temperatures from deg C to deg F
     temp_columns = [
-        col for col in df.columns
+        col
+        for col in df.columns
         if (col.startswith("CHT") or col.startswith("EGT")) and "(deg C)" in col
     ]
 
@@ -94,7 +95,7 @@ def plot_flight(df, flight_id, left_signal, right_signal, canvas):
         return
 
     fig = plt.Figure(figsize=(8, 4), dpi=100)
-    fig.subplots_adjust(right=0.85)
+    fig.subplots_adjust(right=0.75)
     ax_left = fig.add_subplot(111)
     ax_right = ax_left.twinx()
 
@@ -189,10 +190,16 @@ def plot_flight(df, flight_id, left_signal, right_signal, canvas):
     )
     ax_left.grid(True)
 
-    # Combine legends
+    # Combine legends and place outside plot
     lines_left, labels_left = ax_left.get_legend_handles_labels()
     lines_right, labels_right = ax_right.get_legend_handles_labels()
-    ax_left.legend(lines_left + lines_right, labels_left + labels_right)
+    ax_left.legend(
+        lines_left + lines_right,
+        labels_left + labels_right,
+        loc="upper left",
+        bbox_to_anchor=(1.02, 1),
+        borderaxespad=0,
+    )
 
     # Clear previous canvas content
     for child in canvas.winfo_children():
@@ -204,9 +211,7 @@ def plot_flight(df, flight_id, left_signal, right_signal, canvas):
     widget.pack(fill="both", expand=1)
 
     # Add click-to-move vertical cursor
-    cursor_line = ax_left.axvline(
-        x=flight_data["Session Time"].iloc[0], linestyle="--"
-    )
+    cursor_line = ax_left.axvline(x=flight_data["Session Time"].iloc[0], linestyle="--")
 
     def on_click(event):
         if event.inaxes == ax_left and event.xdata is not None:
