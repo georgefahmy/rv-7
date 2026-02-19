@@ -1,9 +1,12 @@
 import sys
 
 import FreeSimpleGUI as sg
+import matplotlib
 import matplotlib.pyplot as plt
 import pandas as pd
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+
+matplotlib.use("TkAgg")
 
 
 def load_data(filepath):
@@ -209,16 +212,19 @@ def plot_flight(df, flight_id, left_signal, right_signal, canvas):
     figure_canvas.draw()
     widget = figure_canvas.get_tk_widget()
     widget.pack(fill="both", expand=1)
+    print("DEBUG: Matplotlib canvas initialized and packed")
 
-    # Add click-to-move vertical cursor
-    cursor_line = ax_left.axvline(x=flight_data["Session Time"].iloc[0], linestyle="--")
+    # Add real-time hover vertical cursor
+    ylim = ax_left.get_ylim()
+    cursor_line, = ax_left.plot([flight_data["Session Time"].iloc[0]] * 2, ylim, linestyle="--")
 
-    def on_click(event):
-        if event.inaxes == ax_left and event.xdata is not None:
-            cursor_line.set_xdata(event.xdata)
+    def on_motion(event):
+        if event.inaxes in (ax_left, ax_right) and event.xdata is not None:
+            cursor_line.set_xdata([event.xdata, event.xdata])
             figure_canvas.draw_idle()
 
-    fig.canvas.mpl_connect("button_press_event", on_click)
+    cid = figure_canvas.mpl_connect("motion_notify_event", on_motion)
+    print(f"DEBUG: mpl_connect registered with id {cid}")
 
 
 def main():
