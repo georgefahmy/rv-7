@@ -25,6 +25,8 @@ def process_flights(df):
     """
     Groups data into flights and marks if the engine was run.
     """
+    # Remove rows where System Time is NaN or blank
+    df = df[df["System Time"].notna() & (df["System Time"] != "")]
     # Convert all CHT and EGT temperatures from deg C to deg F
     temp_columns = [
         col
@@ -38,12 +40,20 @@ def process_flights(df):
         df.rename(columns={col: new_name}, inplace=True)
 
     # 1. Identify Flights based on Session Time resets
-    df["Flight ID"] = (df["Session Time"].diff() < 0).cumsum()
+    df["_orig_flight_num"] = (df["Session Time"].diff() < 0).cumsum()
+    # Ensure System Time is numeric and fill NaNs with 0 to prevent aggregation errors
+    df["System Time"] = pd.to_numeric(df["System Time"], errors="coerce").fillna(0)
+
+    # Ensure RPM L and RPM R are numeric and fill NaNs with 0
+    for col in ['RPM L', 'RPM R']:
+        df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
+    # Create combined RPM signal as average of left and right
+    df['RPM'] = (df['RPM L'] + df['RPM R']) / 2
 
     # 2. Determine if Engine was Run for each flight
     # Calculate max RPM for each flight
-    flight_max_rpm = df.groupby("Flight ID")[["RPM L", "RPM R"]].max()
-    flight_max_cht = df.groupby("Flight ID")[
+    flight_max_rpm = df.groupby("_orig_flight_num")[["RPM L", "RPM R"]].max()
+    flight_max_cht = df.groupby("_orig_flight_num")[
         [
             "CHT 1 (deg F)",
             "CHT 2 (deg F)",
@@ -51,13 +61,28 @@ def process_flights(df):
             "CHT 4 (deg F)",
         ]
     ].max()
-    df["Max CHT"] = df["Flight ID"].map(flight_max_cht.max(axis=1))
+    df["Max CHT"] = df["_orig_flight_num"].map(flight_max_cht.max(axis=1))
 
     # Create a boolean Series: True if any RPM > 0
     flights_with_engine = (flight_max_rpm["RPM L"] > 0) | (flight_max_rpm["RPM R"] > 0)
 
     # Map this status back to the original DataFrame
-    df["Engine Run"] = df["Flight ID"].map(flights_with_engine)
+    df["Engine Run"] = df["_orig_flight_num"].map(flights_with_engine)
+
+    # Assign sequential numeric Flight IDs for engine-run flights, starting from 1
+    # Non-engine-run flights get NaN
+    engine_flight_ids = [
+        fid
+        for fid in df["_orig_flight_num"].unique()
+        if flights_with_engine.get(fid, False)
+    ]
+    # Map: _orig_flight_num -> sequential integer (starting at 1)
+    flightid_map = {fid: idx + 1 for idx, fid in enumerate(engine_flight_ids)}
+    df["Flight ID"] = df["_orig_flight_num"].map(lambda x: flightid_map.get(x, None))
+    df.drop(columns=["_orig_flight_num"], inplace=True)
+
+    # Fill any null or NaN values in the DataFrame with 0 to ensure consistent datatypes
+    df.fillna(0, inplace=True)
 
     return df
 
@@ -217,7 +242,7 @@ def plot_flight(df, flight_id, left_signal, right_signal, canvas):
     # Add real-time hover vertical cursor with value display
     ylim_left = ax_left.get_ylim()
     ylim_right = ax_right.get_ylim()
-    xlim = ax_left.get_xlim()
+    # xlim = ax_left.get_xlim()
     (cursor_line,) = ax_left.plot(
         [flight_data["Session Time"].iloc[0]] * 2, ylim_left, linestyle="--"
     )
@@ -506,7 +531,8 @@ def main():
         Max_CHT=("Max CHT", "max"),
     )
 
-    flight_ids = sorted(df["Flight ID"].unique())
+    # Only include flights where Engine_Run is True
+    flight_ids = sorted(flight_stats[flight_stats["Engine_Run"] == True].index.tolist())
     available_signals = sorted(
         [
             col
@@ -536,54 +562,59 @@ def main():
 
     layout = [
         [
-            sg.Text("Select Flight ID:"),
+            sg.Text("Select Flight ID:", font=("Arial", 16)),
             sg.Combo(
                 flight_ids,
                 key="-FLIGHT-",
                 readonly=True,
                 enable_events=True,
+                font=("Arial", 16),
             ),
-            sg.Button("Exit"),
+            sg.Button("Exit", font=("Arial", 16)),
         ],
         [sg.Text("Flight Summary:", font=("Arial", 16))],
-        [sg.Text(size=(50, 8), key="-SUMMARY-")],
+        [sg.Text(size=(50, 8), key="-SUMMARY-", font=("Arial", 16))],
         [
-            sg.Text("Select Left Axis Signal:"),
+            sg.Text("Select Left Axis Signal:", font=("Arial", 16)),
             sg.Combo(
                 available_signals,
                 key="-LEFT_SIGNAL_1-",
                 readonly=True,
                 enable_events=True,
                 size=(30, 1),
+                font=("Arial", 16),
             ),
             sg.VerticalSeparator(),
-            sg.Text("Select Right Axis Signal:"),
+            sg.Text("Select Right Axis Signal:", font=("Arial", 16)),
             sg.Combo(
                 available_signals,
                 key="-RIGHT_SIGNAL_1-",
                 readonly=True,
                 enable_events=True,
                 size=(30, 1),
+                font=("Arial", 16),
             ),
         ],
         [sg.Canvas(key="-CANVAS_1-", expand_x=True, expand_y=True)],
         [
-            sg.Text("Select Left Axis Signal:"),
+            sg.Text("Select Left Axis Signal:", font=("Arial", 16)),
             sg.Combo(
                 available_signals,
                 key="-LEFT_SIGNAL_2-",
                 readonly=True,
                 enable_events=True,
                 size=(30, 1),
+                font=("Arial", 16),
             ),
             sg.VerticalSeparator(),
-            sg.Text("Select Right Axis Signal:"),
+            sg.Text("Select Right Axis Signal:", font=("Arial", 16)),
             sg.Combo(
                 available_signals,
                 key="-RIGHT_SIGNAL_2-",
                 readonly=True,
                 enable_events=True,
                 size=(30, 1),
+                font=("Arial", 16),
             ),
         ],
         [sg.Canvas(key="-CANVAS_2-", expand_x=True, expand_y=True)],
