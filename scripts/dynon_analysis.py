@@ -93,8 +93,10 @@ def process_flights(df):
     ].max()
     df["Max CHT"] = df["_orig_flight_num"].map(flight_max_cht.max(axis=1))
 
-    # Create a boolean Series: True if any RPM > 0
-    flights_with_engine = (flight_max_rpm["RPM L"] > 0) | (flight_max_rpm["RPM R"] > 0)
+    # Create a boolean Series: True if any RPM > 0 and CHT > 125
+    flights_with_engine = (
+        (flight_max_rpm["RPM L"] > 0) | (flight_max_rpm["RPM R"] > 0)
+    ) & (flight_max_cht.max(axis=1) > 125)
 
     # Compute first GPS Date & Time for each flight
     flight_start_gps = df.groupby("_orig_flight_num")["GPS Date & Time"].first()
