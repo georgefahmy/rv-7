@@ -582,76 +582,34 @@ def plot_flight(df, flight_id, left_signal, right_signal, canvas):
 
 
 def main():
-    if len(sys.argv) > 1:
-        filename = sys.argv[1]
-    else:
-        filename = sg.popup_get_file(
-            "Select your CSV file", file_types=(("CSV Files", "*.csv"),)
-        )
-        if not filename:
-            return
+    df = None
+    flight_stats = None
+    flight_ids = []
+    available_signals = []
 
-    df = load_data(filename)
-    if df is None:
-        sg.popup_error("Failed to load file.")
-        return
-
-    df = process_flights(df)
-
-    flight_stats = df.groupby("Flight ID").agg(
-        Start_Time=("Session Time", "min"),
-        End_Time=("Session Time", "max"),
-        Duration=("Session Time", lambda x: x.max() - x.min()),
-        Data_Points=("Session Time", "count"),
-        Engine_Run=("Engine Run", "first"),
-        Max_RPM=("RPM L", "max"),
-        Max_CHT=("Max CHT", "max"),
-    )
-
-    # Only include flights where Engine_Run is True
-    flight_ids = sorted(flight_stats[flight_stats["Engine_Run"]].index.tolist())
-    available_signals = sorted(
-        [
-            col
-            for col in df.columns
-            if col
-            not in [
-                "Flight ID",
-                "Unnamed: 103",
-                "Engine Run",
-                "Max CHT",
-                "AP Yaw Force",
-                "AP Yaw Position",
-                "AP Yaw Slip (bool)",
-                "Session Time",
-                "RPM L",
-                "RPM R",
-                "Fuel Flow 2 (gal/hr)",
-            ]
-        ]
-    )
-
-    # Add synthetic combined CHT signal
-    if "CHT" not in available_signals:
-        available_signals.append("CHT")
-        available_signals = sorted(available_signals)
-        # Add synthetic combined CHT signal
-    if "EGT" not in available_signals:
-        available_signals.append("EGT")
-        available_signals = sorted(available_signals)
-    # Add explicit None option to allow clearing an axis
-    if "None" not in available_signals:
-        available_signals = ["None"] + available_signals
     layout = [
+        [
+            sg.Text("Input CSV File:", font=("Arial", 16)),
+            sg.Input(
+                key="-FILE-",
+                enable_events=True,
+                readonly=True,
+                size=(60, 1),
+                font=("Arial", 16),
+                disabled_readonly_background_color="white",
+            ),
+            sg.FileBrowse(file_types=(("CSV Files", "*.csv"),), font=("Arial", 16)),
+        ],
+        [sg.HorizontalSeparator()],
         [
             sg.Text("Select Flight ID:", font=("Arial", 22)),
             sg.Combo(
-                flight_ids,
+                [],
                 key="-FLIGHT-",
                 readonly=True,
                 enable_events=True,
                 font=("Arial", 22),
-                default_value=flight_ids[-1],
+                size=(30, 1),
             ),
             sg.Text(expand_x=True),
             sg.Button("Export Flights", font=("Arial", 16)),
@@ -664,24 +622,22 @@ def main():
         [
             sg.Text("Select Left Axis Signal:", font=("Arial", 16)),
             sg.Combo(
-                available_signals,
+                [],
                 key="-LEFT_SIGNAL_1-",
                 readonly=True,
                 enable_events=True,
                 size=(30, 1),
                 font=("Arial", 16),
-                default_value="CHT",
             ),
             sg.Text(expand_x=True),
             sg.Text("Select Right Axis Signal:", font=("Arial", 16)),
             sg.Combo(
-                available_signals,
+                [],
                 key="-RIGHT_SIGNAL_1-",
                 readonly=True,
                 enable_events=True,
                 size=(30, 1),
                 font=("Arial", 16),
-                default_value="EGT",
             ),
         ],
         [sg.Canvas(key="-CANVAS_1-", expand_x=True, expand_y=True)],
@@ -691,21 +647,85 @@ def main():
         "Dynon Flight Analyzer", layout=layout, resizable=True, finalize=True
     )
     window.maximize()
-    window.write_event_value(key="-FLIGHT-", value=flight_ids[-1])
-    window.write_event_value(key="-LEFT_SIGNAL_1-", value="CHT")
+    # window.write_event_value(key="-FLIGHT-", value=flight_ids[-1])  # <--- REMOVE this line
+    # window.write_event_value(key="-LEFT_SIGNAL_1-", value="CHT")
 
     while True:
         event, values = window.read()
         if event in (sg.WINDOW_CLOSED, "Exit"):
             break
 
+        # --- Handle file selection and load ---
+        if event == "-FILE-" and values["-FILE-"]:
+            filename = values["-FILE-"]
+            df_loaded = load_data(filename)
+            if df_loaded is None:
+                sg.popup_error("Failed to load file.")
+                continue
+
+            df = process_flights(df_loaded)
+
+            flight_stats = df.groupby("Flight ID").agg(
+                Start_Time=("Session Time", "min"),
+                End_Time=("Session Time", "max"),
+                Duration=("Session Time", lambda x: x.max() - x.min()),
+                Data_Points=("Session Time", "count"),
+                Engine_Run=("Engine Run", "first"),
+                Max_RPM=("RPM L", "max"),
+                Max_CHT=("Max CHT", "max"),
+            )
+
+            flight_ids = sorted(flight_stats[flight_stats["Engine_Run"]].index.tolist())
+
+            available_signals = sorted(
+                [
+                    col
+                    for col in df.columns
+                    if col
+                    not in [
+                        "Flight ID",
+                        "Unnamed: 103",
+                        "Engine Run",
+                        "Max CHT",
+                        "AP Yaw Force",
+                        "AP Yaw Position",
+                        "AP Yaw Slip (bool)",
+                        "Session Time",
+                        "RPM L",
+                        "RPM R",
+                        "Fuel Flow 2 (gal/hr)",
+                    ]
+                ]
+            )
+
+            if "CHT" not in available_signals:
+                available_signals.append("CHT")
+            if "EGT" not in available_signals:
+                available_signals.append("EGT")
+            available_signals = sorted(available_signals)
+
+            if "None" not in available_signals:
+                available_signals = ["None"] + available_signals
+
+            window["-FLIGHT-"].update(values=flight_ids)
+            window["-LEFT_SIGNAL_1-"].update(values=available_signals)
+            window["-RIGHT_SIGNAL_1-"].update(values=available_signals)
+
+            if flight_ids:
+                window["-FLIGHT-"].update(value=flight_ids[-1])
+                window.write_event_value("-FLIGHT-", flight_ids[-1])
+
         if event == "Export Flights":
             folder = sg.popup_get_folder("Select folder to save flight CSV files")
-            if folder:
+            if folder and df is not None:
                 save_flights_to_csv(df, folder)
                 sg.popup("Flights exported successfully.")
 
-        if event == "-FLIGHT-" and values["-FLIGHT-"] is not None:
+        if (
+            event == "-FLIGHT-"
+            and values["-FLIGHT-"] is not None
+            and flight_stats is not None
+        ):
             fid = values["-FLIGHT-"]
             stats = flight_stats.loc[fid]
             summary_text = (
@@ -724,8 +744,7 @@ def main():
             left_signal_1 = values["-LEFT_SIGNAL_1-"]
             right_signal_1 = values["-RIGHT_SIGNAL_1-"]
 
-            if flight_id is None:
-                sg.popup("Please select a Flight ID.")
+            if df is None or flight_id is None:
                 continue
 
             plot_flight(
@@ -740,8 +759,7 @@ def main():
             left_signal_2 = values["-LEFT_SIGNAL_2-"]
             right_signal_2 = values["-RIGHT_SIGNAL_2-"]
 
-            if flight_id is None:
-                sg.popup("Please select a Flight ID.")
+            if df is None or flight_id is None:
                 continue
 
             plot_flight(
