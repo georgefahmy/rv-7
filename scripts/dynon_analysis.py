@@ -159,7 +159,9 @@ def list_signals(df):
 
 # --- Helper function to export each flight to its own CSV file ---
 def save_flights_to_csv(df, output_dir):
-    """Saves each flight (Engine Run == True) to its own CSV file."""
+    """
+    Saves each flight to its own CSV file, grouping exports into subfolders based on their GPS date.
+    """
     import os
 
     if not os.path.exists(output_dir):
@@ -170,10 +172,23 @@ def save_flights_to_csv(df, output_dir):
 
     for fid in flight_ids:
         flight_data = df[df["Flight ID"] == fid]
-        if not flight_data.empty:
-            safe_name = str(fid).replace("/", "-").replace(":", "-")
-            filepath = os.path.join(output_dir, f"{safe_name}.csv")
-            flight_data.to_csv(filepath, index=False)
+        if flight_data.empty:
+            continue
+
+        # Extract date from Flight ID (assumes format: "YYYY-MM-DD ... - Flight X")
+        fid_str = str(fid)
+        date_part = fid_str.split()[0]  # First token should be date
+
+        # Create subfolder for that date
+        date_folder = os.path.join(output_dir, date_part)
+        if not os.path.exists(date_folder):
+            os.makedirs(date_folder)
+
+        # Clean filename
+        safe_name = fid_str.replace("/", "-").replace(":", "-")
+        filepath = os.path.join(date_folder, f"{safe_name}.csv")
+
+        flight_data.to_csv(filepath, index=False)
 
 
 def plot_flight(df, flight_id, left_signal, right_signal, canvas):
