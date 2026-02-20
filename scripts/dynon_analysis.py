@@ -1,5 +1,3 @@
-import sys
-
 import matplotlib
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -641,6 +639,12 @@ def main():
             ),
         ],
         [sg.Canvas(key="-CANVAS_1-", expand_x=True, expand_y=True)],
+        [
+            sg.HorizontalSeparator(),
+        ],
+        [
+            sg.Text("No file loaded", key="-STATUS-", font=("Arial", 14), expand_x=True, justification="left")
+        ],
     ]
 
     window = sg.Window(
@@ -658,12 +662,24 @@ def main():
         # --- Handle file selection and load ---
         if event == "-FILE-" and values["-FILE-"]:
             filename = values["-FILE-"]
+
+            # Show loading spinner
+            sg.popup_animated(sg.DEFAULT_BASE64_LOADING_GIF, message="Loading file...", time_between_frames=50)
+            window.refresh()
+
             df_loaded = load_data(filename)
             if df_loaded is None:
+                sg.popup_animated(None)
                 sg.popup_error("Failed to load file.")
                 continue
 
             df = process_flights(df_loaded)
+
+            # Stop loading spinner
+            sg.popup_animated(None)
+
+            # Update status bar with current file
+            window["-STATUS-"].update(f"Current File: {filename}")
 
             flight_stats = df.groupby("Flight ID").agg(
                 Start_Time=("Session Time", "min"),
@@ -710,6 +726,15 @@ def main():
             window["-FLIGHT-"].update(values=flight_ids)
             window["-LEFT_SIGNAL_1-"].update(values=available_signals)
             window["-RIGHT_SIGNAL_1-"].update(values=available_signals)
+
+            # Set default signals
+            if "CHT" in available_signals:
+                window["-LEFT_SIGNAL_1-"].update(value="CHT")
+                window.write_event_value(key="-LEFT_SIGNAL_1-", value="CHT")
+
+            if "EGT" in available_signals:
+                window["-RIGHT_SIGNAL_1-"].update(value="EGT")
+                window.write_event_value(key="-RIGHT_SIGNAL_1-", value="EGT")
 
             if flight_ids:
                 window["-FLIGHT-"].update(value=flight_ids[-1])
