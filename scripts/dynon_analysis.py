@@ -39,9 +39,13 @@ def process_flights(df):
     ]
 
     for col in temp_columns:
-        df[col] = df[col] * 9.0 / 5.0 + 32.0
-        new_name = col.replace("(deg C)", "(deg F)")
-        df.rename(columns={col: new_name}, inplace=True)
+        try:
+            df[col] = df[col] * 9.0 / 5.0 + 32.0
+            new_name = col.replace("(deg C)", "(deg F)")
+            df.rename(columns={col: new_name}, inplace=True)
+        except Exception as e:
+            print(e)
+            continue
 
     # 1. Identify Flights based on Session Time resets
     df["_orig_flight_num"] = (df["Session Time"].diff() < 0).cumsum()
@@ -643,7 +647,13 @@ def main():
             sg.HorizontalSeparator(),
         ],
         [
-            sg.Text("No file loaded", key="-STATUS-", font=("Arial", 14), expand_x=True, justification="left")
+            sg.Text(
+                "No file loaded",
+                key="-STATUS-",
+                font=("Arial", 14),
+                expand_x=True,
+                justification="left",
+            )
         ],
     ]
 
@@ -664,7 +674,11 @@ def main():
             filename = values["-FILE-"]
 
             # Show loading spinner
-            sg.popup_animated(sg.DEFAULT_BASE64_LOADING_GIF, message="Loading file...", time_between_frames=50)
+            sg.popup_animated(
+                sg.DEFAULT_BASE64_LOADING_GIF,
+                message="Loading file...",
+                time_between_frames=50,
+            )
             window.refresh()
 
             df_loaded = load_data(filename)
