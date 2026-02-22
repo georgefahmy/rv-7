@@ -31,21 +31,23 @@ def process_flights(df):
     # Remove rows where GPS Date & Time is NaN or blank
     df = df[df["GPS Date & Time"].notna() & (df["GPS Date & Time"] != "")]
 
-    # Convert all CHT and EGT temperatures from deg C to deg F
-    temp_columns = [
-        col
-        for col in df.columns
-        if (col.startswith("CHT") or col.startswith("EGT")) and "(deg C)" in col
-    ]
+    # Convert all temperature columns from deg C to deg F
+    temp_cols = [col for col in df.columns if "(deg C)" in col]
 
-    for col in temp_columns:
+    for col in temp_cols:
         try:
+            # Force numeric conversion to prevent string math errors
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+
+            # Convert C to F
             df[col] = df[col] * 9.0 / 5.0 + 32.0
+
+            # Rename column to deg F
             new_name = col.replace("(deg C)", "(deg F)")
             df.rename(columns={col: new_name}, inplace=True)
+
         except Exception as e:
-            print(e)
-            continue
+            print(f"Warning: Temperature conversion failed for column '{col}': {e}")
 
     # 1. Identify Flights based on Session Time resets
     df["_orig_flight_num"] = (df["Session Time"].diff() < 0).cumsum()
@@ -562,10 +564,10 @@ def plot_flight(df, flight_id, left_signal, right_signal, canvas):
     # Explicitly draw the canvas after creating the selector to ensure it appears
     figure_canvas.draw_idle()
 
-    # Add right-click to reset zoom
+    # Add left double-click to reset zoom
     def on_press(event):
-        # Respond to right-clicks (button 3) anywhere on the figure
-        if event.button == 3:
+        # Respond to left double-clicks (button 1) anywhere on the figure
+        if event.dblclick and event.button == 1:
             # Reset both axes (left and right) to full x/y range
             x_min = flight_data["Session Time"].min()
             x_max = flight_data["Session Time"].max()
@@ -579,7 +581,7 @@ def plot_flight(df, flight_id, left_signal, right_signal, canvas):
             # Hide rectangle after selection so it does not block right-clicks
             selector.set_visible(False)
 
-    # Connect to button_press_event to detect right-clicks
+    # Connect to button_press_event to detect left double-clicks
     figure_canvas.mpl_connect("button_press_event", on_press)
 
 

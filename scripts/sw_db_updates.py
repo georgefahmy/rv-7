@@ -285,7 +285,7 @@ if __name__ == "__main__":
         if "GARMIN_G5" in drive
     ]
 
-    config_file = json.load(open("sw_folder_config.json", "r"))
+    config_file = json.load(open("scripts/sw_folder_config.json", "r"))
     config = (
         config_file.get("default")
         if "default" in config_file.keys()
