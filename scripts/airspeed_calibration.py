@@ -139,7 +139,7 @@ def analyze_flight_data(df, start_time=None, end_time=None, show_plot=True):
         plt.show()
 
     maneuver_df["sigma"] = calculate_density_ratio(
-        maneuver_df["press_alt"], maneuver_df["oat"]
+        maneuver_df["press_alt"], (maneuver_df["oat"] - 32.0) * 5.0 / 9.0
     )
 
     initial_guess = [0.0, 0.0, 10.0, 180.0]

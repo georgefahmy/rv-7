@@ -4,6 +4,7 @@ import pandas as pd
 
 # import FreeSimpleGUI as sg
 import PySimpleGUI as sg
+from airspeed_calibration import analyze_flight_data
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.widgets import RectangleSelector
 
@@ -612,7 +613,7 @@ def main():
                 key="-FLIGHT-",
                 readonly=True,
                 enable_events=True,
-                font=("Arial", 22),
+                font=("Arial", 18),
                 size=(30, 1),
             ),
             sg.Text(expand_x=True),
@@ -620,8 +621,41 @@ def main():
             sg.Button("Exit", font=("Arial", 16)),
         ],
         [sg.HorizontalSeparator()],
-        [sg.Text("Flight Summary:", font=("Arial", 18))],
-        [sg.Text(size=(50, 8), key="-SUMMARY-", font=("Arial", 14))],
+        [
+            sg.Text(
+                "Flight Summary: ",
+                font=("Arial", 18),
+            ),
+            sg.Text(expand_x=True),
+            sg.Text(
+                "Start",
+                font=("Arial", 16),
+            ),
+            sg.Input(
+                key="-START_MANUEVER-",
+                size=(10, 1),
+                font=("Arial", 16),
+            ),
+            sg.Text(
+                "End",
+                font=("Arial", 16),
+            ),
+            sg.Input(
+                key="-END_MANUEVER-",
+                size=(10, 1),
+                font=("Arial", 16),
+            ),
+            sg.Button(
+                "Airspeed Calibration",
+                key="-AIRSPEED_CALIBRATION-",
+                font=("Arial", 16),
+            ),
+        ],
+        [
+            sg.Text(size=(50, 8), key="-SUMMARY-", font=("Arial", 14)),
+            sg.Text(expand_x=True),
+            sg.Text(size=(50, 8), key="-ASI_CALIBRATION-", font=("Arial", 14)),
+        ],
         [sg.HorizontalSeparator()],
         [
             sg.Text("Select Left Axis Signal:", font=("Arial", 16)),
@@ -810,6 +844,54 @@ def main():
                 right_signal_2,
                 window["-CANVAS_2-"].TKCanvas,
             )
+        if event == "-AIRSPEED_CALIBRATION-":
+            as_cal_df = df.rename(
+                columns={
+                    "Session Time": "session_time",
+                    "Indicated Airspeed (knots)": "ias",
+                    "Pressure Altitude (ft)": "press_alt",
+                    "Magnetic Heading (deg)": "hdg",
+                    "Ground Speed (knots)": "gps_gs",
+                    "Ground Track (deg)": "gps_trk",
+                    "OAT (deg F)": "oat",
+                    "Barometer Setting (inHg)": "baro",
+                }
+            )
+
+            essential_columns = [
+                "session_time",
+                "ias",
+                "press_alt",
+                "hdg",
+                "gps_gs",
+                "gps_trk",
+                "oat",
+                "baro",
+            ]
+            as_cal_df = as_cal_df[essential_columns].copy()
+
+            as_cal_df = as_cal_df.dropna()
+            as_cal_df = as_cal_df[as_cal_df["ias"] > 40.0]
+
+            as_cal_df = as_cal_df.reset_index(drop=True)
+            output = analyze_flight_data(
+                as_cal_df,
+                start_time=float(values["-START_MANUEVER-"]),
+                end_time=float(values["-END_MANUEVER-"]),
+                show_plot=True,
+            )
+            if output:
+                asi_calibration_summary = (
+                    f"Data Points Analyzed:  {output['analyzed_data_points']}\n"
+                    f"CAS Correction:        {output['calibrated_airspeed_correction_kts']} kts\n"
+                    f"Airspeed Error:        {output['airspeed_error_kts']} kts\n"
+                    f"HDG Correction:        {output['calibrated_heading_correction_deg']} deg\n"
+                    f"Wind Direction:        {output['wind_direction_deg']} deg\n"
+                    f"Wind Speed:            {output['wind_speed_kts']} kts\n"
+                    f"Uncorr. Avg TAS:       {output['uncorrected_average_true_airspeed_kts']} kts\n"
+                    f"Corrected Avg TAS:     {output['corrected_average_true_airspeed_kts']} kts\n"
+                )
+                window["-ASI_CALIBRATION-"].update(asi_calibration_summary)
 
     window.close()
 
