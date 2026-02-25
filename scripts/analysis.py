@@ -1,14 +1,30 @@
 import matplotlib
 import matplotlib.pyplot as plt
+
+# import numpy as np
 import pandas as pd
 
 # import FreeSimpleGUI as sg
 import PySimpleGUI as sg
 from airspeed_calibration import analyze_flight_data
+from geopy.distance import geodesic
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.widgets import RectangleSelector
 
 matplotlib.use("TkAgg")
+ground_track = {
+    "lat": None,
+    "lon": None,
+    "time": None,
+    "marker": None,
+    "canvas": None,
+}
+# --- Ground track sync globals ---
+ground_track_lat = None
+ground_track_lon = None
+ground_track_time = None
+ground_track_marker = None
+ground_track_canvas = None
 
 
 def load_data(filepath):
@@ -299,15 +315,15 @@ def plot_flight(df, flight_id, left_signal, right_signal, canvas):
     )
     ax_left.grid(True)
 
-    # Combine legends and place outside plot
+    # Combine legends and place completely outside plot on the right
     lines_left, labels_left = ax_left.get_legend_handles_labels()
     lines_right, labels_right = ax_right.get_legend_handles_labels()
     ax_left.legend(
         lines_left + lines_right,
         labels_left + labels_right,
-        loc="upper left",
-        bbox_to_anchor=(1.02, 1),
-        borderaxespad=0,
+        loc="lower left",
+        bbox_to_anchor=(1.05, 0.5),
+        borderaxespad=3,
     )
 
     # Clear previous canvas content
@@ -347,7 +363,21 @@ def plot_flight(df, flight_id, left_signal, right_signal, canvas):
 
             # Find nearest index
             idx = (abs(session_time - event.xdata)).argmin()
+            global ground_track
 
+            if (
+                ground_track["time"] is not None
+                and ground_track["marker"] is not None
+                and event.xdata is not None
+            ):
+                idx = (abs(ground_track["time"] - event.xdata)).argmin()
+                if idx < len(ground_track["lat"]):
+                    x_val = float(ground_track["lon"][idx])
+                    y_val = float(ground_track["lat"][idx])
+
+                    marker = ground_track["marker"]
+                    marker.set_data([x_val], [y_val])
+                    ground_track["canvas"].draw_idle()
             # Prepare display string
             display_lines = [f"Time: {session_time[idx]:.2f} sec"]
 
@@ -412,7 +442,7 @@ def plot_flight(df, flight_id, left_signal, right_signal, canvas):
             # Update text box to appear on the right side of the cursor, slightly below the top of the axis
             x = event.xdata
             ylim_top = ax_left.get_ylim()[1]
-            y = ylim_top - 0.05 * (ylim_top - ax_left.get_ylim()[0])  # 5% below top
+            y = ylim_top - 0.60 * (ylim_top - ax_left.get_ylim()[0])  # 70% below top
             value_text.set_position(
                 (x + 0.01 * (ax_left.get_xlim()[1] - ax_left.get_xlim()[0]), y)
             )
@@ -658,27 +688,52 @@ def main():
         ],
         [sg.HorizontalSeparator()],
         [
-            sg.Text("Select Left Axis Signal:", font=("Arial", 16)),
-            sg.Combo(
-                [],
-                key="-LEFT_SIGNAL_1-",
-                readonly=True,
-                enable_events=True,
-                size=(30, 1),
-                font=("Arial", 16),
+            sg.Column(
+                expand_x=True,
+                expand_y=True,
+                layout=[
+                    [
+                        sg.Text("Left Axis Signal:", font=("Arial", 16)),
+                        sg.Combo(
+                            [],
+                            key="-LEFT_SIGNAL_1-",
+                            readonly=True,
+                            enable_events=True,
+                            size=(30, 1),
+                            font=("Arial", 16),
+                        ),
+                        sg.Text(expand_x=True),
+                        sg.Text("Right Axis Signal:", font=("Arial", 16)),
+                        sg.Combo(
+                            [],
+                            key="-RIGHT_SIGNAL_1-",
+                            readonly=True,
+                            enable_events=True,
+                            size=(30, 1),
+                            font=("Arial", 16),
+                        ),
+                    ],
+                    [sg.HorizontalSeparator()],
+                    [
+                        sg.Canvas(key="-CANVAS_1-", expand_x=True, expand_y=True),
+                    ],
+                ],
             ),
-            sg.Text(expand_x=True),
-            sg.Text("Select Right Axis Signal:", font=("Arial", 16)),
-            sg.Combo(
-                [],
-                key="-RIGHT_SIGNAL_1-",
-                readonly=True,
-                enable_events=True,
-                size=(30, 1),
-                font=("Arial", 16),
+            sg.VerticalSeparator(),
+            sg.Column(
+                expand_x=True,
+                expand_y=True,
+                layout=[
+                    [
+                        sg.Text("Flight Path", font=("Arial", 16), expand_x=True),
+                    ],
+                    [sg.HorizontalSeparator()],
+                    [
+                        sg.Canvas(key="-CANVAS_2-", expand_x=True, expand_y=True),
+                    ],
+                ],
             ),
         ],
-        [sg.Canvas(key="-CANVAS_1-", expand_x=True, expand_y=True)],
         [
             sg.HorizontalSeparator(),
         ],
@@ -829,21 +884,72 @@ def main():
                 right_signal_1,
                 window["-CANVAS_1-"].TKCanvas,
             )
-        if event in ("-LEFT_SIGNAL_2-", "-RIGHT_SIGNAL_2-"):
-            flight_id = values["-FLIGHT-"]
-            left_signal_2 = values["-LEFT_SIGNAL_2-"]
-            right_signal_2 = values["-RIGHT_SIGNAL_2-"]
 
-            if df is None or flight_id is None:
-                continue
+            # --- Plot 2D GPS Ground Track (Relative Distance in NM) Colored by IAS ---
+            if "Latitude (deg)" in df.columns and "Longitude (deg)" in df.columns:
+                # from geopy.distance import geodesic
 
-            plot_flight(
-                df,
-                flight_id,
-                left_signal_2,
-                right_signal_2,
-                window["-CANVAS_2-"].TKCanvas,
-            )
+                flight_data = df[df["Flight ID"] == flight_id]
+                lat = flight_data["Latitude (deg)"].values
+                lon = flight_data["Longitude (deg)"].values
+                session_time_gt = flight_data["Session Time"].values
+
+                # Compute relative distances from the first point in nautical miles
+                origin = (lat[0], lon[0])
+                x_dist = []  # East-West relative distance in NM
+                y_dist = []  # North-South relative distance in NM
+
+                for la, lo in zip(lat, lon):
+                    # Compute North-South distance
+                    north_south = geodesic((la, lon[0]), origin).nautical
+                    # Compute East-West distance
+                    east_west = geodesic((lat[0], lo), origin).nautical
+
+                    # Adjust sign based on relative position
+                    if la < lat[0]:
+                        north_south *= -1
+                    if lo < lon[0]:
+                        east_west *= -1
+
+                    y_dist.append(north_south)
+                    x_dist.append(east_west)
+
+                fig2, ax2 = plt.subplots()
+
+                # Color by Indicated Airspeed if available
+                if "Indicated Airspeed (knots)" in flight_data.columns:
+                    ias = flight_data["Indicated Airspeed (knots)"].values
+                    sc = ax2.scatter(x_dist, y_dist, c=ias, cmap="viridis", s=8)
+                    cbar = fig2.colorbar(sc, ax=ax2, pad=0.1)
+                    cbar.set_label("True Airspeed (knots)")
+                else:
+                    ax2.plot(x_dist, y_dist)
+
+                ax2.set_xlabel("Relative East-West Distance (NM)")
+                ax2.set_ylabel("Relative North-South Distance (NM)")
+                ax2.set_title("GPS Ground Track (Relative Distance Colored by IAS)")
+                ax2.grid(True)
+
+                # Moving position marker (start at origin)
+                (ground_track_marker,) = ax2.plot(
+                    [x_dist[0]], [y_dist[0]], "ro", zorder=10
+                )
+
+                # Clear existing canvas
+                for child in window["-CANVAS_2-"].TKCanvas.winfo_children():
+                    child.destroy()
+
+                canvas2 = FigureCanvasTkAgg(fig2, window["-CANVAS_2-"].TKCanvas)
+                canvas2.draw()
+                canvas2.get_tk_widget().pack(side="top", fill="both", expand=1)
+
+                # Store globals for syncing
+                ground_track["lat"] = y_dist
+                ground_track["lon"] = x_dist
+                ground_track["time"] = session_time_gt
+                ground_track["marker"] = ground_track_marker
+                ground_track["canvas"] = canvas2
+
         if event == "-AIRSPEED_CALIBRATION-":
             as_cal_df = df.rename(
                 columns={
@@ -867,7 +973,10 @@ def main():
                 "gps_trk",
                 "oat",
                 "baro",
+                "Wind Speed (knots)",
+                "Wind Direction (deg)",
             ]
+
             as_cal_df = as_cal_df[essential_columns].copy()
 
             as_cal_df = as_cal_df.dropna()
@@ -878,20 +987,40 @@ def main():
                 as_cal_df,
                 start_time=float(values["-START_MANUEVER-"]),
                 end_time=float(values["-END_MANUEVER-"]),
-                show_plot=True,
+                show_plot=False,
             )
-            if output:
-                asi_calibration_summary = (
-                    f"Data Points Analyzed:  {output['analyzed_data_points']}\n"
-                    f"CAS Correction:        {output['calibrated_airspeed_correction_kts']} kts\n"
-                    f"Airspeed Error:        {output['airspeed_error_kts']} kts\n"
-                    f"HDG Correction:        {output['calibrated_heading_correction_deg']} deg\n"
-                    f"Wind Direction:        {output['wind_direction_deg']} deg\n"
-                    f"Wind Speed:            {output['wind_speed_kts']} kts\n"
-                    f"Uncorr. Avg TAS:       {output['uncorrected_average_true_airspeed_kts']} kts\n"
-                    f"Corrected Avg TAS:     {output['corrected_average_true_airspeed_kts']} kts\n"
-                )
-                window["-ASI_CALIBRATION-"].update(asi_calibration_summary)
+            start_time = float(values["-START_MANUEVER-"])
+            end_time = float(values["-END_MANUEVER-"])
+
+            # Filter the DataFrame to only include the selected maneuver window
+            maneuver_df = as_cal_df[
+                (as_cal_df["session_time"] >= start_time)
+                & (as_cal_df["session_time"] <= end_time)
+            ]
+
+            avg_wind_speed = (
+                maneuver_df["Wind Speed (knots)"].mean()
+                if not maneuver_df.empty and "Wind Speed (knots)" in maneuver_df.columns
+                else float("nan")
+            )
+            avg_wind_dir = (
+                maneuver_df["Wind Direction (deg)"].mean()
+                if not maneuver_df.empty
+                and "Wind Direction (deg)" in maneuver_df.columns
+                else float("nan")
+            )
+
+            asi_calibration_summary = (
+                f"Data Points Analyzed:  {output['analyzed_data_points']}\n"
+                f"CAS Correction:        {output['calibrated_airspeed_correction_kts']} kts\n"
+                f"Airspeed Error:        {output['airspeed_error_kts']} kts\n"
+                f"HDG Correction:        {output['calibrated_heading_correction_deg']} deg\n"
+                f"Wind Direction:        {output['wind_direction_deg']} deg (Avg: {avg_wind_dir:.1f} deg)\n"
+                f"Wind Speed:            {output['wind_speed_kts']} kts (Avg: {avg_wind_speed:.1f} kts)\n"
+                f"Uncorr. Avg TAS:       {output['uncorrected_average_true_airspeed_kts']} kts\n"
+                f"Corrected Avg TAS:     {output['corrected_average_true_airspeed_kts']} kts\n"
+            )
+            window["-ASI_CALIBRATION-"].update(asi_calibration_summary)
 
     window.close()
 

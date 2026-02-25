@@ -94,7 +94,7 @@ def load_flight_log(filepath):
     return df
 
 
-def analyze_flight_data(df, start_time=None, end_time=None, show_plot=True):
+def analyze_flight_data(df, start_time=None, end_time=None, show_plot=False):
     """
     Processes the time-series dataframe and outputs the calibration parameters.
     Slices the data based on Session Time rather than row index.
