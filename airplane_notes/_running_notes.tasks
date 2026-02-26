@@ -57,9 +57,10 @@ Backlog:
 
     @future PMAG controller (~$500):
         PMAG EI Controller - see advance angle on skyview
+        ✔ Order PMAG EI Controller @done(26-02-25)
         ☐ Fabricate Tx/Rx harness for Left/Right PMAG to D15 connector
         ☐ Power VPX J1.1 (2amp max),
-        ☐ Ground to ground tab on Firewall
+        ☐ Ground to ground-tab on Firewall
         ☐ EMS GPIO1, GPIO5, GPIO7, GPIO8 available (after changing Trim to VPX) Left/Right advance and temperature monitor
         ☐ change trim position to as follows on VPX J1
             ☐ J1.3 roll trim 2.5v ref
@@ -89,10 +90,9 @@ Backlog:
 
     @future Landing gear fairings and wheel pants:
         Jacks:
-            Drill holes in second jack for ancoring
-            fabricate remaining support tubes
-            cut to length pipe clamp
-
+            ☐ Drill holes in second jack for ancoring
+            ☐ fabricate remaining support tubes
+            ☐ cut to length pipe clamp
         Gear Leg Fairings:
             ☐ Cut left gear leg fairing to size using template
             ☐ Fit fairings to landing gear
@@ -128,6 +128,11 @@ On Deck:
 Daily Updates are collected below this line
 Updates are moved to the archive section after
 they have been added to the build log
+2/25/2026:
+    brake master cylinder return springs
+    new tow bar alignment
+    pmag monitor wiring harness
+
 2/22/2026:
     ✔ Third flight done! flew sunday afternoon for half an hour crusing at 3500ft. @done(26-02-25)
     ✔ 15 deg warmer OAT - slightly higher CHTs and Oil temp but well below what I was concerned about @done(26-02-25)
