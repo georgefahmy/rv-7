@@ -15,11 +15,15 @@ ELT_TEST_INTERVAL_DAYS = 90
 OAS_AVIATION_DB_INTERVAL_DAYS = 28  # example 28-day FAA cycle
 OAS_OBSTACLE_DB_INTERVAL_DAYS = 56
 
+
 # --- Colors ---
 DEFAULT_COLOR = "black"
 OVERDUE_COLOR = "red"
 WARNING_COLOR = "yellow"
 CURRENT_COLOR = "green"
+
+# --- Override for Total Airframe Hours ---
+current_total_hours_override = None
 
 
 def update_database_due_dates(window):
@@ -112,15 +116,6 @@ def update_database_due_dates(window):
         print("Failed to fetch aviation/obstacle dates:", e)
         window["aviation_db_due_text"].update("--")
         window["obstacle_db_due_text"].update("--")
-
-
-def update_total_airframe_hours(window):
-    cursor.execute(
-        "SELECT airframe_time FROM maintenance_entries ORDER BY date DESC LIMIT 1"
-    )
-    result = cursor.fetchone()
-    total_hours = float(result[0]) if result and result[0] is not None else 0.0
-    window["total_airframe_text"].update(f"Total Airframe Hours: {total_hours:.1f}")
 
 
 def refresh_table(window):
@@ -326,6 +321,14 @@ def resequence_ids():
     conn.commit()
 
 
+def update_total_airframe_hours(window):
+    cursor.execute("SELECT total_airframe_hours FROM aircraft_totals WHERE id=1")
+    result = cursor.fetchone()
+    total_hours = float(result[0]) if result and result[0] is not None else 0.0
+
+    window["total_airframe_text"].update(f"Total Airframe Hours: {total_hours:.1f}")
+
+
 conn = sqlite3.connect("scripts/maintenance.db")
 cursor = conn.cursor()
 
@@ -343,6 +346,21 @@ cursor.execute(
     """
 )
 conn.commit()
+cursor.execute(
+    """
+    CREATE TABLE IF NOT EXISTS aircraft_totals (
+        id INTEGER PRIMARY KEY CHECK (id = 1),
+        total_airframe_hours REAL
+    )
+    """
+)
+conn.commit()
+cursor.execute("SELECT total_airframe_hours FROM aircraft_totals WHERE id=1")
+if cursor.fetchone() is None:
+    cursor.execute(
+        "INSERT INTO aircraft_totals (id, total_airframe_hours) VALUES (1, 0.0)"
+    )
+    conn.commit()
 
 entry_layout = [
     [
@@ -414,12 +432,26 @@ entry_layout = [
 main_layout = [
     [
         sg.Text("N890GF Maintenance Tracker", font=("Arial", 24), expand_x=True),
-        sg.Text(
-            "Total Airframe Hours: 0",
-            font=("Arial", 18),
-            key="total_airframe_text",
-            justification="right",
-            expand_x=True,
+        sg.Column(
+            element_justification="right",
+            layout=[
+                [
+                    sg.Text(
+                        "Total Airframe Hours: 0",
+                        font=("Arial", 18),
+                        key="total_airframe_text",
+                        justification="right",
+                        expand_x=True,
+                    ),
+                ],
+                [
+                    sg.Button(
+                        "Update",
+                        font=("Arial", 12),
+                        key="update_total_hours",
+                    )
+                ],
+            ],
         ),
     ],
     [
@@ -543,7 +575,41 @@ while True:
     event, values = window.read()
     if event in (sg.WINDOW_CLOSED, "Exit"):
         break
-    print(event, values)
+
+    if event == "update_total_hours":
+        update_layout = [
+            [sg.Text("Enter New Total Airframe Hours:")],
+            [sg.Input(key="new_total_hours")],
+            [sg.Button("Submit"), sg.Button("Cancel")],
+        ]
+
+        update_window = sg.Window(
+            "Update Total Airframe Hours", update_layout, modal=True
+        )
+
+        while True:
+            u_event, u_values = update_window.read()
+            if u_event in (sg.WINDOW_CLOSED, "Cancel"):
+                update_window.close()
+                break
+
+            if u_event == "Submit":
+                try:
+                    new_hours = float(u_values["new_total_hours"])
+
+                    cursor.execute(
+                        "UPDATE aircraft_totals SET total_airframe_hours=? WHERE id=1",
+                        (new_hours,),
+                    )
+                    conn.commit()
+
+                    update_total_airframe_hours(window)
+
+                except Exception:
+                    sg.popup("Please enter a valid number.")
+
+                update_window.close()
+                break
     if event == "add_entry_button":
         entry_window = sg.Window("Add Maintenance Entry", entry_layout, modal=True)
         while True:
@@ -585,6 +651,7 @@ while True:
                     entry_window["notes_input"].update("")
                     entry_window["recurrent_item_input"].update("")
                     entry_window["category_input"].update("")
+
     if event == "submit_entry":
         date = values.get("date_input")
         tach = values.get("tach_hours_input")  # using same input for now
