@@ -120,9 +120,24 @@ Future Project Order:
     -  usb power supply
     -  oil cooler temp optimization
     -  fwf cooling optimization (exit air)
+    -  Fabricate rudder stop extensions and rivet/bolt to existing rudder stops
 
 On Deck:
-    ☐ Fabricate rudder stop extensions and rivet/bolt to existing rudder stops
+    Set ELT to ARMED position and add red cap
+    install batteries into ELT audio thing and panel thing
+
+    ☐ maintenance log ui
+        https://vansairforce.net/threads/preferred-method-for-maintenance-logs.235411/post-1847239
+        add entry button
+        upcoming maintenance (oil change based on hours, condition inspection based on calendar, ELT test every 3 months, ELT Main Battery change 5 years, remote and audio battery every 10 years, beacon registration every 2 years (https://beaconregistration.noaa.gov/RGDB/BeaconOwner/dashboard - expires Dec 14, 2027))
+        total hours tracking with update button
+        maintenance log
+            date, hours, notes, recurrent item?, category (airframe, engine, avionics, prop), action (edit, delete - open popups to make edits)
+        maintenance details pop up
+            date, hours, category, notes, performed by
+        nav database update (current, needs update, dates valid)
+
+
 
 ################################################
 Daily Updates are collected below this line
