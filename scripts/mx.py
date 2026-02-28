@@ -9,6 +9,14 @@ OIL_CHANGE_INTERVAL_HOURS = 50
 CONDITION_INSPECTION_INTERVAL_MONTHS = 12
 ELT_TEST_INTERVAL_DAYS = 90
 
+
+def update_total_airframe_hours(window):
+    cursor.execute("SELECT SUM(airframe_time) FROM maintenance_entries")
+    result = cursor.fetchone()[0]
+    total_hours = float(result) if result else 0.0
+    window["total_airframe_text"].update(f"Total Airframe Hours: {total_hours:.1f}")
+
+
 entry_layout = [
     [
         sg.Column(
@@ -72,7 +80,16 @@ entry_layout = [
 
 
 main_layout = [
-    [sg.Text("N890GF Maintenance Tracker", font=("Arial", 24), expand_x=True)],
+    [
+        sg.Text("N890GF Maintenance Tracker", font=("Arial", 24), expand_x=True),
+        sg.Text(
+            "Total Airframe Hours: 0",
+            font=("Arial", 18),
+            key="total_airframe_text",
+            justification="right",
+            expand_x=True,
+        ),
+    ],
     [
         sg.Frame(
             title="MX Summary",
@@ -114,7 +131,6 @@ main_layout = [
         )
     ],
     [sg.Button("Add Entry", key="add_entry_button")],
-    entry_layout,
     [sg.HorizontalSeparator()],
     [
         sg.Table(
@@ -127,7 +143,6 @@ main_layout = [
                 "Notes",
                 "Recurrent Item",
                 "Category",
-                "Next Due Tach",
             ],
             key="maintenance_table",
             auto_size_columns=True,
@@ -147,29 +162,13 @@ main_layout = [
 
 
 def refresh_table(window):
-    cursor.execute("SELECT * FROM maintenance_entries ORDER BY id DESC")
+    cursor.execute("SELECT * FROM maintenance_entries ORDER BY date DESC")
     rows = cursor.fetchall()
 
     updated_rows = []
 
     for row in rows:
         entry_id, date, tach, airframe, notes, recurrent_item, category = row
-
-        next_due_tach = ""
-
-        if tach is not None:
-            try:
-                tach_val = float(tach)
-
-                if recurrent_item == "Oil Change":
-                    next_due_tach = tach_val + OIL_CHANGE_INTERVAL_HOURS
-                elif recurrent_item == "Condition Inspection":
-                    next_due_tach = "Calendar Based"
-                else:
-                    next_due_tach = ""
-            except:
-                next_due_tach = ""
-
         updated_rows.append(
             [
                 entry_id,
@@ -179,7 +178,6 @@ def refresh_table(window):
                 notes,
                 recurrent_item,
                 category,
-                next_due_tach,
             ]
         )
 
@@ -193,14 +191,14 @@ def calculate_overdue():
     rows = cursor.fetchall()
 
     overdue_count = 0
-    today = datetime.today()
+    today = datetime.today().date()
 
     for item, last_date in rows:
         if not last_date:
             continue
 
         try:
-            last_dt = datetime.strptime(last_date, "%Y-%m-%d")
+            last_dt = datetime.strptime(last_date, "%m/%d/%Y").date()
         except:
             continue
 
@@ -218,98 +216,127 @@ def calculate_overdue():
 
 
 def update_due_dates(window):
-    today = datetime.today()
+    today = datetime.today().date()
 
-    cursor.execute("SELECT DISTINCT recurrent_item FROM maintenance_entries")
-    items = cursor.fetchall()
-
-    rows = []
-
-    for (item,) in items:
-        cursor.execute(
-            """
-            SELECT date, tach_time
-            FROM maintenance_entries
-            WHERE recurrent_item=?
-            ORDER BY date DESC
-            LIMIT 1
-            """,
-            (item,),
-        )
-        result = cursor.fetchone()
-        if result:
-            last_date, last_tach = result
-            rows.append((item, last_date, last_tach))
-
-    cond_due = "--"
-    oil_due = "--"
-    elt_due = "--"
-
-    cond_color = "black"
-    oil_color = "black"
-    elt_color = "black"
-
-    for item, last_date, last_tach in rows:
-        if not last_date:
-            continue
-
+    # --- Find latest Condition Inspection entry ---
+    cursor.execute(
+        """
+        SELECT date
+        FROM maintenance_entries
+        WHERE recurrent_item=?
+        ORDER BY date DESC
+        LIMIT 1
+        """,
+        ("Condition Inspection",),
+    )
+    ci_result = cursor.fetchone()
+    if ci_result and ci_result[0]:
+        last_date = ci_result[0]
         try:
-            last_dt = datetime.strptime(last_date, "%Y-%m-%d")
-        except:
-            continue
+            from calendar import monthrange
 
-        # CONDITION INSPECTION (12 months calendar)
-        if item == "Condition Inspection":
-            due_date = last_dt + timedelta(days=365)
+            last_dt = datetime.strptime(last_date, "%m/%d/%Y").date()
+            preliminary_due = last_dt + timedelta(days=365)
+
+            # Set due date to last day of that month
+            last_day = monthrange(preliminary_due.year, preliminary_due.month)[1]
+            due_date = preliminary_due.replace(day=last_day)
+
             days_remaining = (due_date - today).days
-
             cond_due = f"{due_date.strftime('%Y-%m-%d')} ({days_remaining} days)"
-
             if days_remaining < 0:
                 cond_color = "red"
             elif days_remaining <= 30:
                 cond_color = "yellow"
+            else:
+                cond_color = "black"
+        except:
+            cond_due = "--"
+            cond_color = "black"
+    else:
+        cond_due = "--"
+        cond_color = "black"
 
-        # ELT TEST (calendar)
-        if item == "ELT Test":
+    # --- Find latest Oil Change entry ---
+    cursor.execute(
+        """
+        SELECT date, tach_time
+        FROM maintenance_entries
+        WHERE recurrent_item=?
+        ORDER BY date DESC
+        LIMIT 1
+        """,
+        ("Oil Change",),
+    )
+    oil_result = cursor.fetchone()
+    oil_due = "--"
+    oil_color = "black"
+    if oil_result and oil_result[1] is not None:
+        last_tach = oil_result[1]
+        try:
+            tach_val = float(last_tach)
+            if tach_val < 50:
+                interval = 10
+            else:
+                interval = OIL_CHANGE_INTERVAL_HOURS
+
+            next_due_tach = tach_val + interval
+            # Determine current aircraft tach (max tach in DB)
+            cursor.execute("SELECT MAX(tach_time) FROM maintenance_entries")
+            current_tach = cursor.fetchone()[0]
+            hours_remaining = None
+            if current_tach is not None:
+                hours_remaining = next_due_tach - float(current_tach)
+            if hours_remaining is not None:
+                oil_due = f"{next_due_tach:.1f} hrs ({hours_remaining:.1f} hrs left)"
+                if hours_remaining < 0:
+                    oil_color = "red"
+                elif hours_remaining <= 5:
+                    oil_color = "yellow"
+                else:
+                    oil_color = "black"
+            else:
+                oil_due = f"{next_due_tach:.1f} hrs"
+        except:
+            oil_due = "--"
+            oil_color = "black"
+    else:
+        oil_due = "--"
+        oil_color = "black"
+
+    # --- Find latest ELT Test entry ---
+    cursor.execute(
+        """
+        SELECT date
+        FROM maintenance_entries
+        WHERE recurrent_item=?
+        ORDER BY date DESC
+        LIMIT 1
+        """,
+        ("ELT Test",),
+    )
+    elt_result = cursor.fetchone()
+    elt_due = "--"
+    elt_color = "black"
+    if elt_result and elt_result[0]:
+        last_date = elt_result[0]
+        try:
+            last_dt = datetime.strptime(last_date, "%m/%d/%Y").date()
             due_date = last_dt + timedelta(days=ELT_TEST_INTERVAL_DAYS)
             days_remaining = (due_date - today).days
-
             elt_due = f"{due_date.strftime('%Y-%m-%d')} ({days_remaining} days)"
-
             if days_remaining < 0:
                 elt_color = "red"
             elif days_remaining <= 30:
                 elt_color = "yellow"
-
-        # OIL CHANGE (tach based)
-        if item == "Oil Change" and last_tach is not None:
-            try:
-                tach_val = float(last_tach)
-                next_due_tach = tach_val + OIL_CHANGE_INTERVAL_HOURS
-
-                # Determine current aircraft tach (max tach in DB)
-                cursor.execute("SELECT MAX(tach_time) FROM maintenance_entries")
-                current_tach = cursor.fetchone()[0]
-
-                hours_remaining = None
-                if current_tach is not None:
-                    hours_remaining = next_due_tach - float(current_tach)
-
-                if hours_remaining is not None:
-                    oil_due = (
-                        f"{next_due_tach:.1f} hrs ({hours_remaining:.1f} hrs left)"
-                    )
-
-                    if hours_remaining < 0:
-                        oil_color = "red"
-                    elif hours_remaining <= 5:
-                        oil_color = "yellow"
-                else:
-                    oil_due = f"{next_due_tach:.1f} hrs"
-
-            except:
-                oil_due = "--"
+            else:
+                elt_color = "black"
+        except:
+            elt_due = "--"
+            elt_color = "black"
+    else:
+        elt_due = "--"
+        elt_color = "black"
 
     window["cond_due_text"].update(cond_due, text_color=cond_color)
     window["oil_due_text"].update(oil_due, text_color=oil_color)
@@ -354,8 +381,9 @@ conn.commit()
 window = sg.Window(title="MX Tracker", layout=main_layout, finalize=True)
 
 # Initial load of table and summary
-refresh_table(window)
 update_due_dates(window)
+refresh_table(window)
+update_total_airframe_hours(window)
 
 # Initialize overdue count on startup
 initial_overdue = calculate_overdue()
@@ -366,6 +394,46 @@ while True:
     if event in (sg.WINDOW_CLOSED, "Exit"):
         break
     print(event, values)
+    if event == "add_entry_button":
+        entry_window = sg.Window("Add Maintenance Entry", entry_layout, modal=True)
+        while True:
+            e_event, e_values = entry_window.read()
+            if e_event in (sg.WINDOW_CLOSED, "Cancel"):
+                entry_window.close()
+                break
+            if e_event == "submit_entry":
+                date = e_values.get("date_input")
+                tach = e_values.get("tach_hours_input")
+                airframe = e_values.get("total_hours_input")
+                notes = e_values.get("notes_input")
+                recurrent_item = e_values.get("recurrent_item_input")
+                category = e_values.get("category_input")
+
+                if date:
+                    cursor.execute(
+                        """
+                        INSERT INTO maintenance_entries
+                        (date, tach_time, airframe_time, notes, recurrent_item, category)
+                        VALUES (?, ?, ?, ?, ?, ?)
+                        """,
+                        (date, tach, airframe, notes, recurrent_item, category),
+                    )
+                    conn.commit()
+
+                    refresh_table(window)
+                    update_due_dates(window)
+                    update_total_airframe_hours(window)
+                    overdue = calculate_overdue()
+                    window["overdue_text"].update(overdue)
+                    sg.popup("Maintenance entry saved.")
+
+                    # Clear entry fields
+                    entry_window["date_input"].update("")
+                    entry_window["tach_hours_input"].update("")
+                    entry_window["total_hours_input"].update("")
+                    entry_window["notes_input"].update("")
+                    entry_window["recurrent_item_input"].update("")
+                    entry_window["category_input"].update("")
     if event == "submit_entry":
         date = values.get("date_input")
         tach = values.get("tach_hours_input")  # using same input for now
@@ -387,6 +455,7 @@ while True:
 
             refresh_table(window)
             update_due_dates(window)
+            update_total_airframe_hours(window)
             overdue = calculate_overdue()
             window["overdue_text"].update(overdue)
             sg.popup("Maintenance entry saved.")
@@ -404,6 +473,7 @@ while True:
             resequence_ids()
             refresh_table(window)
             update_due_dates(window)
+            update_total_airframe_hours(window)
     if event == "Edit Selected":
         selected = values["maintenance_table"]
         if selected:
@@ -413,16 +483,58 @@ while True:
 
             entry_id = row[0]
 
-            new_values = sg.popup_get_text(
-                f"Edit Notes for Entry {entry_id}",
-                default_text=row[4],
-            )
+            # Pre-fill existing values
+            edit_layout = [
+                [sg.Text("Date"), sg.Input(row[1], key="edit_date")],
+                [sg.Text("Tach Hours"), sg.Input(row[2], key="edit_tach")],
+                [sg.Text("Airframe Hours"), sg.Input(row[3], key="edit_airframe")],
+                [sg.Text("Notes"), sg.Input(row[4], key="edit_notes")],
+                [
+                    sg.Text("Recurrent Item"),
+                    sg.DropDown(
+                        ["Condition Inspection", "Oil Change", "ELT Test"],
+                        default_value=row[5],
+                        key="edit_recurrent_item",
+                    ),
+                ],
+                [
+                    sg.Text("Category"),
+                    sg.DropDown(
+                        ["Airframe", "Engine", "Propeller", "Avionics"],
+                        default_value=row[6],
+                        key="edit_category",
+                    ),
+                ],
+                [sg.Button("Save"), sg.Button("Cancel")],
+            ]
 
-            if new_values is not None:
-                cursor.execute(
-                    "UPDATE maintenance_entries SET notes=? WHERE id=?",
-                    (new_values, entry_id),
-                )
-                conn.commit()
-                refresh_table(window)
-                update_due_dates(window)
+            edit_window = sg.Window(f"Edit Entry ID {entry_id}", edit_layout)
+
+            while True:
+                e_event, e_values = edit_window.read()
+                if e_event in (sg.WINDOW_CLOSED, "Cancel"):
+                    edit_window.close()
+                    break
+                if e_event == "Save":
+                    cursor.execute(
+                        """
+                        UPDATE maintenance_entries
+                        SET date=?, tach_time=?, airframe_time=?, notes=?, recurrent_item=?, category=?
+                        WHERE id=?
+                        """,
+                        (
+                            e_values["edit_date"],
+                            e_values["edit_tach"],
+                            e_values["edit_airframe"],
+                            e_values["edit_notes"],
+                            e_values["edit_recurrent_item"],
+                            e_values["edit_category"],
+                            entry_id,
+                        ),
+                    )
+                    conn.commit()
+                    refresh_table(window)
+                    update_due_dates(window)
+                    update_total_airframe_hours(window)
+                    edit_window.close()
+                    break
