@@ -780,6 +780,34 @@ def main():
 
             df = process_flights(df_loaded)
 
+            # --- MPG (nautical miles per gallon) calculation ---
+            # Ensure numeric conversion for "Ground Speed (knots)" and "Fuel Flow"
+            if "Ground Speed (knots)" in df.columns:
+                df["Ground Speed (knots)"] = pd.to_numeric(
+                    df["Ground Speed (knots)"], errors="coerce"
+                ).fillna(0)
+            # Try both "Fuel Flow" and "Fuel Flow 1 (gal/hr)" as possible columns
+            if "Fuel Flow" in df.columns:
+                df["Fuel Flow"] = pd.to_numeric(
+                    df["Fuel Flow"], errors="coerce"
+                ).fillna(0)
+            elif "Fuel Flow 1 (gal/hr)" in df.columns:
+                df["Fuel Flow"] = pd.to_numeric(
+                    df["Fuel Flow 1 (gal/hr)"], errors="coerce"
+                ).fillna(0)
+            # Calculate MPG (nautical miles per gallon)
+            if "Ground Speed (knots)" in df.columns and "Fuel Flow" in df.columns:
+                df["MPG"] = df.apply(
+                    lambda row: (
+                        row["Ground Speed (knots)"] / row["Fuel Flow"]
+                        if row["Fuel Flow"] and row["Fuel Flow"] > 0
+                        else 0
+                    ),
+                    axis=1,
+                )
+            else:
+                df["MPG"] = 0
+
             # Stop loading spinner
             sg.popup_animated(None)
 
@@ -818,6 +846,10 @@ def main():
                     ]
                 ]
             )
+
+            # Add "MPG" to selectable/displayed columns if not present
+            if "MPG" not in available_signals:
+                available_signals.append("MPG")
 
             if "CHT" not in available_signals:
                 available_signals.append("CHT")
