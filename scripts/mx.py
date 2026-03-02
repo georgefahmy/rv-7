@@ -22,6 +22,16 @@ OVERDUE_COLOR = "red"
 WARNING_COLOR = "yellow"
 CURRENT_COLOR = "green"
 
+RECURRENT_ITEMS = [
+    "Condition Inspection",
+    "Oil Change",
+    "ELT Test",
+    "Nav Data Update",
+    "Batteries",
+]
+
+MX_CATEGORIES = ["Airframe", "Engine", "Propeller", "Avionics"]
+
 # --- Override for Total Airframe Hours ---
 current_total_hours_override = None
 
@@ -128,6 +138,7 @@ def refresh_table(window):
         entry_id, date, tach, airframe, notes, recurrent_item, category = row
         updated_rows.append(
             [
+                entry_id,
                 date,
                 tach,
                 airframe,
@@ -393,12 +404,7 @@ entry_layout = [
                 [sg.Text("Recurrent Item", expand_x=True)],
                 [
                     sg.DropDown(
-                        [
-                            "Condition Inspection",
-                            "Oil Change",
-                            "ELT Test",
-                            "Nav Data Update",
-                        ],
+                        RECURRENT_ITEMS,
                         key="recurrent_item_input",
                         expand_x=True,
                         size=(15, 1),
@@ -411,7 +417,7 @@ entry_layout = [
                 [sg.Text("Category", expand_x=True)],
                 [
                     sg.DropDown(
-                        ["Airframe", "Engine", "Propeller", "Avionics"],
+                        MX_CATEGORIES,
                         key="category_input",
                         expand_x=True,
                         size=(15, 1),
@@ -534,6 +540,7 @@ main_layout = [
         sg.Table(
             values=[],
             headings=[
+                "ID",
                 "Date",
                 "Tach",
                 "Airframe",
@@ -542,7 +549,7 @@ main_layout = [
                 "Category",
             ],
             key="maintenance_table",
-            col_widths=[7, 5, 5, 60, 12, 10],  # Notes column is wider
+            col_widths=[3, 7, 5, 5, 60, 12, 10],  # Notes column is wider
             auto_size_columns=False,
             alternating_row_color="light gray",
             justification="left",
@@ -610,6 +617,7 @@ while True:
 
                 update_window.close()
                 break
+
     if event == "add_entry_button":
         entry_window = sg.Window("Add Maintenance Entry", entry_layout, modal=True)
         while True:
@@ -651,6 +659,8 @@ while True:
                     entry_window["notes_input"].update("")
                     entry_window["recurrent_item_input"].update("")
                     entry_window["category_input"].update("")
+                    entry_window.close()
+                    break
 
     if event == "submit_entry":
         date = values.get("date_input")
@@ -659,7 +669,7 @@ while True:
         notes = values.get("notes_input")
         recurrent_item = values.get("recurrent_item_input")
         category = values.get("category_input")
-
+        print("it goes here")
         if date:
             cursor.execute(
                 """
@@ -712,7 +722,7 @@ while True:
                 [
                     sg.Text("Recurrent Item"),
                     sg.DropDown(
-                        ["Condition Inspection", "Oil Change", "ELT Test"],
+                        RECURRENT_ITEMS,
                         default_value=row[5],
                         key="edit_recurrent_item",
                     ),
@@ -720,7 +730,7 @@ while True:
                 [
                     sg.Text("Category"),
                     sg.DropDown(
-                        ["Airframe", "Engine", "Propeller", "Avionics"],
+                        MX_CATEGORIES,
                         default_value=row[6],
                         key="edit_category",
                     ),
