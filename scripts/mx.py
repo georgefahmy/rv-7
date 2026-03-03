@@ -130,7 +130,7 @@ def update_database_due_dates(window):
 
 def refresh_flight_log_table(window):
     cursor.execute(
-        "SELECT date, takeoff_airport, landing_airport, hobbs, tach, landings, notes FROM flight_log ORDER BY date DESC"
+        "SELECT date, takeoff_airport, landing_airport, hobbs, tach, hobbs_delta, tach_delta, landings, notes FROM flight_log ORDER BY date DESC, hobbs DESC"
     )
     rows = cursor.fetchall()
     window["flight_log_table"].update(values=rows)
@@ -139,24 +139,7 @@ def refresh_flight_log_table(window):
 def refresh_table(window):
     cursor.execute("SELECT * FROM maintenance_entries ORDER BY date DESC")
     rows = cursor.fetchall()
-
-    updated_rows = []
-
-    for row in rows:
-        entry_id, date, tach, airframe, notes, recurrent_item, category = row
-        updated_rows.append(
-            [
-                entry_id,
-                date,
-                tach,
-                airframe,
-                notes,
-                recurrent_item,
-                category,
-            ]
-        )
-
-    window["maintenance_table"].update(values=updated_rows)
+    window["maintenance_table"].update(values=rows)
 
 
 def calculate_overdue():
@@ -391,6 +374,8 @@ cursor.execute(
         landing_airport TEXT,
         hobbs REAL,
         tach REAL,
+        hobbs_delta REAL,
+        tach_delta REAL,
         landings INTEGER,
         notes TEXT
     )
@@ -574,17 +559,25 @@ main_layout = [
                 "Landing",
                 "Hobbs",
                 "Tach",
+                "Hobbs Delta",
+                "Tach Delta",
                 "Landings",
                 "Notes",
             ],
             key="flight_log_table",
-            col_widths=[4, 3, 3, 3, 3, 3, 60],
-            auto_size_columns=True,
+            col_widths=[4, 3, 3, 3, 3, 5, 5, 3, 45],
+            auto_size_columns=False,
             justification="left",
             alternating_row_color="light gray",
+            enable_events=True,
+            select_mode=sg.TABLE_SELECT_MODE_BROWSE,
             expand_x=True,
             num_rows=6,
         )
+    ],
+    [
+        sg.Button("Edit Flight Selected"),
+        sg.Button("Delete Flight Selected"),
     ],
     [sg.HorizontalSeparator()],
     [
@@ -772,18 +765,46 @@ while True:
 
             if f_event == "Submit":
                 try:
+                    # Get most recent flight for delta calculation
+                    cursor.execute(
+                        "SELECT hobbs, tach FROM flight_log ORDER BY date DESC, hobbs DESC LIMIT 1"
+                    )
+                    previous = cursor.fetchone()
+
+                    hobbs_val = (
+                        float(f_values["flight_hobbs"])
+                        if f_values["flight_hobbs"]
+                        else None
+                    )
+                    tach_val = (
+                        float(f_values["flight_tach"])
+                        if f_values["flight_tach"]
+                        else None
+                    )
+
+                    hobbs_delta = None
+                    tach_delta = None
+
+                    if previous and hobbs_val is not None and previous[0] is not None:
+                        hobbs_delta = round(hobbs_val - float(previous[0]), 2)
+
+                    if previous and tach_val is not None and previous[1] is not None:
+                        tach_delta = round(tach_val - float(previous[1]), 2)
+
                     cursor.execute(
                         """
                         INSERT INTO flight_log
-                        (date, takeoff_airport, landing_airport, hobbs, tach, landings, notes)
-                        VALUES (?, ?, ?, ?, ?, ?, ?)
+                        (date, takeoff_airport, landing_airport, hobbs, tach, hobbs_delta, tach_delta, landings, notes)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                         """,
                         (
                             f_values["flight_date"],
                             f_values["flight_takeoff"],
                             f_values["flight_landing"],
-                            f_values["flight_hobbs"],
-                            f_values["flight_tach"],
+                            hobbs_val,
+                            tach_val,
+                            hobbs_delta,
+                            tach_delta,
                             f_values["flight_landings"],
                             f_values["flight_notes"],
                         ),
@@ -811,6 +832,78 @@ while True:
             update_due_dates(window)
             update_total_airframe_hours(window)
             update_database_due_dates(window)
+
+    if event == "Delete Flight Selected":
+        selected = values["flight_log_table"]
+        if selected:
+            row_index = selected[0]
+            table_data = window["flight_log_table"].get()
+            row = table_data[row_index]
+
+            date_val = row[0]
+            hobbs_val = row[3]
+
+            cursor.execute(
+                "DELETE FROM flight_log WHERE date=? AND hobbs=?",
+                (date_val, hobbs_val),
+            )
+            conn.commit()
+
+            refresh_flight_log_table(window)
+
+    if event == "Edit Flight Selected":
+        selected = values["flight_log_table"]
+        if selected:
+            row_index = selected[0]
+            table_data = window["flight_log_table"].get()
+            row = table_data[row_index]
+
+            original_date = row[0]
+            original_hobbs = row[3]
+
+            edit_layout = [
+                [sg.Text("Date"), sg.Input(row[0], key="edit_flight_date")],
+                [sg.Text("Takeoff"), sg.Input(row[1], key="edit_flight_takeoff")],
+                [sg.Text("Landing"), sg.Input(row[2], key="edit_flight_landing")],
+                [sg.Text("Hobbs"), sg.Input(row[3], key="edit_flight_hobbs")],
+                [sg.Text("Tach"), sg.Input(row[4], key="edit_flight_tach")],
+                [sg.Text("Landings"), sg.Input(row[7], key="edit_flight_landings")],
+                [sg.Text("Notes"), sg.Input(row[8], key="edit_flight_notes")],
+                [sg.Button("Save"), sg.Button("Cancel")],
+            ]
+
+            edit_window = sg.Window("Edit Flight Entry", edit_layout, modal=True)
+
+            while True:
+                e_event, e_values = edit_window.read()
+                if e_event in (sg.WINDOW_CLOSED, "Cancel"):
+                    edit_window.close()
+                    break
+
+                if e_event == "Save":
+                    cursor.execute(
+                        """
+                        UPDATE flight_log
+                        SET date=?, takeoff_airport=?, landing_airport=?, hobbs=?, tach=?, landings=?, notes=?
+                        WHERE date=? AND hobbs=?
+                        """,
+                        (
+                            e_values["edit_flight_date"],
+                            e_values["edit_flight_takeoff"],
+                            e_values["edit_flight_landing"],
+                            e_values["edit_flight_hobbs"],
+                            e_values["edit_flight_tach"],
+                            e_values["edit_flight_landings"],
+                            e_values["edit_flight_notes"],
+                            original_date,
+                            original_hobbs,
+                        ),
+                    )
+                    conn.commit()
+
+                    refresh_flight_log_table(window)
+                    edit_window.close()
+                    break
     if event == "Edit Selected":
         selected = values["maintenance_table"]
         if selected:
