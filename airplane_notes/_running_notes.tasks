@@ -10,6 +10,7 @@ Backlog:
             SP12-0003 through SP12-0089, inclusive
             SP13-0034 through SP13-0150, inclusive
             SP14-0151 through SP14-0202, inclusive
+
     @future Accessories/Misc:
         ☐ Add safety wire to elevator trim tab hinge
         ☐ Double USB Power Supply - add to accessory bus with 10A fuse
@@ -123,20 +124,9 @@ Future Project Order:
     -  Fabricate rudder stop extensions and rivet/bolt to existing rudder stops
 
 On Deck:
-    Set ELT to ARMED position and add red cap
+    Set ELT to ARMED (down) position and add red cap
     install batteries into ELT audio thing and panel thing
-
-    ☐ maintenance log ui
-        https://vansairforce.net/threads/preferred-method-for-maintenance-logs.235411/post-1847239
-        add entry button
-        upcoming maintenance (oil change based on hours, condition inspection based on calendar, ELT test every 3 months, ELT Main Battery change 5 years, remote and audio battery every 10 years, beacon registration every 2 years (https://beaconregistration.noaa.gov/RGDB/BeaconOwner/dashboard - expires Dec 14, 2027))
-        total hours tracking with update button
-        maintenance log
-            date, hours, notes, recurrent item?, category (airframe, engine, avionics, prop), action (edit, delete - open popups to make edits)
-        maintenance details pop up
-            date, hours, category, notes, performed by
-        nav database update (current, needs update, dates valid)
-
+    investigate flaps position sensor flickering
 
 
 ################################################
