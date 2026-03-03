@@ -361,7 +361,7 @@ def update_total_airframe_hours(window):
 
     total_hours = float(result[0]) if result and result[0] is not None else 0.0
 
-    window["total_airframe_text"].update(f"Total Airframe Hours: {total_hours:.1f}")
+    window["total_airframe_text"].update(f"Total Hours: {total_hours:.1f}")
 
 
 conn = sqlite3.connect("scripts/maintenance.db")
@@ -492,13 +492,6 @@ main_layout = [
                         justification="right",
                         expand_x=True,
                     ),
-                ],
-                [
-                    sg.Button(
-                        "Update",
-                        font=("Arial", 12),
-                        key="update_total_hours",
-                    )
                 ],
             ],
         ),
@@ -669,41 +662,6 @@ while True:
     event, values = window.read()
     if event in (sg.WINDOW_CLOSED, "Exit"):
         break
-
-    if event == "update_total_hours":
-        update_layout = [
-            [sg.Text("Enter New Total Airframe Hours:")],
-            [sg.Input(key="new_total_hours")],
-            [sg.Button("Submit"), sg.Button("Cancel")],
-        ]
-
-        update_window = sg.Window(
-            "Update Total Airframe Hours", update_layout, modal=True
-        )
-
-        while True:
-            u_event, u_values = update_window.read()
-            if u_event in (sg.WINDOW_CLOSED, "Cancel"):
-                update_window.close()
-                break
-
-            if u_event == "Submit":
-                try:
-                    new_hours = float(u_values["new_total_hours"])
-
-                    cursor.execute(
-                        "UPDATE aircraft_totals SET total_airframe_hours=? WHERE id=1",
-                        (new_hours,),
-                    )
-                    conn.commit()
-
-                    update_total_airframe_hours(window)
-
-                except Exception:
-                    sg.popup("Please enter a valid number.")
-
-                update_window.close()
-                break
 
     if event == "add_entry_button":
         entry_window = sg.Window("Add Maintenance Entry", entry_layout, modal=True)
