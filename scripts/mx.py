@@ -453,7 +453,7 @@ main_layout = [
             layout=[
                 [
                     sg.Text(
-                        "Total Airframe Hours: 0",
+                        "Total Hours: 0",
                         font=("Arial", 18),
                         key="total_airframe_text",
                         justification="right",
@@ -545,11 +545,13 @@ main_layout = [
         )
     ],
     [
-        sg.Button("Add Mx Log", key="add_entry_button"),
         sg.Button("Add Flight Log", key="flight_log_button"),
+        sg.Button("Add Mx Log", key="add_entry_button"),
     ],
     [sg.HorizontalSeparator()],
-    [sg.Text("Flight Log", font=("Arial", 16))],
+    [
+        sg.Text("Flight Log", font=("Arial", 16)),
+    ],
     [
         sg.Table(
             values=[],
@@ -576,10 +578,14 @@ main_layout = [
         )
     ],
     [
+        sg.Text(expand_x=True),
         sg.Button("Edit Flight Selected"),
         sg.Button("Delete Flight Selected"),
     ],
     [sg.HorizontalSeparator()],
+    [
+        sg.Text("Maintenance Log", font=("Arial", 16)),
+    ],
     [
         sg.Table(
             values=[],
@@ -605,6 +611,7 @@ main_layout = [
         )
     ],
     [
+        sg.Text(expand_x=True),
         sg.Button("Edit Selected"),
         sg.Button("Delete Selected"),
     ],
