@@ -128,6 +128,36 @@ def update_database_due_dates(window):
         window["obstacle_db_due_text"].update("--")
 
 
+def recalculate_flight_deltas():
+    cursor.execute(
+        "SELECT id, hobbs, tach FROM flight_log ORDER BY date ASC, hobbs ASC"
+    )
+    rows = cursor.fetchall()
+
+    previous_hobbs = None
+    previous_tach = None
+
+    for entry_id, hobbs, tach in rows:
+        hobbs_delta = None
+        tach_delta = None
+
+        if previous_hobbs is not None and hobbs is not None:
+            hobbs_delta = round(float(hobbs) - float(previous_hobbs), 2)
+
+        if previous_tach is not None and tach is not None:
+            tach_delta = round(float(tach) - float(previous_tach), 2)
+
+        cursor.execute(
+            "UPDATE flight_log SET hobbs_delta=?, tach_delta=? WHERE id=?",
+            (hobbs_delta, tach_delta, entry_id),
+        )
+
+        previous_hobbs = hobbs
+        previous_tach = tach
+
+    conn.commit()
+
+
 def refresh_flight_log_table(window):
     cursor.execute(
         "SELECT date, takeoff_airport, landing_airport, hobbs, tach, hobbs_delta, tach_delta, landings, notes FROM flight_log ORDER BY date DESC, hobbs DESC"
@@ -324,8 +354,11 @@ def resequence_ids():
 
 
 def update_total_airframe_hours(window):
-    cursor.execute("SELECT total_airframe_hours FROM aircraft_totals WHERE id=1")
+    cursor.execute(
+        "SELECT hobbs FROM flight_log ORDER BY date DESC, hobbs DESC LIMIT 1"
+    )
     result = cursor.fetchone()
+
     total_hours = float(result[0]) if result and result[0] is not None else 0.0
 
     window["total_airframe_text"].update(f"Total Airframe Hours: {total_hours:.1f}")
@@ -546,7 +579,6 @@ main_layout = [
     ],
     [
         sg.Button("Add Flight Log", key="flight_log_button"),
-        sg.Button("Add Mx Log", key="add_entry_button"),
     ],
     [sg.HorizontalSeparator()],
     [
@@ -574,7 +606,7 @@ main_layout = [
             enable_events=True,
             select_mode=sg.TABLE_SELECT_MODE_BROWSE,
             expand_x=True,
-            num_rows=6,
+            num_rows=10,
         )
     ],
     [
@@ -583,6 +615,9 @@ main_layout = [
         sg.Button("Delete Flight Selected"),
     ],
     [sg.HorizontalSeparator()],
+    [
+        sg.Button("Add Mx Log", key="add_entry_button"),
+    ],
     [
         sg.Text("Maintenance Log", font=("Arial", 16)),
     ],
@@ -817,6 +852,7 @@ while True:
                         ),
                     )
                     conn.commit()
+                    recalculate_flight_deltas()
                     refresh_flight_log_table(window)
                 except Exception as e:
                     sg.popup(f"Error saving flight log: {e}")
@@ -855,7 +891,7 @@ while True:
                 (date_val, hobbs_val),
             )
             conn.commit()
-
+            recalculate_flight_deltas()
             refresh_flight_log_table(window)
 
     if event == "Edit Flight Selected":
@@ -907,8 +943,9 @@ while True:
                         ),
                     )
                     conn.commit()
-
+                    recalculate_flight_deltas()
                     refresh_flight_log_table(window)
+                    update_total_airframe_hours(window)
                     edit_window.close()
                     break
     if event == "Edit Selected":
