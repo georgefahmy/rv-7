@@ -128,6 +128,14 @@ def update_database_due_dates(window):
         window["obstacle_db_due_text"].update("--")
 
 
+def refresh_flight_log_table(window):
+    cursor.execute(
+        "SELECT date, takeoff_airport, landing_airport, hobbs, tach, landings, notes FROM flight_log ORDER BY date DESC"
+    )
+    rows = cursor.fetchall()
+    window["flight_log_table"].update(values=rows)
+
+
 def refresh_table(window):
     cursor.execute("SELECT * FROM maintenance_entries ORDER BY date DESC")
     rows = cursor.fetchall()
@@ -373,6 +381,23 @@ if cursor.fetchone() is None:
     )
     conn.commit()
 
+# --- Create flight_log table ---
+cursor.execute(
+    """
+    CREATE TABLE IF NOT EXISTS flight_log (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        date TEXT NOT NULL,
+        takeoff_airport TEXT,
+        landing_airport TEXT,
+        hobbs REAL,
+        tach REAL,
+        landings INTEGER,
+        notes TEXT
+    )
+    """
+)
+conn.commit()
+
 entry_layout = [
     [
         sg.Column(
@@ -534,7 +559,33 @@ main_layout = [
             ],
         )
     ],
-    [sg.Button("Add Entry", key="add_entry_button")],
+    [
+        sg.Button("Add Mx Log", key="add_entry_button"),
+        sg.Button("Add Flight Log", key="flight_log_button"),
+    ],
+    [sg.HorizontalSeparator()],
+    [sg.Text("Flight Log", font=("Arial", 16))],
+    [
+        sg.Table(
+            values=[],
+            headings=[
+                "Date",
+                "Takeoff",
+                "Landing",
+                "Hobbs",
+                "Tach",
+                "Landings",
+                "Notes",
+            ],
+            key="flight_log_table",
+            col_widths=[4, 3, 3, 3, 3, 3, 60],
+            auto_size_columns=True,
+            justification="left",
+            alternating_row_color="light gray",
+            expand_x=True,
+            num_rows=6,
+        )
+    ],
     [sg.HorizontalSeparator()],
     [
         sg.Table(
@@ -573,6 +624,7 @@ refresh_table(window)
 update_due_dates(window)
 update_total_airframe_hours(window)
 update_database_due_dates(window)
+refresh_flight_log_table(window)
 
 # Initialize overdue count on startup
 initial_overdue = calculate_overdue()
@@ -688,6 +740,61 @@ while True:
             overdue = calculate_overdue()
             window["overdue_text"].update(overdue)
             sg.popup("Maintenance entry saved.")
+
+    if event == "flight_log_button":
+        flight_layout = [
+            [
+                sg.Text("Date"),
+                sg.Input(key="flight_date", size=(10, 1)),
+                sg.Text("Takeoff Airport"),
+                sg.Input(key="flight_takeoff", size=(10, 1)),
+                sg.Text("Landing Airport"),
+                sg.Input(key="flight_landing", size=(10, 1)),
+                sg.Text("Hobbs"),
+                sg.Input(key="flight_hobbs", size=(10, 1)),
+                sg.Text("Tach"),
+                sg.Input(key="flight_tach", size=(10, 1)),
+                sg.Text("Landings"),
+                sg.Input(key="flight_landings", size=(10, 1)),
+                sg.Text("Notes"),
+                sg.Input(key="flight_notes", size=(10, 1)),
+            ],
+            [sg.Button("Submit"), sg.Button("Cancel")],
+        ]
+
+        flight_window = sg.Window("Flight Log Entry", flight_layout, modal=True)
+
+        while True:
+            f_event, f_values = flight_window.read()
+            if f_event in (sg.WINDOW_CLOSED, "Cancel"):
+                flight_window.close()
+                break
+
+            if f_event == "Submit":
+                try:
+                    cursor.execute(
+                        """
+                        INSERT INTO flight_log
+                        (date, takeoff_airport, landing_airport, hobbs, tach, landings, notes)
+                        VALUES (?, ?, ?, ?, ?, ?, ?)
+                        """,
+                        (
+                            f_values["flight_date"],
+                            f_values["flight_takeoff"],
+                            f_values["flight_landing"],
+                            f_values["flight_hobbs"],
+                            f_values["flight_tach"],
+                            f_values["flight_landings"],
+                            f_values["flight_notes"],
+                        ),
+                    )
+                    conn.commit()
+                    refresh_flight_log_table(window)
+                except Exception as e:
+                    sg.popup(f"Error saving flight log: {e}")
+
+                flight_window.close()
+                break
 
     if event == "Delete Selected":
         selected = values["maintenance_table"]
