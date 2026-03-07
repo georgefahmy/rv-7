@@ -388,7 +388,6 @@ def plot_3d_wing(
     - num_chord_points: resolution along chord
     - num_span_points: resolution along span
     """
-    from mpl_toolkits.mplot3d import Axes3D
 
     x_frac = np.linspace(0, 1.0, num_chord_points)
     y_span = np.linspace(0, span, num_span_points)
@@ -408,26 +407,24 @@ def plot_3d_wing(
     fig = plt.figure()
     ax = fig.add_subplot(111, projection="3d")
 
-    # set equal aspect ratio for x, y, z
-    max_range = (
-        np.array(
-            [X.max() - X.min(), Y.max() - Y.min(), Z_top.max() - Z_bottom.min()]
-        ).max()
-        / 2.0
-    )
-    mid_x = (X.max() + X.min()) * 0.5
-    mid_y = (Y.max() + Y.min()) * 0.5
-    mid_z = (Z_top.max() + Z_bottom.min()) * 0.5
+    # Apply both chordwise tilt and spanwise tilt to the wing surfaces
+    tilt_span = math.radians(TILT_DEG)
+    theta_chord = -math.radians(CHORD_TILT_DEG)  # negative for nose-up rotation
 
-    ax.set_xlim(mid_x - max_range, mid_x + max_range)
-    ax.set_ylim(mid_y - max_range, mid_y + max_range)
-    ax.set_zlim(mid_z - max_range, mid_z + max_range)
+    # filler_y for reference (spanwise position of filler)
+    filler_y = SPAN - FILLER_OFFSET
 
-    # plot wing surfaces
-    ax.plot_surface(X, Y, Z_top, color="red", alpha=0.7)
-    ax.plot_surface(X, Y, Z_bottom, color="orange", alpha=0.7)
+    # rotate wing surfaces with chord and span tilt
+    X_rot = X * np.cos(theta_chord) - Z_top * np.sin(theta_chord)
+    Z_chord_rot = X * np.sin(theta_chord) + Z_top * np.cos(theta_chord)
+    Z_top_rot = Z_chord_rot + np.tan(tilt_span) * (Y - filler_y)
 
-    # spar surface along the span, between top and bottom surfaces
+    X_rot_bot = X * np.cos(theta_chord) - Z_bottom * np.sin(theta_chord)
+    Z_chord_rot_bot = X * np.sin(theta_chord) + Z_bottom * np.cos(theta_chord)
+    Z_bottom_rot = Z_chord_rot_bot + np.tan(tilt_span) * (Y - filler_y)
+
+    # spar surface along the span at TANK_CHORD
+    # create 2D arrays for the spar surface
     X_spar_2d = np.full((2, len(y_span)), TANK_CHORD)
     Y_spar_2d = np.tile(y_span, (2, 1))
 
@@ -438,7 +435,131 @@ def plot_3d_wing(
         Z_spar_2d[0, i] = bottom
         Z_spar_2d[1, i] = top
 
-    ax.plot_surface(X_spar_2d, Y_spar_2d, Z_spar_2d, color="blue", alpha=0.5)
+    # rotate spar surface using both chordwise and spanwise tilt
+    xf_spar = TANK_CHORD / chord
+    top_spar, bottom_spar = airfoil_func(xf_spar)
+    # rotate top and bottom points using chordwise tilt
+    top_spar_rot = TANK_CHORD * np.sin(theta_chord) + top_spar * np.cos(theta_chord)
+    bottom_spar_rot = TANK_CHORD * np.sin(theta_chord) + bottom_spar * np.cos(
+        theta_chord
+    )
+    # apply spanwise tilt
+    Z_spar_rot_top = np.zeros_like(Y_spar_2d)
+    Z_spar_rot_bottom = np.zeros_like(Y_spar_2d)
+    Z_spar_rot_top[:, :] = top_spar_rot + np.tan(tilt_span) * (Y_spar_2d - filler_y)
+    Z_spar_rot_bottom[:, :] = bottom_spar_rot + np.tan(tilt_span) * (
+        Y_spar_2d - filler_y
+    )
+
+    # set equal aspect ratio for x, y, z
+    max_range = (
+        np.array(
+            [
+                X_rot.max() - X_rot.min(),
+                Y.max() - Y.min(),
+                Z_top_rot.max() - Z_bottom_rot.min(),
+            ]
+        ).max()
+        / 2.0
+    )
+    mid_x = (X_rot.max() + X_rot.min()) * 0.5
+    mid_y = (Y.max() + Y.min()) * 0.5
+    mid_z = (Z_top_rot.max() + Z_bottom_rot.min()) * 0.5
+
+    ax.set_xlim(mid_x - max_range, mid_x + max_range)
+    ax.set_ylim(mid_y - max_range, mid_y + max_range)
+    ax.set_zlim(mid_z - max_range, mid_z + max_range)
+
+    # plot wing surfaces
+    ax.plot_surface(X_rot, Y, Z_top_rot, color="gray", alpha=0.3)
+    ax.plot_surface(X_rot_bot, Y, Z_bottom_rot, color="lightgray", alpha=0.7)
+
+    # # plot as two surfaces (top and bottom) with alpha=1
+    # ax.plot_surface(X_spar_rot_2d, Y_spar_2d, Z_spar_rot_top, color="blue", alpha=1)
+    # ax.plot_surface(X_spar_rot_2d, Y_spar_2d, Z_spar_rot_bottom, color="blue", alpha=1)
+
+    # ---------------------------
+    # Add fuel surfaces based on height at filler
+    # ---------------------------
+    # calculate fuel surfaces based on height at filler
+    # ---------------------------
+    # Flat fuel surface: use bottom surface at filler hole, flat across tank
+    # ---------------------------
+    # determine bottom surface under filler hole
+    filler_x = TANK_CHORD - FILLER_X_OFFSET  # chordwise position of filler
+    filler_y_pos = SPAN - FILLER_OFFSET  # spanwise position of filler
+
+    xf_filler = filler_x / chord
+    top_filler, bottom_filler = airfoil_func(xf_filler)
+
+    # rotate bottom under filler for chord tilt only (ignore span tilt for fuel surface)
+    theta_chord = -math.radians(CHORD_TILT_DEG)  # nose-up
+    bottom_filler_rot = filler_x * np.sin(theta_chord) + bottom_filler * np.cos(
+        theta_chord
+    )
+
+    # compute flat fuel surface height
+    try:
+        height = globals()["height"]
+    except KeyError:
+        height = 0
+
+    fuel_surface_height = bottom_filler_rot + height
+
+    # assign fuel top surface only forward of spar
+    Z_fuel_top = np.where(
+        X <= TANK_CHORD,
+        np.minimum(fuel_surface_height, Z_top_rot),  # can't exceed wing top
+        Z_top_rot,
+    )
+
+    # ensure fuel surface is never below the wing bottom
+    Z_fuel_top = np.maximum(Z_fuel_top, Z_bottom_rot)
+    # Z_fuel_bottom = Z_bottom_rot.copy()
+
+    # Only plot fuel top surface (parallel to gravity) and side surfaces
+    Z_fuel_top_clamped = np.minimum(Z_fuel_top, Z_top_rot)
+
+    # only select points where X_rot is between 0 and TANK_CHORD
+    X_fuel_plot = np.where(X_rot <= TANK_CHORD, X_rot, np.nan)
+
+    # only plot fuel where fuel surface is above the wing bottom
+    fuel_mask = Z_fuel_top_clamped > Z_bottom_rot
+    X_fuel_masked = np.where(fuel_mask, X_fuel_plot, np.nan)
+    Z_fuel_masked = np.where(fuel_mask, Z_fuel_top_clamped, np.nan)
+
+    ax.plot_surface(X_fuel_masked, Y, Z_fuel_masked, color="purple", alpha=0.7)
+
+    # plot filler hole as black dot on wing top surface height (not fuel surface)
+    filler_x_rot = filler_x * np.cos(theta_chord) - bottom_filler * np.sin(theta_chord)
+    # Place dot at the lesser of fuel surface or actual wing top at that chordwise location
+    # chordwise index closest to filler
+    idx_filler = np.argmin(np.abs(X[0, :] - filler_x))
+
+    # wing top at filler location (before rotation)
+    top_at_filler = Z_top[0, idx_filler]
+
+    # chord tilt rotation
+    theta_chord = -math.radians(CHORD_TILT_DEG)  # nose-up
+
+    # span tilt in radians
+    tilt_span = math.radians(TILT_DEG)
+
+    # chordwise rotated Z
+    z_chord_rot = X[0, idx_filler] * np.sin(theta_chord) + top_at_filler * np.cos(
+        theta_chord
+    )
+
+    # apply spanwise tilt along y relative to filler_y
+    filler_z = z_chord_rot + math.tan(tilt_span) * (filler_y_pos - filler_y_pos)
+    ax.scatter(
+        [filler_x_rot],
+        [filler_y_pos],
+        [filler_z],
+        color="black",
+        s=50,
+        label="Filler Hole",
+    )
 
     ax.set_xlabel("Chord (inches)")
     ax.set_ylabel("Span (inches)")
@@ -472,7 +593,7 @@ if __name__ == "__main__":
 
     print(f"\nEstimated Fuel: {gallons:.2f} gallons")
     print(f"Estimated inboard-most fuel height: {inboard_height:.2f} inches")
-    # plot_airfoil_with_tank(height)
+    plot_airfoil_with_tank(height)
     plot_3d_wing(
         section_bounds,
         span=SPAN,
