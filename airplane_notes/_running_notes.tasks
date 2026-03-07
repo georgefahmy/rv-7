@@ -54,7 +54,14 @@ Backlog:
         ☐ Use Left wing access panel
         ☐ Feed 3 wire harness through wing to access panel
 
-    @future PMAG controller (~$500):
+    @future Dynon Heated Pitot (~$500):
+        ☐ access panel mounting of the heater controller (on left wing)
+        ☐ pull wire through wing for heater controller (shielded multi-core)
+        ☐ vpx pin for power - 10A? pin J12.12
+        ☐ switch on the panel (or digital only switch from vpx?)
+        ☐ indicator on panel (or digital only on hdx screen)
+
+        @future PMAG controller (~$500):
         PMAG EI Controller - see advance angle on skyview
         ✔ Order PMAG EI Controller @done(26-02-25)
         ☐ Fabricate Tx/Rx harness for Left/Right PMAG to D15 connector
@@ -69,14 +76,6 @@ Backlog:
             ☐ J1.9 pitch trim ground
             ☐ J1.10 pitch trim position
             ☐ Set VPX Endpoints to 1 - do calibration on Skyview for Trim motors
-
-    @future Dynon Heated Pitot (~$500):
-        ☐ access panel mounting of the heater controller (on left wing)
-        ☐ pull wire through wing for heater controller (shielded multi-core)
-        ☐ vpx pin for power - 10A? pin J12.12
-        ☐ switch on the panel (or digital only switch from vpx?)
-        ☐ indicator on panel (or digital only on hdx screen)
-
 
     @future O2 Sensor:
         ✔ Wire harness routing @done(26-01-08)
@@ -111,6 +110,7 @@ Backlog:
             ☐ Add intersection fairing and align to gear leg fairing offset centerline
 
 
+
 Future Project Order:
     -  Fairings (gear and wheels)
     -  O2 Sensor
@@ -131,6 +131,13 @@ On Deck:
 Daily Updates are collected below this line
 Updates are moved to the archive section after
 they have been added to the build log
+3/6/2026:
+    ✔ Removed entire interior to access floor @done(26-03-06)
+    ✔ Removed floor and baggage bulkheads @done(26-03-06)
+    ✔ Found that the BNC connector to the antenna was not fully seated, resulting in TX POWER LOW (130w) errors on the Dynon @done(26-03-06)
+    ✔ Replaced the TNC connector and BNC connector on the cable, ensuring a positive 'click' for the center conductor @done(26-03-06)
+    ✔ Powered up the transponder and saw no warnings on multiple power ups @done(26-03-06)
+
 3/1/2026:
     ✔ installed new JD Air lightweight tailwheel - saved 1.5 lbs @done(26-03-06)
     ✔ started on removal of transponder @done(26-03-06)
@@ -140,176 +147,176 @@ they have been added to the build log
     ✔ new tow bar alignment @done(26-02-25)
     ✔ pmag monitor wiring harness @done(26-02-25)
 
-2/22/2026:
-    ✔ Third flight done! flew sunday afternoon for half an hour crusing at 3500ft. @done(26-02-25)
-    ✔ 15 deg warmer OAT - slightly higher CHTs and Oil temp but well below what I was concerned about @done(26-02-25)
-    ✔ Autopilot testing showed smooth turning control, maybe slight undershoot? will need to do longer duration calibration runs @done(26-02-25)
-    ✔ Airspeed calibration script development - showed ~5kts low on initial testing @done(26-02-25)
-    ✔ Scheduled transponder and pitot-static regulatory checks (early march likely) @done(26-02-25)
-
-2/20/2026:
-    ✔ Second flight in the books! @done(26-02-22)
-    ✔ 30 minutes @done(26-02-22)
-    ✔ CHT, OIl, and EGT temps all look good @done(26-02-22)
-    ✔ Cruised at 85-90% power 3000 - 3500 ft @done(26-02-22)
-
-2/13/2026:
-    ✔ finished fuel nozzle and line replacement @done(26-02-14)
-    ✔ initial ground run successful @done(26-02-14)
-    ✔ cowled airplane @done(26-02-14)
-    ✔ high speed taxi test successful - showed some anomolous engine vibration at the mid range RPMs @done(26-02-14)
-    ✔ reached out to a guy to do prop balancing @done(26-02-14)
-    ✔ added weather stripping to the forward canopy @done(26-02-14)
-
-2/7/2026:
-    ✔ removed fuel pump and cleaned threads and resealed NPT fitting @done(26-02-07)
-    ✔ flushed whole system @done(26-02-07)
-    ✔ reprimed fuel pump @done(26-02-07)
-    ✔ taxi test and low power run was successful @done(26-02-07)
-
-1/31/2026:
-    ✔ first flight! engine trouble - partial power loss. investigation indicated clogged injectors and/or clogged fuel lines post fuel pump/filter @done(26-02-05)
-    ✔ flushed lines. removed any visible debris @done(26-02-05)
-    ✔ still need to clean out fuel pump and filter @done(26-02-07)
-1/23/2026:
-    ✔ high speed taxis in the RV-6 @done(26-01-23)
-
-1/10/2026:
-    ✔ Cowled the aircraft @done(26-01-10)
-    ✔ full engine power run up to 2740RPM @done(26-01-10)
-    ✔ taxi and brake testing @done(26-01-10)
-
-1/4/2026:
-    ✔ Dissassembled #4 fuel injector - found debris in the restrictor - cleaned and reassembled @done(26-01-06)
-    ✔ Engine ground run - successful up to 1800 RPM, mag checks and prop cycle. all good @done(26-01-06)
-
-1/3/2026:
-    ✔ Engine ground run - cylinder number 4 not firing (cold CHT and EGT) @done(26-01-06)
-
-1/2/2026:
-    ✔ Finished installation of Classic Aero Interior @done(26-01-06)
-
-12/18/2025:
-    ✔ 5 takeoffs and landings in the rv6 @done(25-12-19)
-    ✔ installed plenum on engine @done(25-12-19)
-
-12/13/2025:
-    ✔ AIRWORTHY! @done(25-12-14)
-    todo list:
-        ✔ change seat belt buckles to 4-7A bolts (larger) @done(25-12-19)
-        ✔ tighten shoulder strap bolts @done(25-12-19)
-        ✔ re-grease main gear and add cotter pins @done(26-01-11)
-        ✔ safety wire starter bolt @done(25-12-19)
-        ✔ safety wire alternator bolt @done(25-12-19)
-        ✔ fuel line abraison RTV @done(26-01-06)
-        ✔ fuel tank labels (before first flight) @done(26-01-06)
-        ✔ add two missing AN3-4A bolts to left wing fuel tank bracket @done(26-01-06)
-
-12/12/2025:
-    prep for inspection
-    autopilot servo serial numbers
-        SN-7500 pitch
-        SN-9251 roll
-
-    ELT battery expiration 8/29/2030 - set reminder
-    ✔ Dynon back up battery test complete @done(25-12-12)
-    ✔ airmate charts and plates loaded onto USBs @done(25-12-12)
-    ✔ torqued and cotter pinned the rear spar bolts @done(25-12-12)
-12/9/2025:
-    ✔ flight in the rv-6 with taylor - performed basic maneuvers and stalls - systems management and an approach @done(25-12-11)
-
-12/7/2025:
-    ✔ initial ops lims reported. @done(25-12-10)
-
-11/29/2025:
-    ✔ re-ran engine, observed very cold #4. engine died while idling at full rich - black smoke observed indicating idle mixture is too rich @done(25-11-29)
-    ✔ restarted engine, #4 cylinder came up and was hotter than other cylinders when leaning the engine out  @done(25-11-29)
-    ✔ tested insta360 camera and cockpit audio successfully @done(25-11-29)
-    ✔ observed a continued fuel leak at the pump pipe fitting. i need to remove and clean the fuel pump to fix the issue - FIXED. @done(25-12-10)
-    observed oil pressure above 86 psi
-        max oil pressure is 95psi min is 50psi for 1800 - 2700 rpm (20 psi minimum at idle)
-        need to run engine at 2000 rpm with oil temps in normal range and observe oil pressure and adjust as necessary
-    Idle fuel mixture
-        with engine at idle and full rich, slowly and smoothly pull back mixture and observe RPM
-        if it rises more than ~50rpm then I need to lean the idle mixture, if it just quits i need to richen it.
-        Likely need to lean based on observed run
-
-    CHT temp limits
-        500F never exceed
-        430F high performance cruise
-        400F economy cruise
-        300F - 400F optimal temperatures
-    Oil Temperatures
-        120F - 220F in cruise flights
-        130F - 200F optimal
-        240F Never exceed
-    Oil Pressure Limits (1800 - 2700 RPM)
-        50psi - Minimum
-        95psi - Maximum
-
-
-11/24/2025:
-    ✔ had visit from FAA safety inspectors - both advised ready for inspection @done(25-11-26)
-    ✔ contacted DAR Adam Valdez @done(25-11-26)
-
-11/22/2025:
-    ✔ second engine run @done(25-11-23)
-    ✔ fuel flow established @done(25-11-23)
-    ✔ fixed oil leaks @done(25-11-23)
-    ✔ fixed fuel leak in cabin @done(25-11-23)
-
-
-11/8/2025:
-    ✔ finish cleaning hangar @done(25-11-05)
-    ✔ bring chairs to hangar @done(25-11-04)
-    ✔ get waters, and beer @done(25-11-04)
-    ✔ torque rudder cable bolts @done(25-11-06)
-    ✔ Install Pitot Tube screws @done(25-11-05)
-    ✔ install top spark plugs @done(25-11-05)
-    ✔ run the engine @done(25-11-06)
-
-11/7/2025:
-    ✔ fixed oil leaks @done(25-11-07)
-    ✔ fixed and torqued fuel pump outlet and firewall attachment lines @done(25-11-07)
-    ✔ tightened and torqued oil temperature sensor fitting @done(25-11-07)
-    ✔ torqued oil cooler engine fittings @done(25-11-07)
-    ✔ torqued engine control cables @done(25-11-07)
-    ✔ added cotter pin to elevator trim @done(25-11-07)
-
-
-11/6/2025:
-    ✔ First Engine Run! @done(25-11-06)
-    ✔ found oil leak from oil pressure sensor line - FIXED @done(25-11-06)
-    ✔ fuel leak in the cabin from firewall and pump outlet connections - FIXED @done(25-11-07)
-
-10/25/2025 - 10/29/2025:
-    ✔ cleaned the workbenches @done(25-10-29)
-    ✔ cleaned the hangar @done(25-10-29)
-    ✔ lubricated the piano wire for the elevator trim @done(25-10-29)
-    ✔ test fit the landing gear fairing on the right side @done(25-10-29)
-    ✔ installed and connected the battery @done(25-10-29)
-    ✔ charged the battery @done(25-10-29)
-    ✔ filled the plane with 40 gal of 94UL @done(25-10-29)
-✔ @done(25-10-29)
-10/23/2025:
-    ✔ filled and fared the cowl inlets @done(25-10-27)
-
-10/9/2025:
-    ✔ trimmed duct seals @done(25-10-19)
-    ✔ drilled pilot holes through seals @done(25-10-19)
-    ✔ test fit seals to inlets @done(25-10-19)
-10/8/2025:
-    ✔ second pass with baffle seal 1/6" offset for the fiberglass @done(25-10-19)
-    ✔ molded to inlets + baffle seal @done(25-10-19)
-
-10/6/2025:
-    ✔ first pass at inlet duct seals out of fiberglass @done(25-10-19)
-
 
 #########################################
 Below items have been updated in the blog
 
 Archive:
+    2/22/2026:
+        ✔ Third flight done! flew sunday afternoon for half an hour crusing at 3500ft. @done(26-02-25)
+        ✔ 15 deg warmer OAT - slightly higher CHTs and Oil temp but well below what I was concerned about @done(26-02-25)
+        ✔ Autopilot testing showed smooth turning control, maybe slight undershoot? will need to do longer duration calibration runs @done(26-02-25)
+        ✔ Airspeed calibration script development - showed ~5kts low on initial testing @done(26-02-25)
+        ✔ Scheduled transponder and pitot-static regulatory checks (early march likely) @done(26-02-25)
+
+    2/20/2026:
+        ✔ Second flight in the books! @done(26-02-22)
+        ✔ 30 minutes @done(26-02-22)
+        ✔ CHT, OIl, and EGT temps all look good @done(26-02-22)
+        ✔ Cruised at 85-90% power 3000 - 3500 ft @done(26-02-22)
+
+    2/13/2026:
+        ✔ finished fuel nozzle and line replacement @done(26-02-14)
+        ✔ initial ground run successful @done(26-02-14)
+        ✔ cowled airplane @done(26-02-14)
+        ✔ high speed taxi test successful - showed some anomolous engine vibration at the mid range RPMs @done(26-02-14)
+        ✔ reached out to a guy to do prop balancing @done(26-02-14)
+        ✔ added weather stripping to the forward canopy @done(26-02-14)
+
+    2/7/2026:
+        ✔ removed fuel pump and cleaned threads and resealed NPT fitting @done(26-02-07)
+        ✔ flushed whole system @done(26-02-07)
+        ✔ reprimed fuel pump @done(26-02-07)
+        ✔ taxi test and low power run was successful @done(26-02-07)
+
+    1/31/2026:
+        ✔ first flight! engine trouble - partial power loss. investigation indicated clogged injectors and/or clogged fuel lines post fuel pump/filter @done(26-02-05)
+        ✔ flushed lines. removed any visible debris @done(26-02-05)
+        ✔ still need to clean out fuel pump and filter @done(26-02-07)
+    1/23/2026:
+        ✔ high speed taxis in the RV-6 @done(26-01-23)
+
+    1/10/2026:
+        ✔ Cowled the aircraft @done(26-01-10)
+        ✔ full engine power run up to 2740RPM @done(26-01-10)
+        ✔ taxi and brake testing @done(26-01-10)
+
+    1/4/2026:
+        ✔ Dissassembled #4 fuel injector - found debris in the restrictor - cleaned and reassembled @done(26-01-06)
+        ✔ Engine ground run - successful up to 1800 RPM, mag checks and prop cycle. all good @done(26-01-06)
+
+    1/3/2026:
+        ✔ Engine ground run - cylinder number 4 not firing (cold CHT and EGT) @done(26-01-06)
+
+    1/2/2026:
+        ✔ Finished installation of Classic Aero Interior @done(26-01-06)
+
+    12/18/2025:
+        ✔ 5 takeoffs and landings in the rv6 @done(25-12-19)
+        ✔ installed plenum on engine @done(25-12-19)
+
+    12/13/2025:
+        ✔ AIRWORTHY! @done(25-12-14)
+        todo list:
+            ✔ change seat belt buckles to 4-7A bolts (larger) @done(25-12-19)
+            ✔ tighten shoulder strap bolts @done(25-12-19)
+            ✔ re-grease main gear and add cotter pins @done(26-01-11)
+            ✔ safety wire starter bolt @done(25-12-19)
+            ✔ safety wire alternator bolt @done(25-12-19)
+            ✔ fuel line abraison RTV @done(26-01-06)
+            ✔ fuel tank labels (before first flight) @done(26-01-06)
+            ✔ add two missing AN3-4A bolts to left wing fuel tank bracket @done(26-01-06)
+
+    12/12/2025:
+        prep for inspection
+        autopilot servo serial numbers
+            SN-7500 pitch
+            SN-9251 roll
+
+        ELT battery expiration 8/29/2030 - set reminder
+        ✔ Dynon back up battery test complete @done(25-12-12)
+        ✔ airmate charts and plates loaded onto USBs @done(25-12-12)
+        ✔ torqued and cotter pinned the rear spar bolts @done(25-12-12)
+    12/9/2025:
+        ✔ flight in the rv-6 with taylor - performed basic maneuvers and stalls - systems management and an approach @done(25-12-11)
+
+    12/7/2025:
+        ✔ initial ops lims reported. @done(25-12-10)
+
+    11/29/2025:
+        ✔ re-ran engine, observed very cold #4. engine died while idling at full rich - black smoke observed indicating idle mixture is too rich @done(25-11-29)
+        ✔ restarted engine, #4 cylinder came up and was hotter than other cylinders when leaning the engine out  @done(25-11-29)
+        ✔ tested insta360 camera and cockpit audio successfully @done(25-11-29)
+        ✔ observed a continued fuel leak at the pump pipe fitting. i need to remove and clean the fuel pump to fix the issue - FIXED. @done(25-12-10)
+        observed oil pressure above 86 psi
+            max oil pressure is 95psi min is 50psi for 1800 - 2700 rpm (20 psi minimum at idle)
+            need to run engine at 2000 rpm with oil temps in normal range and observe oil pressure and adjust as necessary
+        Idle fuel mixture
+            with engine at idle and full rich, slowly and smoothly pull back mixture and observe RPM
+            if it rises more than ~50rpm then I need to lean the idle mixture, if it just quits i need to richen it.
+            Likely need to lean based on observed run
+
+        CHT temp limits
+            500F never exceed
+            430F high performance cruise
+            400F economy cruise
+            300F - 400F optimal temperatures
+        Oil Temperatures
+            120F - 220F in cruise flights
+            130F - 200F optimal
+            240F Never exceed
+        Oil Pressure Limits (1800 - 2700 RPM)
+            50psi - Minimum
+            95psi - Maximum
+
+
+    11/24/2025:
+        ✔ had visit from FAA safety inspectors - both advised ready for inspection @done(25-11-26)
+        ✔ contacted DAR Adam Valdez @done(25-11-26)
+
+    11/22/2025:
+        ✔ second engine run @done(25-11-23)
+        ✔ fuel flow established @done(25-11-23)
+        ✔ fixed oil leaks @done(25-11-23)
+        ✔ fixed fuel leak in cabin @done(25-11-23)
+
+
+    11/8/2025:
+        ✔ finish cleaning hangar @done(25-11-05)
+        ✔ bring chairs to hangar @done(25-11-04)
+        ✔ get waters, and beer @done(25-11-04)
+        ✔ torque rudder cable bolts @done(25-11-06)
+        ✔ Install Pitot Tube screws @done(25-11-05)
+        ✔ install top spark plugs @done(25-11-05)
+        ✔ run the engine @done(25-11-06)
+
+    11/7/2025:
+        ✔ fixed oil leaks @done(25-11-07)
+        ✔ fixed and torqued fuel pump outlet and firewall attachment lines @done(25-11-07)
+        ✔ tightened and torqued oil temperature sensor fitting @done(25-11-07)
+        ✔ torqued oil cooler engine fittings @done(25-11-07)
+        ✔ torqued engine control cables @done(25-11-07)
+        ✔ added cotter pin to elevator trim @done(25-11-07)
+
+
+    11/6/2025:
+        ✔ First Engine Run! @done(25-11-06)
+        ✔ found oil leak from oil pressure sensor line - FIXED @done(25-11-06)
+        ✔ fuel leak in the cabin from firewall and pump outlet connections - FIXED @done(25-11-07)
+
+    10/25/2025 - 10/29/2025:
+        ✔ cleaned the workbenches @done(25-10-29)
+        ✔ cleaned the hangar @done(25-10-29)
+        ✔ lubricated the piano wire for the elevator trim @done(25-10-29)
+        ✔ test fit the landing gear fairing on the right side @done(25-10-29)
+        ✔ installed and connected the battery @done(25-10-29)
+        ✔ charged the battery @done(25-10-29)
+        ✔ filled the plane with 40 gal of 94UL @done(25-10-29)
+    ✔ @done(25-10-29)
+    10/23/2025:
+        ✔ filled and fared the cowl inlets @done(25-10-27)
+
+    10/9/2025:
+        ✔ trimmed duct seals @done(25-10-19)
+        ✔ drilled pilot holes through seals @done(25-10-19)
+        ✔ test fit seals to inlets @done(25-10-19)
+    10/8/2025:
+        ✔ second pass with baffle seal 1/6" offset for the fiberglass @done(25-10-19)
+        ✔ molded to inlets + baffle seal @done(25-10-19)
+
+    10/6/2025:
+        ✔ first pass at inlet duct seals out of fiberglass @done(25-10-19)
+
     9/6/2025:
         ✔ Right Front weight average over 5 weights 474.36 horizontal @done(25-09-07)
         ✔ Right Front weight average over 3 weights 464.2 three point @done(25-09-07)
