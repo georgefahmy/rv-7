@@ -677,6 +677,23 @@ while True:
                 date = e_values.get("date_input")
                 tach = e_values.get("tach_hours_input")
                 airframe = e_values.get("total_hours_input")
+                # If tach or airframe hours are missing, use the most recent values from the database
+                if not tach:
+                    cursor.execute(
+                        "SELECT tach_time FROM maintenance_entries WHERE tach_time IS NOT NULL ORDER BY date DESC LIMIT 1"
+                    )
+                    last_tach = cursor.fetchone()
+                    if last_tach:
+                        tach = last_tach[0]
+
+                if not airframe:
+                    cursor.execute(
+                        "SELECT airframe_time FROM maintenance_entries WHERE airframe_time IS NOT NULL ORDER BY date DESC LIMIT 1"
+                    )
+                    last_airframe = cursor.fetchone()
+                    if last_airframe:
+                        airframe = last_airframe[0]
+
                 notes = e_values.get("notes_input")
                 recurrent_item = e_values.get("recurrent_item_input")
                 category = e_values.get("category_input")
