@@ -7,4 +7,4 @@ rad2deg = 180 / pi
 
 angle = asin(vs_fpm / airspeed_fpm) * rad2deg
 
-print(round(angle, 2))
+print(f"{round(angle, 2)} degrees")

@@ -1,3 +1,4 @@
+import contextily as ctx
 import matplotlib
 import matplotlib.pyplot as plt
 
@@ -7,8 +8,9 @@ import pandas as pd
 # import FreeSimpleGUI as sg
 import PySimpleGUI as sg
 from airspeed_calibration import analyze_flight_data
-from geopy.distance import geodesic
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+
+# from geopy.distance import geodesic
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 from matplotlib.widgets import RectangleSelector
 
 matplotlib.use("TkAgg")
@@ -917,54 +919,75 @@ def main():
                 window["-CANVAS_1-"].TKCanvas,
             )
 
-            # --- Plot 2D GPS Ground Track (Relative Distance in NM) Colored by IAS ---
+            # --- Plot 2D GPS Ground Track on OpenStreetMap using contextily ---
             if "Latitude (deg)" in df.columns and "Longitude (deg)" in df.columns:
-                # from geopy.distance import geodesic
-
                 flight_data = df[df["Flight ID"] == flight_id]
                 lat = flight_data["Latitude (deg)"].values
                 lon = flight_data["Longitude (deg)"].values
                 session_time_gt = flight_data["Session Time"].values
 
-                # Compute relative distances from the first point in nautical miles
-                origin = (lat[0], lon[0])
-                x_dist = []  # East-West relative distance in NM
-                y_dist = []  # North-South relative distance in NM
-
-                for la, lo in zip(lat, lon):
-                    # Compute North-South distance
-                    north_south = geodesic((la, lon[0]), origin).nautical
-                    # Compute East-West distance
-                    east_west = geodesic((lat[0], lo), origin).nautical
-
-                    # Adjust sign based on relative position
-                    if la < lat[0]:
-                        north_south *= -1
-                    if lo < lon[0]:
-                        east_west *= -1
-
-                    y_dist.append(north_south)
-                    x_dist.append(east_west)
-
                 fig2, ax2 = plt.subplots()
+
+                # Plot using real latitude/longitude so a map can be used
+                lat_vals = lat
+                lon_vals = lon
 
                 # Color by Indicated Airspeed if available
                 if "Indicated Airspeed (knots)" in flight_data.columns:
                     ias = flight_data["Indicated Airspeed (knots)"].values
-                    sc = ax2.scatter(x_dist, y_dist, c=ias, cmap="viridis", s=8)
+                    sc = ax2.scatter(lon_vals, lat_vals, c=ias, cmap="viridis", s=8)
                     cbar = fig2.colorbar(sc, ax=ax2, pad=0.1)
-                    cbar.set_label("True Airspeed (knots)")
+                    cbar.set_label("Indicated Airspeed (knots)")
                 else:
-                    ax2.plot(x_dist, y_dist)
+                    ax2.plot(lon_vals, lat_vals)
 
-                ax2.set_xlabel("Relative East-West Distance (NM)")
-                ax2.set_ylabel("Relative North-South Distance (NM)")
-                ax2.set_title("GPS Ground Track (Relative Distance Colored by IAS)")
+                ax2.set_xlabel("Longitude")
+                ax2.set_ylabel("Latitude")
+                ax2.set_title("GPS Ground Track on Map")
+
+                # Add OpenStreetMap basemap
+                try:
+                    ctx.add_basemap(
+                        ax2, crs="EPSG:4326", source=ctx.providers.OpenStreetMap.Mapnik
+                    )
+                except Exception:
+                    pass
+
                 ax2.grid(True)
 
-                # Moving position marker (start at origin)
+                # --- Make map square and add margin so it is not tightly cropped to the flight path ---
+                if len(lat_vals) > 0:
+                    min_lat, max_lat = float(min(lat_vals)), float(max(lat_vals))
+                    min_lon, max_lon = float(min(lon_vals)), float(max(lon_vals))
+
+                    lat_span = max_lat - min_lat
+                    lon_span = max_lon - min_lon
+
+                    # Expand spans slightly so map is not tightly zoomed to path
+                    padding_factor = 0.25
+                    lat_span *= 1 + padding_factor
+                    lon_span *= 1 + padding_factor
+
+                    # Force square map by using the larger span
+                    span = max(lat_span, lon_span)
+
+                    center_lat = (min_lat + max_lat) / 2
+                    center_lon = (min_lon + max_lon) / 2
+
+                    ax2.set_xlim(center_lon - span / 2, center_lon + span / 2)
+                    ax2.set_ylim(center_lat - span / 2, center_lat + span / 2)
+
+                    # Ensure the axes box itself is square
+                    ax2.set_box_aspect(1)
+
+                # Moving position marker using airplane icon
                 (ground_track_marker,) = ax2.plot(
-                    [x_dist[0]], [y_dist[0]], "ro", zorder=10
+                    [lon_vals[0]],
+                    [lat_vals[0]],
+                    marker="$✈$",
+                    markersize=14,
+                    linestyle="None",
+                    zorder=10,
                 )
 
                 # Clear existing canvas
@@ -973,11 +996,18 @@ def main():
 
                 canvas2 = FigureCanvasTkAgg(fig2, window["-CANVAS_2-"].TKCanvas)
                 canvas2.draw()
-                canvas2.get_tk_widget().pack(side="top", fill="both", expand=1)
+
+                map_widget = canvas2.get_tk_widget()
+                map_widget.pack(side="top", fill="both", expand=1)
+
+                # Add matplotlib navigation toolbar for zoom/pan
+                toolbar = NavigationToolbar2Tk(canvas2, window["-CANVAS_2-"].TKCanvas)
+                toolbar.update()
+                toolbar.pack(side="bottom", fill="x")
 
                 # Store globals for syncing
-                ground_track["lat"] = y_dist
-                ground_track["lon"] = x_dist
+                ground_track["lat"] = lat_vals
+                ground_track["lon"] = lon_vals
                 ground_track["time"] = session_time_gt
                 ground_track["marker"] = ground_track_marker
                 ground_track["canvas"] = canvas2
