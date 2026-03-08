@@ -416,67 +416,6 @@ cursor.execute(
 )
 conn.commit()
 
-entry_layout = [
-    [
-        sg.Column(
-            layout=[
-                [sg.Text("Date", expand_x=True)],
-                [sg.Input(key="date_input", expand_x=True, size=(10, 1))],
-            ]
-        ),
-        sg.Column(
-            layout=[
-                [sg.Text("Total Hours", expand_x=True)],
-                [sg.Input(key="total_hours_input", expand_x=True, size=(10, 1))],
-            ]
-        ),
-        sg.Column(
-            layout=[
-                [sg.Text("Tach Hours", expand_x=True)],
-                [sg.Input(key="tach_hours_input", expand_x=True, size=(10, 1))],
-            ]
-        ),
-        sg.Column(
-            layout=[
-                [sg.Text("Notes", expand_x=True)],
-                [sg.Input(key="notes_input", expand_x=True, size=(30, 1))],
-            ]
-        ),
-        sg.Column(
-            layout=[
-                [sg.Text("Recurrent Item", expand_x=True)],
-                [
-                    sg.DropDown(
-                        RECURRENT_ITEMS,
-                        key="recurrent_item_input",
-                        expand_x=True,
-                        size=(15, 1),
-                    ),
-                ],
-            ]
-        ),
-        sg.Column(
-            layout=[
-                [sg.Text("Category", expand_x=True)],
-                [
-                    sg.DropDown(
-                        MX_CATEGORIES,
-                        key="category_input",
-                        expand_x=True,
-                        size=(15, 1),
-                    ),
-                ],
-            ]
-        ),
-        sg.Column(
-            layout=[
-                [sg.Text("", expand_x=True)],
-                [sg.Button("Submit", key="submit_entry", size=(10, 1))],
-            ]
-        ),
-    ],
-]
-
 
 main_layout = [
     [
@@ -664,6 +603,70 @@ while True:
         break
 
     if event == "add_entry_button":
+        entry_layout = [
+            [
+                sg.Column(
+                    layout=[
+                        [sg.Text("Date", expand_x=True)],
+                        [sg.Input(key="date_input", expand_x=True, size=(10, 1))],
+                    ]
+                ),
+                sg.Column(
+                    layout=[
+                        [sg.Text("Total Hours", expand_x=True)],
+                        [
+                            sg.Input(
+                                key="total_hours_input", expand_x=True, size=(10, 1)
+                            )
+                        ],
+                    ]
+                ),
+                sg.Column(
+                    layout=[
+                        [sg.Text("Tach Hours", expand_x=True)],
+                        [sg.Input(key="tach_hours_input", expand_x=True, size=(10, 1))],
+                    ]
+                ),
+                sg.Column(
+                    layout=[
+                        [sg.Text("Notes", expand_x=True)],
+                        [sg.Input(key="notes_input", expand_x=True, size=(30, 1))],
+                    ]
+                ),
+                sg.Column(
+                    layout=[
+                        [sg.Text("Recurrent Item", expand_x=True)],
+                        [
+                            sg.DropDown(
+                                RECURRENT_ITEMS,
+                                key="recurrent_item_input",
+                                expand_x=True,
+                                size=(15, 1),
+                            ),
+                        ],
+                    ]
+                ),
+                sg.Column(
+                    layout=[
+                        [sg.Text("Category", expand_x=True)],
+                        [
+                            sg.DropDown(
+                                MX_CATEGORIES,
+                                key="category_input",
+                                expand_x=True,
+                                size=(15, 1),
+                            ),
+                        ],
+                    ]
+                ),
+                sg.Column(
+                    layout=[
+                        [sg.Text("", expand_x=True)],
+                        [sg.Button("Submit", key="submit_entry", size=(10, 1))],
+                    ]
+                ),
+            ],
+        ]
         entry_window = sg.Window("Add Maintenance Entry", entry_layout, modal=True)
         while True:
             e_event, e_values = entry_window.read()
@@ -707,32 +710,32 @@ while True:
                     entry_window.close()
                     break
 
-    if event == "submit_entry":
-        date = values.get("date_input")
-        tach = values.get("tach_hours_input")  # using same input for now
-        airframe = values.get("total_hours_input")
-        notes = values.get("notes_input")
-        recurrent_item = values.get("recurrent_item_input")
-        category = values.get("category_input")
-        print("it goes here")
-        if date:
-            cursor.execute(
-                """
-                INSERT INTO maintenance_entries
-                (date, tach_time, airframe_time, notes, recurrent_item, category)
-                VALUES (?, ?, ?, ?, ?, ?)
-                """,
-                (date, tach, airframe, notes, recurrent_item, category),
-            )
-            conn.commit()
+    # if event == "submit_entry":
+    #     date = values.get("date_input")
+    #     tach = values.get("tach_hours_input")  # using same input for now
+    #     airframe = values.get("total_hours_input")
+    #     notes = values.get("notes_input")
+    #     recurrent_item = values.get("recurrent_item_input")
+    #     category = values.get("category_input")
+    #     print("it goes here")
+    #     if date:
+    #         cursor.execute(
+    #             """
+    #             INSERT INTO maintenance_entries
+    #             (date, tach_time, airframe_time, notes, recurrent_item, category)
+    #             VALUES (?, ?, ?, ?, ?, ?)
+    #             """,
+    #             (date, tach, airframe, notes, recurrent_item, category),
+    #         )
+    #         conn.commit()
 
-            refresh_table(window)
-            update_due_dates(window)
-            update_total_airframe_hours(window)
-            update_database_due_dates(window)
-            overdue = calculate_overdue()
-            window["overdue_text"].update(overdue)
-            sg.popup("Maintenance entry saved.")
+    #         refresh_table(window)
+    #         update_due_dates(window)
+    #         update_total_airframe_hours(window)
+    #         update_database_due_dates(window)
+    #         overdue = calculate_overdue()
+    #         window["overdue_text"].update(overdue)
+    #         sg.popup("Maintenance entry saved.")
 
     if event == "flight_log_button":
         flight_layout = [

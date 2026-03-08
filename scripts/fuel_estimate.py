@@ -318,23 +318,32 @@ def plot_airfoil_with_tank(height_at_filler):
     poly_x = list(x_bot_rot[valid])
     poly_y = list(y_bot_rot[valid])
 
-    # add spar intersection points (top then bottom)
-    # spar_top_x = TANK_CHORD * np.cos(theta) - np.interp(
-    #     TANK_CHORD, x_coords, top_surface
-    # ) * np.sin(theta)
-    # spar_top_y = TANK_CHORD * np.sin(theta) + np.interp(
-    #     TANK_CHORD, x_coords, top_surface
-    # ) * np.cos(theta)
+    # interpolate along spar based on fuel level
+    spar_bottom = np.interp(TANK_CHORD, x_coords, bottom_surface)
+    spar_top = np.interp(TANK_CHORD, x_coords, top_surface)
 
-    spar_bot_x = TANK_CHORD * np.cos(theta) - np.interp(
-        TANK_CHORD, x_coords, bottom_surface
-    ) * np.sin(theta)
-    spar_bot_y = TANK_CHORD * np.sin(theta) + np.interp(
-        TANK_CHORD, x_coords, bottom_surface
-    ) * np.cos(theta)
+    frac = (fuel_level - (TANK_CHORD * np.sin(theta) + spar_bottom * np.cos(theta))) / (
+        (TANK_CHORD * np.sin(theta) + spar_top * np.cos(theta))
+        - (TANK_CHORD * np.sin(theta) + spar_bottom * np.cos(theta))
+    )
+    frac = np.clip(frac, 0.0, 1.0)
 
-    poly_x += [spar_bot_x]
-    poly_y += [min(fuel_level, spar_bot_y)]
+    # compute interpolated y along spar (linear along spar line)
+    spar_y_interp = (
+        TANK_CHORD * np.sin(theta) + spar_bottom * np.cos(theta)
+    ) + frac * (
+        (TANK_CHORD * np.sin(theta) + spar_top * np.cos(theta))
+        - (TANK_CHORD * np.sin(theta) + spar_bottom * np.cos(theta))
+    )
+    spar_x_interp = (
+        TANK_CHORD * np.cos(theta) - spar_bottom * np.sin(theta)
+    ) + frac * (
+        (TANK_CHORD * np.cos(theta) - spar_top * np.sin(theta))
+        - (TANK_CHORD * np.cos(theta) - spar_bottom * np.sin(theta))
+    )
+
+    poly_x += [spar_x_interp]
+    poly_y += [spar_y_interp]
 
     # add top surface back toward leading edge
     poly_x += list(x_top_rot[valid][::-1])
@@ -355,7 +364,7 @@ def plot_airfoil_with_tank(height_at_filler):
             + np.interp(TANK_CHORD, x_coords, top_surface) * np.cos(theta),
         ],
         linestyle="--",
-        label="Tank Spar",
+        label="Tank",
     )
 
     # filler location
@@ -372,7 +381,7 @@ def plot_airfoil_with_tank(height_at_filler):
     plt.title("Airfoil Cross Section with Fuel Tank Region")
     plt.axis("equal")
     plt.legend()
-    plt.show()
+    return plt
 
 
 def plot_3d_wing(
@@ -565,7 +574,8 @@ def plot_3d_wing(
     ax.set_ylabel("Span (inches)")
     ax.set_zlabel("Height (inches)")
     ax.set_title("3D Wing Planform")
-    plt.show()
+    ax.legend()
+    return plt
 
 
 # ---------------------------
@@ -593,11 +603,12 @@ if __name__ == "__main__":
 
     print(f"\nEstimated Fuel: {gallons:.2f} gallons")
     print(f"Estimated inboard-most fuel height: {inboard_height:.2f} inches")
-    plot_airfoil_with_tank(height)
-    plot_3d_wing(
+    plot2d = plot_airfoil_with_tank(height)
+    plot3d = plot_3d_wing(
         section_bounds,
         span=SPAN,
         chord=FULL_CHORD,
         num_chord_points=100,
         num_span_points=50,
     )
+    plt.show()
