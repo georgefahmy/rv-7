@@ -727,33 +727,6 @@ while True:
                     entry_window.close()
                     break
 
-    # if event == "submit_entry":
-    #     date = values.get("date_input")
-    #     tach = values.get("tach_hours_input")  # using same input for now
-    #     airframe = values.get("total_hours_input")
-    #     notes = values.get("notes_input")
-    #     recurrent_item = values.get("recurrent_item_input")
-    #     category = values.get("category_input")
-    #     print("it goes here")
-    #     if date:
-    #         cursor.execute(
-    #             """
-    #             INSERT INTO maintenance_entries
-    #             (date, tach_time, airframe_time, notes, recurrent_item, category)
-    #             VALUES (?, ?, ?, ?, ?, ?)
-    #             """,
-    #             (date, tach, airframe, notes, recurrent_item, category),
-    #         )
-    #         conn.commit()
-
-    #         refresh_table(window)
-    #         update_due_dates(window)
-    #         update_total_airframe_hours(window)
-    #         update_database_due_dates(window)
-    #         overdue = calculate_overdue()
-    #         window["overdue_text"].update(overdue)
-    #         sg.popup("Maintenance entry saved.")
-
     if event == "flight_log_button":
         flight_layout = [
             [
