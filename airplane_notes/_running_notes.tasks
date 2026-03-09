@@ -122,8 +122,6 @@ Future Project Order:
     -  Fabricate rudder stop extensions and rivet/bolt to existing rudder stops
 
 On Deck:
-    Set ELT to ARMED (down) position and add red cap
-    install batteries into ELT audio thing and panel thing
     investigate flaps position sensor flickering
 
 
@@ -132,6 +130,8 @@ Daily Updates are collected below this line
 Updates are moved to the archive section after
 they have been added to the build log
 3/7/2026:
+    ✔ Set ELT to ARMED (down) position and add red cap @done(26-03-09)
+    ✔ install batteries into ELT audio thing and panel thing @done(26-03-09)
     ✔ reinstalled floor, cabin interior, and rear bulkheads @done(26-03-08)
     ✔ added tailwheel spacers @done(26-03-08)
     ✔ aircraft is now airworthy @done(26-03-08)
