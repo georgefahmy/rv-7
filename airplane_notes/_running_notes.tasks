@@ -129,6 +129,21 @@ On Deck:
 Daily Updates are collected below this line
 Updates are moved to the archive section after
 they have been added to the build log
+3/10/2026:
+    ✔ First fuel up - added 29.56 Gallons - this brought it to full ~ 42 gallons @done(26-03-10)
+    ✔ Fuel Computer initial calibration
+        Started at 40 Gal
+        Remaining 13.8 Gal
+        Filled up 29.56 Gal to 42 Gal
+        42 - 13.8 = 28.2
+        28.2/29.55 = 0.954
+        0.954 * 68000 pulses = ~65000
+        Now using 65000 to calculate fuel flow rate
+    ✔ flew 1.0 hours today @done(26-03-10)
+    ✔ airspeed calibration flight big square @done(26-03-10)
+    ✔ need to do pitot static check @done(26-03-10)
+
+
 3/7/2026:
     ✔ Set ELT to ARMED (down) position and add red cap @done(26-03-09)
     ✔ install batteries into ELT audio thing and panel thing @done(26-03-09)

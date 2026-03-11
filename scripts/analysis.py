@@ -618,6 +618,67 @@ def plot_flight(df, flight_id, left_signal, right_signal, canvas):
     figure_canvas.mpl_connect("button_press_event", on_press)
 
 
+def identify_flight_phases_for_selected_flight(df, flight_id):
+    """
+    Identify flight phases for the selected flight and print the first timestamp of each phase.
+    """
+    import numpy as np
+
+    # Filter the selected flight
+    flight_df = df[df["Flight ID"] == flight_id].copy()
+    if flight_df.empty:
+        print("No data for selected flight.")
+        return None
+
+    # Signals
+    rpm = flight_df["RPM"].values
+    mp = flight_df["Manifold Pressure (inHg)"].values
+    ff = flight_df["Fuel Flow 1 (gal/hr)"].values
+    pp = flight_df["Percent Power"].values
+    gs = flight_df["Ground Speed (knots)"].values
+    vs = flight_df["Vertical Speed (ft/min)"].values
+
+    # Rates
+    dgs = np.gradient(gs)
+    phases = []
+
+    for i in range(len(flight_df)):
+        if gs[i] < 25:
+            phase = "Taxi"
+        elif rpm[i] > 1800 and gs[i] < 5:
+            phase = "Runup"
+        elif rpm[i] > 2550 and mp[i] > 24 and ff[i] > 12 and pp[i] > 85:
+            phase = "Takeoff"
+        elif vs[i] > 400:
+            phase = "Climb"
+        elif abs(vs[i]) < 100 and gs[i] > 90:
+            phase = "Cruise"
+        elif vs[i] < -300:
+            phase = "Descent"
+        elif gs[i] < 50 and dgs[i] < 0 and mp[i] < 12:
+            phase = "Landing"
+        else:
+            phase = "Taxi"
+
+        phases.append(phase)
+
+    flight_df["Flight Phase"] = phases
+
+    # Print first occurrence of each phase
+    printed = set()
+    print(f"\nFlight Phase Summary for flight: {flight_id}")
+    for idx, row in flight_df.iterrows():
+        phase = row["Flight Phase"]
+        if phase not in printed:
+            timestamp = (
+                row["Session Time"] if "Session Time" in flight_df.columns else idx
+            )
+            print(f"{phase} begins at timestamp: {timestamp}")
+            printed.add(phase)
+
+    return flight_df
+
+
 def main():
     df = None
     flight_stats = None
@@ -902,6 +963,7 @@ def main():
                 f"Max CHT: {stats['Max_CHT']}\n"
             )
             window["-SUMMARY-"].update(summary_text)
+            identify_flight_phases_for_selected_flight(df, fid)
 
         if event in ("-LEFT_SIGNAL_1-", "-RIGHT_SIGNAL_1-", "-FLIGHT-"):
             flight_id = values["-FLIGHT-"]
@@ -935,7 +997,7 @@ def main():
                 # Color by Indicated Airspeed if available
                 if "Indicated Airspeed (knots)" in flight_data.columns:
                     ias = flight_data["Indicated Airspeed (knots)"].values
-                    sc = ax2.scatter(lon_vals, lat_vals, c=ias, cmap="viridis", s=8)
+                    sc = ax2.scatter(lon_vals, lat_vals, c=ias, cmap="rainbow", s=8)
                     cbar = fig2.colorbar(sc, ax=ax2, pad=0.1)
                     cbar.set_label("Indicated Airspeed (knots)")
                 else:
@@ -1013,7 +1075,9 @@ def main():
                 ground_track["canvas"] = canvas2
 
         if event == "-AIRSPEED_CALIBRATION-":
-            as_cal_df = df.rename(
+            flight_id = values["-FLIGHT-"]
+            flight_data = df[df["Flight ID"] == flight_id]
+            as_cal_df = flight_data.rename(
                 columns={
                     "Session Time": "session_time",
                     "Indicated Airspeed (knots)": "ias",
@@ -1059,6 +1123,11 @@ def main():
                 (as_cal_df["session_time"] >= start_time)
                 & (as_cal_df["session_time"] <= end_time)
             ]
+
+            cal_df = maneuver_df[
+                ["press_alt", "ias", "hdg", "gps_gs", "gps_trk"]
+            ].copy()
+            cal_df.to_csv("~/Documents/projects/dynon/data_logs/cal_df.csv")
 
             avg_wind_speed = (
                 maneuver_df["Wind Speed (knots)"].mean()

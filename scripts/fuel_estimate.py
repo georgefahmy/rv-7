@@ -13,7 +13,7 @@ SPAN = 50.0  # tank span (inches)
 FULL_CHORD = 58  # full wing chord (inches)
 T_RATIO = 0.135  # NACA 23013.5 thickness ratio
 MAX_THICK = 7.5  # max thickness (inches)
-TILT_DEG = 3  # fixed dihedral angle of the tank
+TILT_DEG = 3.5  # fixed dihedral angle of the tank
 CHORD_TILT_DEG = 11  # tilt along the chord for tail-low attitude
 DEBUG = False  # set True to print solver diagnostics
 

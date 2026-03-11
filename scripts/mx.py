@@ -26,6 +26,8 @@ RECURRENT_ITEMS = [
     "Condition Inspection",
     "Oil Change",
     "ELT Test",
+    "ELT Batteries",
+    "ELT Registration",
     "Nav Data Update",
     "Batteries",
 ]
@@ -200,6 +202,16 @@ def calculate_overdue():
             if today > due_date:
                 overdue_count += 1
 
+        elif item == "ELT Batteries":
+            due_date = last_dt + timedelta(days=365 * 7)
+            if today > due_date:
+                overdue_count += 1
+
+        elif item == "ELT Registration":
+            due_date = last_dt + timedelta(days=365 * 2)
+            if today > due_date:
+                overdue_count += 1
+
         elif item == "Nav Data Update":
             # Use aviation/obstacle DB intervals to determine overdue
             if today - last_dt > timedelta(days=OAS_AVIATION_DB_INTERVAL_DAYS):
@@ -275,7 +287,7 @@ def update_due_dates(window):
 
             next_due_tach = tach_val + interval
             # Determine current aircraft tach (max tach in DB)
-            cursor.execute("SELECT MAX(tach_time) FROM maintenance_entries")
+            cursor.execute("SELECT MAX(tach) FROM flight_log")
             current_tach = cursor.fetchone()[0]
             hours_remaining = None
             if current_tach is not None:
@@ -297,7 +309,7 @@ def update_due_dates(window):
         oil_due = "--"
         oil_color = DEFAULT_COLOR
 
-    # --- Find latest ELT Test entry ---
+    # --- ELT Test (90 days) ---
     cursor.execute(
         """
         SELECT date
@@ -308,28 +320,79 @@ def update_due_dates(window):
         """,
         ("ELT Test",),
     )
-    elt_result = cursor.fetchone()
-    elt_due = "--"
-    elt_color = DEFAULT_COLOR
-    if elt_result and elt_result[0]:
-        last_date = elt_result[0]
+    elt_test_result = cursor.fetchone()
+
+    elt_test_due = "--"
+    elt_test_color = DEFAULT_COLOR
+
+    if elt_test_result and elt_test_result[0]:
         try:
-            last_dt = datetime.strptime(last_date, "%m/%d/%Y").date()
+            last_dt = datetime.strptime(elt_test_result[0], "%m/%d/%Y").date()
             due_date = last_dt + timedelta(days=ELT_TEST_INTERVAL_DAYS)
             days_remaining = (due_date - today).days
-            elt_due = f"{due_date.strftime('%Y-%m-%d')} ({days_remaining} days)"
+            elt_test_due = (
+                f"Test: {due_date.strftime('%Y-%m-%d')} ({days_remaining} days)"
+            )
+
             if days_remaining < 0:
-                elt_color = OVERDUE_COLOR
+                elt_test_color = OVERDUE_COLOR
             elif days_remaining <= 30:
-                elt_color = WARNING_COLOR
-            else:
-                elt_color = DEFAULT_COLOR
+                elt_test_color = WARNING_COLOR
         except:
-            elt_due = "--"
-            elt_color = DEFAULT_COLOR
-    else:
-        elt_due = "--"
-        elt_color = DEFAULT_COLOR
+            elt_test_due = "Test: --"
+
+    # --- ELT Batteries (7 years) ---
+    cursor.execute(
+        """
+        SELECT date
+        FROM maintenance_entries
+        WHERE recurrent_item=?
+        ORDER BY date DESC
+        LIMIT 1
+        """,
+        ("ELT Batteries",),
+    )
+    elt_batt_result = cursor.fetchone()
+
+    elt_batt_due = "Bat: --"
+    if elt_batt_result and elt_batt_result[0]:
+        try:
+            last_dt = datetime.strptime(elt_batt_result[0], "%m/%d/%Y").date()
+            due_date = last_dt + timedelta(days=365 * 5)
+            days_remaining = (due_date - today).days
+            elt_batt_due = (
+                f"Bat: {due_date.strftime('%Y-%m-%d')} ({days_remaining} days)"
+            )
+        except:
+            pass
+
+    # --- ELT Registration (2 years) ---
+    cursor.execute(
+        """
+        SELECT date
+        FROM maintenance_entries
+        WHERE recurrent_item=?
+        ORDER BY date DESC
+        LIMIT 1
+        """,
+        ("ELT Registration",),
+    )
+    elt_reg_result = cursor.fetchone()
+
+    elt_reg_due = "Reg: --"
+    if elt_reg_result and elt_reg_result[0]:
+        try:
+            last_dt = datetime.strptime(elt_reg_result[0], "%m/%d/%Y").date()
+            due_date = last_dt + timedelta(days=365 * 2)
+            days_remaining = (due_date - today).days
+            elt_reg_due = (
+                f"Reg: {due_date.strftime('%Y-%m-%d')} ({days_remaining} days)"
+            )
+        except:
+            pass
+
+    elt_due = f"{elt_test_due}\n{elt_batt_due}\n{elt_reg_due}"
+    elt_color = elt_test_color
 
     window["cond_due_text"].update(cond_due, text_color=cond_color)
     window["oil_due_text"].update(oil_due, text_color=oil_color)
@@ -466,7 +529,7 @@ main_layout = [
                     sg.Frame(
                         title="ELT Due",
                         layout=[
-                            [sg.Text("--", font=("Arial", 14), key="elt_due_text")]
+                            [sg.Text("--", font=("Arial", 12), key="elt_due_text")]
                         ],
                         size=(180, 100),
                         expand_x=True,
@@ -511,6 +574,7 @@ main_layout = [
     ],
     [
         sg.Button("Add Flight Log", key="flight_log_button"),
+        sg.Button("Generate Logbook Entry", key="generate_logbook_entry"),
     ],
     [sg.HorizontalSeparator()],
     [
@@ -584,6 +648,104 @@ main_layout = [
     ],
 ]
 
+
+def generate_logbook_warning(window):
+    """Generate 30-day warning for upcoming ELT or maintenance and show separate logbook entry window."""
+    today = datetime.today().date()
+    warning_lines = []
+    logbook_lines = []
+
+    # --- ELT Test ---
+    cursor.execute(
+        "SELECT date, tach_time, airframe_time FROM maintenance_entries WHERE recurrent_item=? ORDER BY date DESC LIMIT 1",
+        ("ELT Test",),
+    )
+    result = cursor.fetchone()
+    if result and result[0]:
+        try:
+            last_dt = datetime.strptime(result[0], "%m/%d/%Y").date()
+            tach_time = result[1]
+            hobbs_time = result[2]
+            due_date = last_dt + timedelta(days=ELT_TEST_INTERVAL_DAYS)
+            days_remaining = (due_date - today).days
+            if 0 <= days_remaining <= 30:
+                warning_lines.append(
+                    f"ELT Test due in {days_remaining} days on {due_date.strftime('%Y-%m-%d')}"
+                )
+            logbook_lines.append(
+                f"ELT Test last done {last_dt.strftime('%Y-%m-%d')} - Next due {due_date.strftime('%Y-%m-%d')} | Tach: {tach_time} | Hobbs: {hobbs_time}"
+            )
+        except:
+            pass
+
+    # --- ELT Batteries ---
+    cursor.execute(
+        "SELECT date, tach_time, airframe_time FROM maintenance_entries WHERE recurrent_item=? ORDER BY date DESC LIMIT 1",
+        ("ELT Batteries",),
+    )
+    result = cursor.fetchone()
+    if result and result[0]:
+        try:
+            last_dt = datetime.strptime(result[0], "%m/%d/%Y").date()
+            tach_time = result[1]
+            hobbs_time = result[2]
+            due_date = last_dt + timedelta(days=365 * 7)
+            days_remaining = (due_date - today).days
+            if 0 <= days_remaining <= 30:
+                warning_lines.append(
+                    f"ELT Batteries due in {days_remaining} days on {due_date.strftime('%Y-%m-%d')}"
+                )
+            logbook_lines.append(
+                f"ELT Batteries last replaced {last_dt.strftime('%Y-%m-%d')} - Next due {due_date.strftime('%Y-%m-%d')} | Tach: {tach_time} | Hobbs: {hobbs_time}"
+            )
+        except:
+            pass
+
+    # --- ELT Registration ---
+    cursor.execute(
+        "SELECT date, tach_time, airframe_time FROM maintenance_entries WHERE recurrent_item=? ORDER BY date DESC LIMIT 1",
+        ("ELT Registration",),
+    )
+    result = cursor.fetchone()
+    if result and result[0]:
+        try:
+            last_dt = datetime.strptime(result[0], "%m/%d/%Y").date()
+            tach_time = result[1]
+            hobbs_time = result[2]
+            due_date = last_dt + timedelta(days=365 * 2)
+            days_remaining = (due_date - today).days
+            if 0 <= days_remaining <= 30:
+                warning_lines.append(
+                    f"ELT Registration due in {days_remaining} days on {due_date.strftime('%Y-%m-%d')}"
+                )
+            logbook_lines.append(
+                f"ELT Registration last updated {last_dt.strftime('%Y-%m-%d')} - Next due {due_date.strftime('%Y-%m-%d')} | Tach: {tach_time} | Hobbs: {hobbs_time}"
+            )
+        except:
+            pass
+
+    # --- Show 30-day warning popup ---
+    if warning_lines:
+        sg.popup_scrolled(
+            "30-Day Warnings",
+            "\n".join(warning_lines),
+            title="Upcoming Maintenance Warnings",
+            size=(60, 20),
+        )
+
+    # --- Return logbook preview separately ---
+    logbook_text = (
+        "\n".join(logbook_lines) if logbook_lines else "No recent ELT entries."
+    )
+    sg.popup_scrolled(
+        "Logbook Entry Preview",
+        logbook_text,
+        title="Logbook Entry",
+        size=(60, 20),
+    )
+    return logbook_text, warning_lines
+
+
 window = sg.Window(title="MX Tracker", layout=main_layout, finalize=True)
 
 # Initial load of table and summary
@@ -601,6 +763,9 @@ while True:
     event, values = window.read()
     if event in (sg.WINDOW_CLOSED, "Exit"):
         break
+
+    if event == "generate_logbook_entry":
+        generate_logbook_warning(window)
 
     if event == "add_entry_button":
         entry_layout = [
