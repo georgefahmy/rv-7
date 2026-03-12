@@ -1,33 +1,34 @@
 
-
 backlog:
     ☐ run one tank dry so i can calibrate it with fuel
     ☐ stall testing
     ☐ aoa calibration flight
     ☐ autopilot calibration flight
-    flight tests:
-        ✔ 1. first flight @done(26-03-12)
-        ✔ 2. flap operation @done(26-03-12)
-        ✔ 3. gear operation N/A @done(26-03-12)
-        ✔ 4. pitot static check @done(26-03-12)
-        ✔ 5. longitudinal control @done(26-03-12)
-        ☐ 6. wings level stall
-        ☐ 7. angle of attack
-        ☐ 8. Vx and Vy calcs
-        ☐ 9. best glide speed
-        ✔ 10. trim effectiveness @done(26-03-12)
-        ✔ 11. runaway electric pitch trim @done(26-03-12)
-        ☐ 12. static longitudinal stability
-        ☐ 13. static directional stability
-        ☐ 14. static lateral and spiral stability
-        ☐ 15. dynamic longitudanl stability
-        ☐ 16. accelerated stalls
-        ✔ 17. EFIS testing @done(26-03-12)
-        ✔ 18. autopilot testing @done(26-03-12)
-        ☐ 19. range and endurance
-        ☐ 20. takeoff performance
-        ☐ 21. landing performance
+    ☐ combine flight tests 6, 7, 8, 9 into next flight
+
+flight tests:
+    ☐ 6. wings level stalls
+    ☐ 7. angle of attack
+    ☐ 8. Vx and Vy calcs
+    ☐ 9. best glide speed
+    ☐ 12. static longitudinal stability
+    ☐ 13. static directional stability
+    ☐ 14. static lateral and spiral stability
+    ☐ 15. dynamic longitudanl stability
+    ☐ 16. accelerated stalls
+    ☐ 19. range and endurance
+    ☐ 20. takeoff performance
+    ☐ 21. landing performance
 
 Archive:
+    ✔ 1. first flight @done(26-03-12) @project(flight tests)
+    ✔ 2. flap operation @done(26-03-12) @project(flight tests)
+    ✔ 3. gear operation N/A @done(26-03-12) @project(flight tests)
+    ✔ 4. pitot static check @done(26-03-12) @project(flight tests)
+    ✔ 5. longitudinal control @done(26-03-12) @project(flight tests)
+    ✔ 10. trim effectiveness @done(26-03-12) @project(flight tests)
+    ✔ 11. runaway electric pitch trim @done(26-03-12) @project(flight tests)
+    ✔ 17. EFIS testing @done(26-03-12) @project(flight tests)
+    ✔ 18. autopilot testing @done(26-03-12) @project(flight tests)
     ✔ fly to holister and perform compass calibration @done(26-03-12) @project(backlog)
     ✔ airspeed calibration flight - NSEW for ~30seconds each at 8k ft @done(26-03-12) @project(backlog)
