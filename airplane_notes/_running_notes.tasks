@@ -1,7 +1,6 @@
 # Archive items after updating blog
 
 Backlog:
-    ☐ @critical Perform Transponder and Pitot Static check in accordance with FAR 91.217 91.413 and 91.411 - this needs to be performed not by me - page 340 of installation guide for SV
     ☐ crankshaft serial numbers that have an AD against it:
         Part Numbers:
             SL36500-A20
@@ -129,6 +128,9 @@ On Deck:
 Daily Updates are collected below this line
 Updates are moved to the archive section after
 they have been added to the build log
+3/12/2026:
+    ✔ Perform Transponder and Pitot Static check in accordance with FAR 91.217 91.413 and 91.411 - this needs to be performed not by me - page 340 of installation guide for SV @done(26-03-12)
+
 3/10/2026:
     ✔ First fuel up - added 29.56 Gallons - this brought it to full ~ 42 gallons @done(26-03-10)
     ✔ Fuel Computer initial calibration
