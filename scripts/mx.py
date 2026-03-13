@@ -2,6 +2,7 @@ import sqlite3
 from datetime import datetime, timedelta
 
 import PySimpleGUI as sg
+from numpy import mean
 
 sg.theme("Reddit")
 sg.set_options(font=("Arial", 14))
@@ -479,6 +480,7 @@ def update_total_airframe_hours(window):
 conn = sqlite3.connect("scripts/maintenance.db")
 cursor = conn.cursor()
 
+# --- Create Mx Entries table ---
 cursor.execute(
     """
     CREATE TABLE IF NOT EXISTS maintenance_entries (
@@ -537,6 +539,7 @@ cursor.execute(
         gallons REAL,
         price_per_gallon REAL,
         total_cost REAL
+        gal_per_hour REAL
     )
     """
 )
@@ -576,24 +579,27 @@ main_layout = [
                     sg.Frame(
                         title="Overdue Items",
                         layout=[[sg.Text("0", font=("Arial", 16), key="overdue_text")]],
-                        size=(120, 100),
+                        size=(120, 140),
                         expand_x=True,
                     ),
                     sg.Frame(
-                        title="Condition Insp Due",
+                        title="Inspections Due",
                         layout=[
+                            [sg.Text("Condition Insp", font=("Arial", 12))],
                             [sg.Text("--", font=("Arial", 14), key="cond_due_text")],
+                            [sg.Text("Transponder Check", font=("Arial", 12))],
                             [sg.Text("--", font=("Arial", 14), key="xpndr_due_text")],
                         ],
-                        size=(180, 100),
+                        size=(180, 140),
                         expand_x=True,
+                        pad=0,
                     ),
                     sg.Frame(
                         title="Oil Change Due",
                         layout=[
                             [sg.Text("--", font=("Arial", 14), key="oil_due_text")]
                         ],
-                        size=(180, 100),
+                        size=(180, 140),
                         expand_x=True,
                     ),
                     sg.Frame(
@@ -601,7 +607,7 @@ main_layout = [
                         layout=[
                             [sg.Text("--", font=("Arial", 12), key="elt_due_text")]
                         ],
-                        size=(180, 100),
+                        size=(180, 140),
                         expand_x=True,
                     ),
                     sg.Frame(
@@ -618,7 +624,7 @@ main_layout = [
                                 )
                             ],
                         ],
-                        size=(180, 100),
+                        size=(180, 140),
                         expand_x=True,
                     ),
                     sg.Frame(
@@ -635,7 +641,7 @@ main_layout = [
                                 )
                             ],
                         ],
-                        size=(180, 100),
+                        size=(180, 140),
                         expand_x=True,
                     ),
                 ],
@@ -839,12 +845,13 @@ while True:
     if event == "fuel_tracker_button":
         # Load existing fuel entries
         cursor.execute(
-            "SELECT hours, gallons, price_per_gallon, total_cost FROM fuel_tracker ORDER BY id DESC"
+            "SELECT hours, gallons, price_per_gallon, total_cost, gal_per_hour FROM fuel_tracker ORDER BY id DESC"
         )
         fuel_rows = cursor.fetchall()
 
         total_gallons = sum(r[1] for r in fuel_rows) if fuel_rows else 0
         total_spent = sum(r[3] for r in fuel_rows) if fuel_rows else 0
+        gal_per_hour_avg = mean(r[4] for r in fuel_rows) if fuel_rows else 0
 
         fuel_layout = [
             [
@@ -857,6 +864,8 @@ while True:
                 sg.VerticalSeparator(),
                 sg.Text("Total Cost"),
                 sg.Text(key="fuel_total", size=(10, 1), background_color="lightgray"),
+                sg.Text("Gals Per Hour"),
+                sg.Text(key="gal_per_hour", size=(10, 1), background_color="lightgray"),
             ],
             [
                 sg.Button("Save"),
@@ -869,10 +878,16 @@ while True:
             [
                 sg.Table(
                     values=fuel_rows,
-                    headings=["Hours", "Gallons", "Price/Gal", "Total Cost"],
+                    headings=[
+                        "Hours",
+                        "Gallons",
+                        "Price/Gal",
+                        "Total Cost",
+                        "Gallons Per Hour",
+                    ],
                     key="fuel_table",
                     auto_size_columns=False,
-                    col_widths=[10, 10, 10, 10],
+                    col_widths=[6, 10, 10, 10, 10],
                     justification="left",
                     num_rows=8,
                     expand_x=True,
@@ -890,6 +905,12 @@ while True:
                     key="fuel_total_spent",
                 )
             ],
+            [
+                sg.Text(
+                    f"Average Fuel Consumption: {round(gal_per_hour_avg, 2)}",
+                    key="gal_per_hour_avg",
+                )
+            ],
         ]
 
         fuel_window = sg.Window("Fuel Tracker", fuel_layout, modal=True)
@@ -904,9 +925,11 @@ while True:
             if f_event == "fuel_price" or f_event == "fuel_gallons":
                 if f_values["fuel_gallons"] and f_values["fuel_price"]:
                     try:
+                        hours = float(f_values["fuel_hours"])
                         gallons = float(f_values["fuel_gallons"])
                         price = float(f_values["fuel_price"])
                         total = round(gallons * price, 2)
+                        gal_per_hour = round(gallons / hours, 2)
                         fuel_window["fuel_total"].update(total)
                     except:
                         sg.popup("Enter valid gallons and price.")
@@ -917,10 +940,11 @@ while True:
                     gallons = float(f_values["fuel_gallons"])
                     price = float(f_values["fuel_price"])
                     total = round(gallons * price, 2)
+                    gal_per_hour = round(gallons / hours, 2)
 
                     cursor.execute(
-                        "INSERT INTO fuel_tracker (hours, gallons, price_per_gallon, total_cost) VALUES (?, ?, ?, ?)",
-                        (hours, gallons, price, total),
+                        "INSERT INTO fuel_tracker (hours, gallons, price_per_gallon, total_cost, gal_per_hour) VALUES (?, ?, ?, ?)",
+                        (hours, gallons, price, total, gal_per_hour),
                     )
                     conn.commit()
 
@@ -930,20 +954,25 @@ while True:
                     fuel_window["fuel_gallons"].update("")
                     fuel_window["fuel_price"].update("")
                     fuel_window["fuel_total"].update("")
+                    fuel_window["gal_per_hour"].update("")
                     cursor.execute(
-                        "SELECT hours, gallons, price_per_gallon, total_cost FROM fuel_tracker ORDER BY id DESC"
+                        "SELECT hours, gallons, price_per_gallon, total_cost, gal_per_hour FROM fuel_tracker ORDER BY id DESC"
                     )
                     fuel_rows = cursor.fetchall()
                     fuel_window["fuel_table"].update(values=fuel_rows)
 
                     total_gallons = sum(r[1] for r in fuel_rows) if fuel_rows else 0
                     total_spent = sum(r[3] for r in fuel_rows) if fuel_rows else 0
+                    gal_per_hour_avg = mean(r[4] for r in fuel_rows) if fuel_rows else 0
 
                     fuel_window["fuel_total_gallons"].update(
                         f"Total Fuel Used: {round(total_gallons, 2)} gal"
                     )
                     fuel_window["fuel_total_spent"].update(
                         f"Total Money Spent: ${round(total_spent, 2)}"
+                    )
+                    fuel_window["gal_per_hour_avg"].update(
+                        f"Average Fuel Consumption: ${round(gal_per_hour_avg, 2)}"
                     )
                 except Exception as e:
                     sg.popup(f"Error saving fuel entry: {e}")
@@ -956,13 +985,14 @@ while True:
                         continue
 
                     row_index = selected[0]
-                    hours, gallons, price, total = fuel_rows[row_index]
+                    hours, gallons, price, total, gal_per_hour = fuel_rows[row_index]
 
                     # Populate fields with selected row values
                     fuel_window["fuel_hours"].update(hours)
                     fuel_window["fuel_gallons"].update(gallons)
                     fuel_window["fuel_price"].update(price)
                     fuel_window["fuel_total"].update(total)
+                    fuel_window["gal_per_hour"].update(gal_per_hour)
 
                     # Store index being edited
                     editing_index = row_index
@@ -978,15 +1008,15 @@ while True:
                         continue
 
                     row_index = selected[0]
-                    hours, gallons, price, total = fuel_rows[row_index]
+                    hours, gallons, price, total, gal_per_hour = fuel_rows[row_index]
 
                     confirm = sg.popup_yes_no("Delete this fuel entry?")
                     if confirm != "Yes":
                         continue
 
                     cursor.execute(
-                        "DELETE FROM fuel_tracker WHERE hours=? AND gallons=? AND price_per_gallon=? AND total_cost=?",
-                        (hours, gallons, price, total),
+                        "DELETE FROM fuel_tracker WHERE hours=? AND gallons=? AND price_per_gallon=? AND total_cost=? AND gal_per_hour=?",
+                        (hours, gallons, price, total, gal_per_hour),
                     )
                     conn.commit()
 
@@ -999,12 +1029,16 @@ while True:
 
                     total_gallons = sum(r[1] for r in fuel_rows) if fuel_rows else 0
                     total_spent = sum(r[3] for r in fuel_rows) if fuel_rows else 0
+                    gal_per_hour_avg = mean(r[4] for r in fuel_rows) if fuel_rows else 0
 
                     fuel_window["fuel_total_gallons"].update(
                         f"Total Fuel Used: {round(total_gallons, 2)} gal"
                     )
                     fuel_window["fuel_total_spent"].update(
                         f"Total Money Spent: ${round(total_spent, 2)}"
+                    )
+                    fuel_window["gal_per_hour_avg"].update(
+                        f"Average Fuel Consumption: ${round(gal_per_hour_avg, 2)}"
                     )
 
                 except Exception as e:
