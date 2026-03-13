@@ -528,6 +528,20 @@ cursor.execute(
 )
 conn.commit()
 
+# --- Create fuel_tracker table ---
+cursor.execute(
+    """
+    CREATE TABLE IF NOT EXISTS fuel_tracker (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        hours REAL,
+        gallons REAL,
+        price_per_gallon REAL,
+        total_cost REAL
+    )
+    """
+)
+conn.commit()
+
 
 main_layout = [
     [
@@ -625,6 +639,7 @@ main_layout = [
     [
         sg.Button("Add Flight Log", key="flight_log_button"),
         sg.Button("Generate Logbook Entry", key="generate_logbook_entry"),
+        sg.Button("Fuel Tracker", key="fuel_tracker_button"),
     ],
     [sg.HorizontalSeparator()],
     [
@@ -813,6 +828,180 @@ while True:
     event, values = window.read()
     if event in (sg.WINDOW_CLOSED, "Exit"):
         break
+
+    if event == "fuel_tracker_button":
+        # Load existing fuel entries
+        cursor.execute(
+            "SELECT hours, gallons, price_per_gallon, total_cost FROM fuel_tracker ORDER BY id DESC"
+        )
+        fuel_rows = cursor.fetchall()
+
+        total_gallons = sum(r[1] for r in fuel_rows) if fuel_rows else 0
+        total_spent = sum(r[3] for r in fuel_rows) if fuel_rows else 0
+
+        fuel_layout = [
+            [
+                sg.Text("Hours"),
+                sg.Input(key="fuel_hours", size=(10, 1), enable_events=True),
+                sg.Text("Fuel Fill Up (Gallons)"),
+                sg.Input(key="fuel_gallons", size=(10, 1), enable_events=True),
+                sg.Text("Price Per Gallon"),
+                sg.Input(key="fuel_price", size=(10, 1), enable_events=True),
+                sg.VerticalSeparator(),
+                sg.Text("Total Cost"),
+                sg.Text(key="fuel_total", size=(10, 1), background_color="lightgray"),
+            ],
+            [
+                sg.Button("Save"),
+                sg.Button("Edit Selected"),
+                sg.Button("Delete Selected"),
+                sg.Button("Cancel"),
+            ],
+            [sg.HorizontalSeparator()],
+            [sg.Text("Fuel Entries", font=("Arial", 12))],
+            [
+                sg.Table(
+                    values=fuel_rows,
+                    headings=["Hours", "Gallons", "Price/Gal", "Total Cost"],
+                    key="fuel_table",
+                    auto_size_columns=False,
+                    col_widths=[10, 10, 10, 10],
+                    justification="left",
+                    num_rows=8,
+                    expand_x=True,
+                )
+            ],
+            [
+                sg.Text(
+                    f"Total Fuel Used: {round(total_gallons, 2)} gal",
+                    key="fuel_total_gallons",
+                )
+            ],
+            [
+                sg.Text(
+                    f"Total Money Spent: ${round(total_spent, 2)}",
+                    key="fuel_total_spent",
+                )
+            ],
+        ]
+
+        fuel_window = sg.Window("Fuel Tracker", fuel_layout, modal=True)
+
+        while True:
+            f_event, f_values = fuel_window.read()
+
+            if f_event in (sg.WINDOW_CLOSED, "Cancel"):
+                fuel_window.close()
+                break
+
+            if f_event == "fuel_price" or f_event == "fuel_gallons":
+                if f_values["fuel_gallons"] and f_values["fuel_price"]:
+                    try:
+                        gallons = float(f_values["fuel_gallons"])
+                        price = float(f_values["fuel_price"])
+                        total = round(gallons * price, 2)
+                        fuel_window["fuel_total"].update(total)
+                    except:
+                        sg.popup("Enter valid gallons and price.")
+
+            if f_event == "Save":
+                try:
+                    hours = float(f_values["fuel_hours"])
+                    gallons = float(f_values["fuel_gallons"])
+                    price = float(f_values["fuel_price"])
+                    total = round(gallons * price, 2)
+
+                    cursor.execute(
+                        "INSERT INTO fuel_tracker (hours, gallons, price_per_gallon, total_cost) VALUES (?, ?, ?, ?)",
+                        (hours, gallons, price, total),
+                    )
+                    conn.commit()
+
+                    sg.popup("Fuel entry saved.")
+                    # Refresh the table and totals after saving
+                    fuel_window["fuel_hours"].update("")
+                    fuel_window["fuel_gallons"].update("")
+                    fuel_window["fuel_price"].update("")
+                    fuel_window["fuel_total"].update("")
+                    cursor.execute(
+                        "SELECT hours, gallons, price_per_gallon, total_cost FROM fuel_tracker ORDER BY id DESC"
+                    )
+                    fuel_rows = cursor.fetchall()
+                    fuel_window["fuel_table"].update(values=fuel_rows)
+
+                    total_gallons = sum(r[1] for r in fuel_rows) if fuel_rows else 0
+                    total_spent = sum(r[3] for r in fuel_rows) if fuel_rows else 0
+
+                    fuel_window["fuel_total_gallons"].update(
+                        f"Total Fuel Used: {round(total_gallons, 2)} gal"
+                    )
+                    fuel_window["fuel_total_spent"].update(
+                        f"Total Money Spent: ${round(total_spent, 2)}"
+                    )
+                except Exception as e:
+                    sg.popup(f"Error saving fuel entry: {e}")
+
+            if f_event == "Edit Selected":
+                try:
+                    selected = f_values["fuel_table"]
+                    if not selected:
+                        sg.popup("Select a row to edit.")
+                        continue
+
+                    row_index = selected[0]
+                    hours, gallons, price, total = fuel_rows[row_index]
+
+                    # Populate fields with selected row values
+                    fuel_window["fuel_hours"].update(hours)
+                    fuel_window["fuel_gallons"].update(gallons)
+                    fuel_window["fuel_price"].update(price)
+                    fuel_window["fuel_total"].update(total)
+
+                    # Store index being edited
+                    editing_index = row_index
+
+                except Exception as e:
+                    sg.popup(f"Error selecting row: {e}")
+
+            if f_event == "Delete Selected":
+                try:
+                    selected = f_values["fuel_table"]
+                    if not selected:
+                        sg.popup("Select a row to delete.")
+                        continue
+
+                    row_index = selected[0]
+                    hours, gallons, price, total = fuel_rows[row_index]
+
+                    confirm = sg.popup_yes_no("Delete this fuel entry?")
+                    if confirm != "Yes":
+                        continue
+
+                    cursor.execute(
+                        "DELETE FROM fuel_tracker WHERE hours=? AND gallons=? AND price_per_gallon=? AND total_cost=?",
+                        (hours, gallons, price, total),
+                    )
+                    conn.commit()
+
+                    # Refresh table
+                    cursor.execute(
+                        "SELECT hours, gallons, price_per_gallon, total_cost FROM fuel_tracker ORDER BY id DESC"
+                    )
+                    fuel_rows = cursor.fetchall()
+                    fuel_window["fuel_table"].update(values=fuel_rows)
+
+                    total_gallons = sum(r[1] for r in fuel_rows) if fuel_rows else 0
+                    total_spent = sum(r[3] for r in fuel_rows) if fuel_rows else 0
+
+                    fuel_window["fuel_total_gallons"].update(
+                        f"Total Fuel Used: {round(total_gallons, 2)} gal"
+                    )
+                    fuel_window["fuel_total_spent"].update(
+                        f"Total Money Spent: ${round(total_spent, 2)}"
+                    )
+
+                except Exception as e:
+                    sg.popup(f"Error deleting entry: {e}")
 
     if event == "generate_logbook_entry":
         generate_logbook_warning(window)
