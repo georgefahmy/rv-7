@@ -1258,6 +1258,8 @@ while True:
                     conn.commit()
                     recalculate_flight_deltas()
                     refresh_flight_log_table(window)
+                    update_due_dates(window)
+                    update_total_airframe_hours(window)
                 except Exception as e:
                     sg.popup(f"Error saving flight log: {e}")
 
@@ -1294,7 +1296,10 @@ while True:
             )
             conn.commit()
             recalculate_flight_deltas()
-            refresh_flight_log_table(window)
+            refresh_table(window)
+            update_due_dates(window)
+            update_total_airframe_hours(window)
+            update_database_due_dates(window)
     if event == "Edit Flight Selected":
         selected = values["flight_log_table"]
         if selected:
@@ -1345,8 +1350,10 @@ while True:
                     )
                     conn.commit()
                     recalculate_flight_deltas()
-                    refresh_flight_log_table(window)
+                    refresh_table(window)
+                    update_due_dates(window)
                     update_total_airframe_hours(window)
+                    update_database_due_dates(window)
                     edit_window.close()
                     break
     if event == "Edit Selected":
