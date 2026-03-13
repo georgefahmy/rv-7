@@ -545,7 +545,9 @@ conn.commit()
 
 main_layout = [
     [
-        sg.Text("N890GF Maintenance Tracker", font=("Arial", 24), expand_x=True),
+        sg.Text(
+            "N890GF Maintenance and Flight Tracker", font=("Arial", 24), expand_x=True
+        ),
         sg.Column(
             element_justification="right",
             layout=[
@@ -557,6 +559,10 @@ main_layout = [
                         justification="right",
                         expand_x=True,
                     ),
+                ],
+                [
+                    sg.Button("Fuel Tracker", key="fuel_tracker_button"),
+                    sg.Button("SW DB Updates", key="sw_db_updates"),
                 ],
             ],
         ),
@@ -639,7 +645,6 @@ main_layout = [
     [
         sg.Button("Add Flight Log", key="flight_log_button"),
         sg.Button("Generate Logbook Entry", key="generate_logbook_entry"),
-        sg.Button("Fuel Tracker", key="fuel_tracker_button"),
     ],
     [sg.HorizontalSeparator()],
     [
@@ -828,6 +833,8 @@ while True:
     event, values = window.read()
     if event in (sg.WINDOW_CLOSED, "Exit"):
         break
+    if event == "sw_db_updates":
+        exec(open("scripts/sw_db_updates.py", "r").read())
 
     if event == "fuel_tracker_button":
         # Load existing fuel entries
@@ -1130,7 +1137,6 @@ while True:
                     entry_window["category_input"].update("")
                     entry_window.close()
                     break
-
     if event == "flight_log_button":
         flight_layout = [
             [
@@ -1214,7 +1220,6 @@ while True:
 
                 flight_window.close()
                 break
-
     if event == "Delete Selected":
         selected = values["maintenance_table"]
         if selected:
@@ -1230,7 +1235,6 @@ while True:
             update_due_dates(window)
             update_total_airframe_hours(window)
             update_database_due_dates(window)
-
     if event == "Delete Flight Selected":
         selected = values["flight_log_table"]
         if selected:
@@ -1248,7 +1252,6 @@ while True:
             conn.commit()
             recalculate_flight_deltas()
             refresh_flight_log_table(window)
-
     if event == "Edit Flight Selected":
         selected = values["flight_log_table"]
         if selected:
