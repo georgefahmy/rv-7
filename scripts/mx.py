@@ -10,6 +10,7 @@ sg.set_options(font=("Arial", 14))
 OIL_CHANGE_INTERVAL_HOURS = 50
 CONDITION_INSPECTION_INTERVAL_MONTHS = 12
 ELT_TEST_INTERVAL_DAYS = 90
+TRANSPONDER_CHECK_MONTHS = 24
 
 # --- FAA Aviation/Obstacle DB Intervals ---
 OAS_AVIATION_DB_INTERVAL_DAYS = 28  # example 28-day FAA cycle
@@ -30,6 +31,7 @@ RECURRENT_ITEMS = [
     "ELT Registration",
     "Nav Data Update",
     "Batteries",
+    "Transponder Check",
 ]
 
 MX_CATEGORIES = ["Airframe", "Engine", "Propeller", "Avionics"]
@@ -169,7 +171,9 @@ def refresh_flight_log_table(window):
 
 
 def refresh_table(window):
-    cursor.execute("SELECT * FROM maintenance_entries ORDER BY date DESC")
+    cursor.execute(
+        "SELECT * FROM maintenance_entries ORDER BY airframe_time DESC, id DESC, date DESC"
+    )
     rows = cursor.fetchall()
     window["maintenance_table"].update(values=rows)
 
@@ -217,6 +221,11 @@ def calculate_overdue():
             if today - last_dt > timedelta(days=OAS_AVIATION_DB_INTERVAL_DAYS):
                 overdue_count += 1
 
+        elif item == "Transponder Check":
+            # Use aviation/obstacle DB intervals to determine overdue
+            if today - last_dt > timedelta(days=365 * 2):
+                overdue_count += 1
+
     return overdue_count
 
 
@@ -261,6 +270,45 @@ def update_due_dates(window):
     else:
         cond_due = "--"
         cond_color = DEFAULT_COLOR
+
+    # --- Find latest Transponder Check entry ---
+    cursor.execute(
+        """
+        SELECT date
+        FROM maintenance_entries
+        WHERE recurrent_item=?
+        ORDER BY date DESC
+        LIMIT 1
+        """,
+        ("Transponder Check",),
+    )
+    ci_result = cursor.fetchone()
+    if ci_result and ci_result[0]:
+        last_date = ci_result[0]
+        try:
+            from calendar import monthrange
+
+            last_dt = datetime.strptime(last_date, "%m/%d/%Y").date()
+            preliminary_due = last_dt + timedelta(days=365 * 2)
+
+            # Set due date to last day of that month
+            last_day = monthrange(preliminary_due.year, preliminary_due.month)[1]
+            due_date = preliminary_due.replace(day=last_day)
+
+            days_remaining = (due_date - today).days
+            xpndr_due = f"{due_date.strftime('%Y-%m-%d')} ({days_remaining} days)"
+            if days_remaining < 0:
+                xpndr_color = OVERDUE_COLOR
+            elif days_remaining <= 30:
+                xpndr_color = WARNING_COLOR
+            else:
+                xpndr_color = DEFAULT_COLOR
+        except:
+            xpndr_due = "--"
+            xpndr_color = DEFAULT_COLOR
+    else:
+        xpndr_due = "--"
+        xpndr_color = DEFAULT_COLOR
 
     # --- Find latest Oil Change entry ---
     cursor.execute(
@@ -395,6 +443,7 @@ def update_due_dates(window):
     elt_color = elt_test_color
 
     window["cond_due_text"].update(cond_due, text_color=cond_color)
+    window["xpndr_due_text"].update(xpndr_due, text_color=xpndr_color)
     window["oil_due_text"].update(oil_due, text_color=oil_color)
     window["elt_due_text"].update(elt_due, text_color=elt_color)
 
@@ -434,7 +483,7 @@ cursor.execute(
     """
     CREATE TABLE IF NOT EXISTS maintenance_entries (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        date TEXT NOT NULL,
+        date DATE NOT NULL,
         tach_time REAL,
         airframe_time REAL,
         notes TEXT,
@@ -465,7 +514,7 @@ cursor.execute(
     """
     CREATE TABLE IF NOT EXISTS flight_log (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        date TEXT NOT NULL,
+        date DATE NOT NULL,
         takeoff_airport TEXT,
         landing_airport TEXT,
         hobbs REAL,
@@ -513,7 +562,8 @@ main_layout = [
                     sg.Frame(
                         title="Condition Insp Due",
                         layout=[
-                            [sg.Text("--", font=("Arial", 14), key="cond_due_text")]
+                            [sg.Text("--", font=("Arial", 14), key="cond_due_text")],
+                            [sg.Text("--", font=("Arial", 14), key="xpndr_due_text")],
                         ],
                         size=(180, 100),
                         expand_x=True,
