@@ -100,10 +100,10 @@ def section_bounds(x):
 # ---------------------------
 
 
-def calculate_fuel(height_at_filler):
+def calculate_fuel(height_at_filler, angle=TILT_DEG, pitch_angle=CHORD_TILT_DEG):
 
-    tilt = math.radians(TILT_DEG)
-    tilt_chord = math.radians(CHORD_TILT_DEG)
+    tilt = math.radians(angle)
+    tilt_chord = math.radians(pitch_angle)
 
     NX = 200
     NY = 200
@@ -179,9 +179,9 @@ def calculate_fuel(height_at_filler):
     top_inboard, bottom_inboard = section_bounds(x_full_inboard)
 
     # compute vertical drop from filler to inboard edge due to tilt
-    delta_h = math.tan(math.radians(TILT_DEG)) * (
+    delta_h = math.tan(math.radians(angle)) * (
         (SPAN - FILLER_OFFSET) - inboard_y
-    ) + math.tan(math.radians(CHORD_TILT_DEG)) * ((TANK_CHORD - FILLER_X_OFFSET) - 0)
+    ) + math.tan(math.radians(pitch_angle)) * ((TANK_CHORD - FILLER_X_OFFSET) - 0)
 
     # fuel height at inboard edge = filler height plus vertical rise at inboard
     fuel_height_inboard = height_at_filler + delta_h
@@ -220,12 +220,12 @@ def calculate_full_volume():
 # ---------------------------
 
 
-def filler_height_from_inboard(inboard_height):
+def filler_height_from_inboard(inboard_height, angle=TILT_DEG):
     """
     Calculate the fuel height at the filler hole given the inboard-most fuel height.
     """
     # tank parameters
-    tilt = math.radians(TILT_DEG)
+    tilt = math.radians(angle)
     inboard_y = 0.0  # inboard-most position
     filler_y = SPAN - FILLER_OFFSET  # outboard filler position
 
@@ -243,7 +243,7 @@ def filler_height_from_inboard(inboard_height):
     return height_filler
 
 
-def plot_airfoil_with_tank(height_at_filler):
+def plot_airfoil_with_tank(height_at_filler, pitch_angle=CHORD_TILT_DEG):
     """
     Plot the full airfoil cross-section and highlight the portion used as the fuel tank.
     The tank region is from the leading edge to TANK_CHORD.
@@ -283,7 +283,7 @@ def plot_airfoil_with_tank(height_at_filler):
     fuel_bottom_surface = np.array(fuel_bottom_surface)
 
     # negative sign so positive CHORD_TILT_DEG produces a nose-up rotation
-    theta = -math.radians(CHORD_TILT_DEG)
+    theta = -math.radians(pitch_angle)
 
     x_top_rot = x_coords * np.cos(theta) - top_surface * np.sin(theta)
     y_top_rot = x_coords * np.sin(theta) + top_surface * np.cos(theta)
@@ -385,7 +385,13 @@ def plot_airfoil_with_tank(height_at_filler):
 
 
 def plot_3d_wing(
-    airfoil_func, span=SPAN, chord=TANK_CHORD, num_chord_points=100, num_span_points=50
+    airfoil_func,
+    span=SPAN,
+    chord=TANK_CHORD,
+    num_chord_points=100,
+    num_span_points=50,
+    angle=TILT_DEG,
+    pitch_angle=CHORD_TILT_DEG,
 ):
     """
     Plots a 3D wing using a specified airfoil function.
@@ -417,8 +423,8 @@ def plot_3d_wing(
     ax = fig.add_subplot(111, projection="3d")
 
     # Apply both chordwise tilt and spanwise tilt to the wing surfaces
-    tilt_span = math.radians(TILT_DEG)
-    theta_chord = -math.radians(CHORD_TILT_DEG)  # negative for nose-up rotation
+    tilt_span = math.radians(angle)
+    theta_chord = -math.radians(pitch_angle)  # negative for nose-up rotation
 
     # filler_y for reference (spanwise position of filler)
     filler_y = SPAN - FILLER_OFFSET
@@ -502,7 +508,7 @@ def plot_3d_wing(
     top_filler, bottom_filler = airfoil_func(xf_filler)
 
     # rotate bottom under filler for chord tilt only (ignore span tilt for fuel surface)
-    theta_chord = -math.radians(CHORD_TILT_DEG)  # nose-up
+    theta_chord = -math.radians(pitch_angle)  # nose-up
     bottom_filler_rot = filler_x * np.sin(theta_chord) + bottom_filler * np.cos(
         theta_chord
     )
@@ -549,10 +555,10 @@ def plot_3d_wing(
     top_at_filler = Z_top[0, idx_filler]
 
     # chord tilt rotation
-    theta_chord = -math.radians(CHORD_TILT_DEG)  # nose-up
+    theta_chord = -math.radians(pitch_angle)  # nose-up
 
     # span tilt in radians
-    tilt_span = math.radians(TILT_DEG)
+    tilt_span = math.radians(angle)
 
     # chordwise rotated Z
     z_chord_rot = X[0, idx_filler] * np.sin(theta_chord) + top_at_filler * np.cos(
@@ -586,29 +592,37 @@ if __name__ == "__main__":
 
     import sys
 
-    if len(sys.argv) > 1:
-        try:
-            height = float(sys.argv[1])
-        except ValueError:
-            print("Invalid height argument, must be a number.")
-            sys.exit(1)
+    if len(sys.argv) > 2:
+
+        height = float(sys.argv[1])
+        angle = float(sys.argv[2])
+        pitch_angle = float(sys.argv[3])
+    elif len(sys.argv) > 1:
+        height = float(sys.argv[1])
+        angle = TILT_DEG
+        pitch_angle = CHORD_TILT_DEG
+
     else:
-        print("Usage: python fuel_estimate.py <fuel_height_in_inches>")
+        print(
+            "Usage: python fuel_estimate.py <fuel_height_in_inches> <tilt_angle_in_deg>"
+        )
         sys.exit(1)
 
     if DEBUG:
         print("DEBUG: input height:", height)
 
-    gallons, inboard_height = calculate_fuel(height)
+    gallons, inboard_height = calculate_fuel(height, angle, pitch_angle)
 
     print(f"\nEstimated Fuel: {gallons:.2f} gallons")
     print(f"Estimated inboard-most fuel height: {inboard_height:.2f} inches")
-    plot2d = plot_airfoil_with_tank(height)
+    plot2d = plot_airfoil_with_tank(height, pitch_angle=pitch_angle)
     plot3d = plot_3d_wing(
         section_bounds,
         span=SPAN,
         chord=FULL_CHORD,
         num_chord_points=100,
         num_span_points=50,
+        angle=angle,
+        pitch_angle=pitch_angle,
     )
     plt.show()
