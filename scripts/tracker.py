@@ -21,7 +21,7 @@ OAS_OBSTACLE_DB_INTERVAL_DAYS = 56
 # --- Colors ---
 DEFAULT_COLOR = "black"
 OVERDUE_COLOR = "red"
-WARNING_COLOR = "yellow"
+WARNING_COLOR = "orange"
 CURRENT_COLOR = "green"
 
 RECURRENT_ITEMS = [

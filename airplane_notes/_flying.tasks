@@ -7,20 +7,20 @@ backlog:
     ☐ combine flight tests 6, 7, 8, 9 into next flight
 
 flight tests:
-    ☐ 6. wings level stalls
-    ☐ 7. angle of attack
     ☐ 8. Vx and Vy calcs
     ☐ 9. best glide speed
     ☐ 12. static longitudinal stability
     ☐ 13. static directional stability
     ☐ 14. static lateral and spiral stability
     ☐ 15. dynamic longitudanl stability
-    ☐ 16. accelerated stalls
+    ☐ 16. accelerated stalls (may not do)
     ☐ 19. range and endurance
-    ☐ 20. takeoff performance
-    ☐ 21. landing performance
 
 Archive:
+    ✔ 20. takeoff performance @done(26-03-15) @project(flight tests)
+    ✔ 21. landing performance @done(26-03-15) @project(flight tests)
+    ✔ 6. wings level stalls @done(26-03-15) @project(flight tests)
+    ✔ 7. angle of attack @done(26-03-15) @project(flight tests)
     ✔ 1. first flight @done(26-03-12) @project(flight tests)
     ✔ 2. flap operation @done(26-03-12) @project(flight tests)
     ✔ 3. gear operation N/A @done(26-03-12) @project(flight tests)

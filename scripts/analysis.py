@@ -104,6 +104,29 @@ def process_flights(df):
                 df.loc[group.index, "Fuel Flow Integral"] = integral
             else:
                 df.loc[group.index, "Fuel Flow Integral"] = 0.0
+    if "Ground Speed (knots)" in df.columns:
+        df["Ground Speed (knots)"] = pd.to_numeric(
+            df["Ground Speed (knots)"], errors="coerce"
+        ).fillna(0)
+
+        # Compute integral (gallons) per flight using trapezoidal rule over Session Time
+        df["Distance Traveled"] = 0.0
+
+        for fid, group in df.groupby("_orig_flight_num"):
+            times = group["Session Time"].values
+            ground_speed = group["Ground Speed (knots)"].values
+
+            if len(times) > 1:
+                # Convert knots to miles then to feet per second before integrating
+                speed_fps = ground_speed * 1.15 * 5280 / 3600
+                integral = [0.0]
+                for i in range(1, len(times)):
+                    dt = times[i] - times[i - 1]
+                    area = 0.5 * (speed_fps[i] + speed_fps[i - 1]) * dt
+                    integral.append(integral[-1] + area)
+                df.loc[group.index, "Distance Traveled"] = integral
+            else:
+                df.loc[group.index, "Distance Traveled"] = 0.0
 
     # 2. Determine if Engine was Run for each flight
     # Calculate max RPM for each flight
