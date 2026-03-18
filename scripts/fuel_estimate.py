@@ -419,7 +419,7 @@ def plot_3d_wing(
             Z_top[i, j] = top
             Z_bottom[i, j] = bottom
 
-    fig = plt.figure()
+    fig = plt.figure(figsize=(10, 8,))
     ax = fig.add_subplot(111, projection="3d")
 
     # Apply both chordwise tilt and spanwise tilt to the wing surfaces
@@ -615,7 +615,7 @@ if __name__ == "__main__":
 
     print(f"\nEstimated Fuel: {gallons:.2f} gallons")
     print(f"Estimated inboard-most fuel height: {inboard_height:.2f} inches")
-    plot2d = plot_airfoil_with_tank(height, pitch_angle=pitch_angle)
+    # plot2d = plot_airfoil_with_tank(height, pitch_angle=pitch_angle)
     plot3d = plot_3d_wing(
         section_bounds,
         span=SPAN,
