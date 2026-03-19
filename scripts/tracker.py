@@ -852,7 +852,7 @@ while True:
         total_gallons = sum(r[1] for r in fuel_rows) if fuel_rows else 0
         total_spent = sum(r[3] for r in fuel_rows) if fuel_rows else 0
         gal_per_hour_avg = mean(list(r[4] for r in fuel_rows) if fuel_rows else 0)
-
+        dollar_per_hour_avg = total_spent / total_gallons * gal_per_hour_avg
         fuel_layout = [
             [
                 sg.Text("Hours"),
@@ -911,6 +911,12 @@ while True:
                     key="gal_per_hour_avg",
                 )
             ],
+            [
+                sg.Text(
+                    f"Average Cost Per Hour: ${round(dollar_per_hour_avg, 2)}/hr",
+                    key="dollar_per_hour_avg",
+                )
+            ],
         ]
 
         fuel_window = sg.Window("Fuel Tracker", fuel_layout, modal=True)
@@ -960,6 +966,7 @@ while True:
                     fuel_window["fuel_price"].update("")
                     fuel_window["fuel_total"].update("")
                     fuel_window["gal_per_hour"].update("")
+                    fuel_window["dollar_per_hour"].update("")
                     cursor.execute(
                         "SELECT hours, gallons, price_per_gallon, total_cost, gal_per_hour FROM fuel_tracker ORDER BY id DESC"
                     )
@@ -971,6 +978,7 @@ while True:
                     gal_per_hour_avg = mean(
                         list(r[4] for r in fuel_rows) if fuel_rows else 0
                     )
+                    dollar_per_hour_avg = total_spent / total_gallons * gal_per_hour_avg
 
                     fuel_window["fuel_total_gallons"].update(
                         f"Total Fuel Used: {round(total_gallons, 2)} gal"
@@ -980,6 +988,9 @@ while True:
                     )
                     fuel_window["gal_per_hour_avg"].update(
                         f"Average Fuel Consumption: {round(gal_per_hour_avg, 2)} gal/hr"
+                    )
+                    fuel_window["dollar_per_hour_avg"].update(
+                        f"Average Cost Per Hour: ${round(dollar_per_hour_avg, 2)}/hr"
                     )
                 except Exception as e:
                     sg.popup(f"Error saving fuel entry: {e}")
@@ -1039,6 +1050,7 @@ while True:
                     gal_per_hour_avg = mean(
                         list(r[4] for r in fuel_rows) if fuel_rows else 0
                     )
+                    dollar_per_hour_avg = total_spent / total_gallons * gal_per_hour_avg
 
                     fuel_window["fuel_total_gallons"].update(
                         f"Total Fuel Used: {round(total_gallons, 2)} gal"
@@ -1048,6 +1060,9 @@ while True:
                     )
                     fuel_window["gal_per_hour_avg"].update(
                         f"Average Fuel Consumption: {round(gal_per_hour_avg, 2)} gal/hr"
+                    )
+                    fuel_window["dollar_per_hour_avg"].update(
+                        f"Average Cost Per Hour: ${round(dollar_per_hour_avg, 2)}/hr"
                     )
 
                 except Exception as e:
