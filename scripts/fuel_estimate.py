@@ -419,7 +419,7 @@ def plot_3d_wing(
             Z_top[i, j] = top
             Z_bottom[i, j] = bottom
 
-    fig = plt.figure(figsize=(10, 8,))
+    fig = plt.figure(figsize=(10, 8))
     ax = fig.add_subplot(111, projection="3d")
 
     # Apply both chordwise tilt and spanwise tilt to the wing surfaces
@@ -592,11 +592,15 @@ if __name__ == "__main__":
 
     import sys
 
-    if len(sys.argv) > 2:
-
+    if len(sys.argv) > 3:
         height = float(sys.argv[1])
         angle = float(sys.argv[2])
         pitch_angle = float(sys.argv[3])
+    elif len(sys.argv) > 2:
+        height = float(sys.argv[1])
+        angle = float(sys.argv[2])
+        pitch_angle = CHORD_TILT_DEG
+
     elif len(sys.argv) > 1:
         height = float(sys.argv[1])
         angle = TILT_DEG
