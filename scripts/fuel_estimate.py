@@ -13,7 +13,7 @@ SPAN = 50.0  # tank span (inches)
 FULL_CHORD = 58  # full wing chord (inches)
 T_RATIO = 0.135  # NACA 23013.5 thickness ratio
 MAX_THICK = 7.5  # max thickness (inches)
-TILT_DEG = 3.5  # fixed dihedral angle of the tank
+TILT_DEG = 3.3  # fixed dihedral angle of the tank
 CHORD_TILT_DEG = 11  # tilt along the chord for tail-low attitude
 DEBUG = False  # set True to print solver diagnostics
 
@@ -386,6 +386,8 @@ def plot_airfoil_with_tank(height_at_filler, pitch_angle=CHORD_TILT_DEG):
 
 def plot_3d_wing(
     airfoil_func,
+    height1=0,
+    height2=0,
     span=SPAN,
     chord=TANK_CHORD,
     num_chord_points=100,
@@ -419,8 +421,9 @@ def plot_3d_wing(
             Z_top[i, j] = top
             Z_bottom[i, j] = bottom
 
-    fig = plt.figure(figsize=(10, 8))
-    ax = fig.add_subplot(111, projection="3d")
+    fig = plt.figure(figsize=(14, 8))
+    ax = fig.add_subplot(121, projection="3d")
+    ax2 = fig.add_subplot(122, projection="3d")
 
     # Apply both chordwise tilt and spanwise tilt to the wing surfaces
     tilt_span = math.radians(angle)
@@ -437,6 +440,7 @@ def plot_3d_wing(
     X_rot_bot = X * np.cos(theta_chord) - Z_bottom * np.sin(theta_chord)
     Z_chord_rot_bot = X * np.sin(theta_chord) + Z_bottom * np.cos(theta_chord)
     Z_bottom_rot = Z_chord_rot_bot + np.tan(tilt_span) * (Y - filler_y)
+    Z_bottom_rot2 = Z_chord_rot_bot + np.tan(tilt_span) * (Y - filler_y)
 
     # spar surface along the span at TANK_CHORD
     # create 2D arrays for the spar surface
@@ -480,14 +484,20 @@ def plot_3d_wing(
     mid_x = (X_rot.max() + X_rot.min()) * 0.5
     mid_y = (Y.max() + Y.min()) * 0.5
     mid_z = (Z_top_rot.max() + Z_bottom_rot.min()) * 0.5
+    mid_z2 = (Z_top_rot.max() + Z_bottom_rot2.min()) * 0.5
 
     ax.set_xlim(mid_x - max_range, mid_x + max_range)
+    ax2.set_xlim(mid_x - max_range, mid_x + max_range)
     ax.set_ylim(mid_y - max_range, mid_y + max_range)
+    ax2.set_ylim(mid_y - max_range, mid_y + max_range)
     ax.set_zlim(mid_z - max_range, mid_z + max_range)
+    ax2.set_zlim(mid_z2 - max_range, mid_z2 + max_range)
 
     # plot wing surfaces
     ax.plot_surface(X_rot, Y, Z_top_rot, color="gray", alpha=0.3)
+    ax2.plot_surface(X_rot, Y, Z_top_rot, color="gray", alpha=0.3)
     ax.plot_surface(X_rot_bot, Y, Z_bottom_rot, color="lightgray", alpha=0.7)
+    ax2.plot_surface(X_rot_bot, Y, Z_bottom_rot2, color="lightgray", alpha=0.7)
 
     # # plot as two surfaces (top and bottom) with alpha=1
     # ax.plot_surface(X_spar_rot_2d, Y_spar_2d, Z_spar_rot_top, color="blue", alpha=1)
@@ -513,13 +523,8 @@ def plot_3d_wing(
         theta_chord
     )
 
-    # compute flat fuel surface height
-    try:
-        height = globals()["height"]
-    except KeyError:
-        height = 0
-
-    fuel_surface_height = bottom_filler_rot + height
+    fuel_surface_height = bottom_filler_rot + height1
+    fuel_surface_height2 = bottom_filler_rot + height2
 
     # assign fuel top surface only forward of spar
     Z_fuel_top = np.where(
@@ -527,23 +532,34 @@ def plot_3d_wing(
         np.minimum(fuel_surface_height, Z_top_rot),  # can't exceed wing top
         Z_top_rot,
     )
+    Z_fuel_top2 = np.where(
+        X <= TANK_CHORD,
+        np.minimum(fuel_surface_height2, Z_top_rot),  # can't exceed wing top
+        Z_top_rot,
+    )
 
     # ensure fuel surface is never below the wing bottom
     Z_fuel_top = np.maximum(Z_fuel_top, Z_bottom_rot)
+    Z_fuel_top2 = np.maximum(Z_fuel_top2, Z_bottom_rot2)
     # Z_fuel_bottom = Z_bottom_rot.copy()
 
     # Only plot fuel top surface (parallel to gravity) and side surfaces
     Z_fuel_top_clamped = np.minimum(Z_fuel_top, Z_top_rot)
+    Z_fuel_top_clamped2 = np.minimum(Z_fuel_top2, Z_top_rot)
 
     # only select points where X_rot is between 0 and TANK_CHORD
     X_fuel_plot = np.where(X_rot <= TANK_CHORD, X_rot, np.nan)
 
     # only plot fuel where fuel surface is above the wing bottom
     fuel_mask = Z_fuel_top_clamped > Z_bottom_rot
+    fuel_mask2 = Z_fuel_top_clamped2 > Z_bottom_rot2
     X_fuel_masked = np.where(fuel_mask, X_fuel_plot, np.nan)
+    X_fuel_masked2 = np.where(fuel_mask2, X_fuel_plot, np.nan)
     Z_fuel_masked = np.where(fuel_mask, Z_fuel_top_clamped, np.nan)
+    Z_fuel_masked2 = np.where(fuel_mask2, Z_fuel_top_clamped2, np.nan)
 
     ax.plot_surface(X_fuel_masked, Y, Z_fuel_masked, color="purple", alpha=0.7)
+    ax2.plot_surface(X_fuel_masked2, Y, Z_fuel_masked2, color="purple", alpha=0.7)
 
     # plot filler hole as black dot on wing top surface height (not fuel surface)
     filler_x_rot = filler_x * np.cos(theta_chord) - bottom_filler * np.sin(theta_chord)
@@ -575,6 +591,14 @@ def plot_3d_wing(
         s=50,
         label="Filler Hole",
     )
+    ax2.scatter(
+        [filler_x_rot],
+        [filler_y_pos],
+        [filler_z],
+        color="black",
+        s=50,
+        label="Filler Hole",
+    )
 
     ax.set_xlabel("Chord (inches)")
     ax.set_ylabel("Span (inches)")
@@ -590,43 +614,24 @@ def plot_3d_wing(
 
 if __name__ == "__main__":
 
-    import sys
+    left = float(input("Input first fuel level: "))
+    right = float(input("Input first fuel level: "))
 
-    if len(sys.argv) > 3:
-        height = float(sys.argv[1])
-        angle = float(sys.argv[2])
-        pitch_angle = float(sys.argv[3])
-    elif len(sys.argv) > 2:
-        height = float(sys.argv[1])
-        angle = float(sys.argv[2])
-        pitch_angle = CHORD_TILT_DEG
+    gallons_1, inboard_height = calculate_fuel(left, TILT_DEG, CHORD_TILT_DEG)
+    gallons_2, inboard_height = calculate_fuel(right, TILT_DEG, CHORD_TILT_DEG)
 
-    elif len(sys.argv) > 1:
-        height = float(sys.argv[1])
-        angle = TILT_DEG
-        pitch_angle = CHORD_TILT_DEG
-
-    else:
-        print(
-            "Usage: python fuel_estimate.py <fuel_height_in_inches> <tilt_angle_in_deg>"
-        )
-        sys.exit(1)
-
-    if DEBUG:
-        print("DEBUG: input height:", height)
-
-    gallons, inboard_height = calculate_fuel(height, angle, pitch_angle)
-
-    print(f"\nEstimated Fuel: {gallons:.2f} gallons")
-    print(f"Estimated inboard-most fuel height: {inboard_height:.2f} inches")
+    print(f"\nEstimated Fuel: {gallons_1 + gallons_2:.2f} gallons")
+    # print(f"Estimated inboard-most fuel height: {inboard_height:.2f} inches")
     # plot2d = plot_airfoil_with_tank(height, pitch_angle=pitch_angle)
     plot3d = plot_3d_wing(
         section_bounds,
         span=SPAN,
+        height1=left,
+        height2=right,
         chord=FULL_CHORD,
-        num_chord_points=100,
-        num_span_points=50,
-        angle=angle,
-        pitch_angle=pitch_angle,
+        num_chord_points=200,
+        num_span_points=10,
+        angle=TILT_DEG,
+        pitch_angle=CHORD_TILT_DEG,
     )
     plt.show()
