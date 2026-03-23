@@ -85,48 +85,27 @@ def process_flights(df):
         df["Fuel Flow 1 (gal/hr)"] = pd.to_numeric(
             df["Fuel Flow 1 (gal/hr)"], errors="coerce"
         ).fillna(0)
-
-        # Compute integral (gallons) per flight using trapezoidal rule over Session Time
-        df["Fuel Flow Integral"] = 0.0
-
-        for fid, group in df.groupby("_orig_flight_num"):
-            times = group["Session Time"].values
-            flow = group["Fuel Flow 1 (gal/hr)"].values
-
-            if len(times) > 1:
-                # Convert gal/hr to gal/sec before integrating
-                flow_gps = flow / 3600.0
-                integral = [0.0]
-                for i in range(1, len(times)):
-                    dt = times[i] - times[i - 1]
-                    area = 0.5 * (flow_gps[i] + flow_gps[i - 1]) * dt
-                    integral.append(integral[-1] + area)
-                df.loc[group.index, "Fuel Flow Integral"] = integral
-            else:
-                df.loc[group.index, "Fuel Flow Integral"] = 0.0
+        # Vectorized trapezoidal integration per flight
+        df = df.sort_values(["_orig_flight_num", "Session Time"])
+        dt = df.groupby("_orig_flight_num")["Session Time"].diff().fillna(0)
+        flow_gps = df["Fuel Flow 1 (gal/hr)"] / 3600.0
+        flow_prev = flow_gps.groupby(df["_orig_flight_num"]).shift(1).fillna(flow_gps)
+        avg_flow = 0.5 * (flow_gps + flow_prev)
+        increment = avg_flow * dt
+        df["Fuel Flow Integral"] = increment.groupby(df["_orig_flight_num"]).cumsum()
     if "Ground Speed (knots)" in df.columns:
         df["Ground Speed (knots)"] = pd.to_numeric(
             df["Ground Speed (knots)"], errors="coerce"
         ).fillna(0)
-
-        # Compute integral (gallons) per flight using trapezoidal rule over Session Time
-        df["Distance Traveled"] = 0.0
-
-        for fid, group in df.groupby("_orig_flight_num"):
-            times = group["Session Time"].values
-            ground_speed = group["Ground Speed (knots)"].values
-
-            if len(times) > 1:
-                # Convert knots to miles then to feet per second before integrating
-                speed_fps = ground_speed * 1.15 * 5280 / 3600
-                integral = [0.0]
-                for i in range(1, len(times)):
-                    dt = times[i] - times[i - 1]
-                    area = 0.5 * (speed_fps[i] + speed_fps[i - 1]) * dt
-                    integral.append(integral[-1] + area)
-                df.loc[group.index, "Distance Traveled"] = integral
-            else:
-                df.loc[group.index, "Distance Traveled"] = 0.0
+        # Vectorized trapezoidal integration for distance per flight
+        dt = df.groupby("_orig_flight_num")["Session Time"].diff().fillna(0)
+        speed_fps = df["Ground Speed (knots)"] * 1.15 * 5280 / 3600
+        speed_prev = (
+            speed_fps.groupby(df["_orig_flight_num"]).shift(1).fillna(speed_fps)
+        )
+        avg_speed = 0.5 * (speed_fps + speed_prev)
+        increment = avg_speed * dt
+        df["Distance Traveled"] = increment.groupby(df["_orig_flight_num"]).cumsum()
 
     # 2. Determine if Engine was Run for each flight
     # Calculate max RPM for each flight
@@ -169,8 +148,10 @@ def process_flights(df):
     df.drop(columns=["_orig_flight_num"], inplace=True)
 
     # Fill any null or NaN values in the DataFrame with 0 to ensure consistent datatypes
-    df.fillna(0, inplace=True)
+    # df.fillna("0", inplace=True)
 
+    # Defragment DataFrame to improve performance after many column insertions
+    df = df.copy()
     return df
 
 
@@ -883,13 +864,9 @@ def main():
                 ).fillna(0)
             # Calculate MPG (nautical miles per gallon)
             if "Ground Speed (knots)" in df.columns and "Fuel Flow" in df.columns:
-                df["MPG"] = df.apply(
-                    lambda row: (
-                        row["Ground Speed (knots)"] / row["Fuel Flow"]
-                        if row["Fuel Flow"] and row["Fuel Flow"] > 0
-                        else 0
-                    ),
-                    axis=1,
+                df["MPG"] = df["Ground Speed (knots)"] / df["Fuel Flow"]
+                df["MPG"] = (
+                    df["MPG"].replace([float("inf"), -float("inf")], 0).fillna(0)
                 )
             else:
                 df["MPG"] = 0
@@ -1018,11 +995,19 @@ def main():
                 lon_vals = lon
 
                 # Color by Indicated Airspeed if available
-                if "Indicated Airspeed (knots)" in flight_data.columns:
-                    ias = flight_data["Indicated Airspeed (knots)"].values
-                    sc = ax2.scatter(lon_vals, lat_vals, c=ias, cmap="rainbow", s=8)
-                    cbar = fig2.colorbar(sc, ax=ax2, pad=0.1)
-                    cbar.set_label("Indicated Airspeed (knots)")
+                if "Ground Speed (knots)" in flight_data.columns:
+                    ias = flight_data["Ground Speed (knots)"].values
+                    sc = ax2.scatter(
+                        lon_vals,
+                        lat_vals,
+                        c=ias,
+                        cmap="gist_ncar",
+                        s=6,
+                        vmin=0,
+                        vmax=200,
+                    )
+                    cbar = fig2.colorbar(sc, ax=ax2, pad=0.1, drawedges=True)
+                    cbar.set_label("Ground Speed (knots)")
                 else:
                     ax2.plot(lon_vals, lat_vals)
 
