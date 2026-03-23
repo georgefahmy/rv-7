@@ -1,7 +1,7 @@
 import sqlite3
 from datetime import datetime, timedelta
 
-import PySimpleGUI as sg
+import FreeSimpleGUI as sg
 from numpy import mean
 
 sg.theme("Reddit")

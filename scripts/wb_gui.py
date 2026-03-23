@@ -2,7 +2,7 @@ import base64
 import json
 import os
 
-import PySimpleGUI as sg
+import FreeSimpleGUI as sg
 from dotmap import DotMap
 from weight_and_balance.functions import (
     calc_cg,

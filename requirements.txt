@@ -42,7 +42,6 @@ pyasn1==0.6.3
 pyasn1_modules==0.4.2
 pyparsing==3.3.2
 PyPDF2==3.0.1
-PySimpleGUI==5.0.8.3
 python-dateutil==2.9.0.post0
 pytz==2026.1
 pyxml2pdf==0.3.5

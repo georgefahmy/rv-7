@@ -1,12 +1,12 @@
 import contextily as ctx
+import FreeSimpleGUI as sg
 import matplotlib
 import matplotlib.pyplot as plt
 
 # import numpy as np
 import pandas as pd
 
-# import FreeSimpleGUI as sg
-import PySimpleGUI as sg
+# import PySimpleGUI as sg
 from airspeed_calibration import analyze_flight_data
 
 # from geopy.distance import geodesic
