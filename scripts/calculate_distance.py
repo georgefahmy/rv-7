@@ -26,6 +26,6 @@ def calculate_distance(ap1: str, ap2: str):
             to_rad(lat1)
         ) * math.cos(to_rad(lat2)) * math.sin(d_lon / 2) * math.sin(d_lon / 2)
         c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-        return R * c / 1.852  # nautical miles
+        return f"{round(R * c / 1.852, 2)} nm"
     except (ValueError, TypeError, KeyError):
         return None
