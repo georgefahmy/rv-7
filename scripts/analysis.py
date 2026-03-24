@@ -73,6 +73,15 @@ def process_flights(df):
     # Create combined RPM signal as average of left and right
     df["RPM"] = (df["RPM L"] + df["RPM R"]) / 2
 
+    df["AVG_CHT"] = (
+        df["CHT 1 (deg F)"]
+        + df["CHT 2 (deg F)"]
+        + df["CHT 3 (deg F)"]
+        + df["CHT 4 (deg F)"]
+    ) / 4
+
+    df["CHT_OAT_Ratio"] = df["AVG_CHT"] / df["OAT (deg F)"]
+
     # --- Compute Fuel Flow Integral (gallons) per flight ---
     # Ensure Fuel Flow 1 is numeric
     if "Fuel Flow 1 (gal/hr)" in df.columns:
