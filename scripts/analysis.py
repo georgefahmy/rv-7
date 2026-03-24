@@ -81,6 +81,7 @@ def process_flights(df):
     ) / 4
 
     df["CHT_OAT_Ratio"] = df["AVG_CHT"] / df["OAT (deg F)"]
+    df["OIL_OAT_Ratio"] = df["Oil Temp (deg F)"] / df["OAT (deg F)"]
 
     # --- Compute Fuel Flow Integral (gallons) per flight ---
     # Ensure Fuel Flow 1 is numeric
