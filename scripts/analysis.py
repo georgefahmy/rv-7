@@ -1,3 +1,5 @@
+import warnings
+
 import contextily as ctx
 import FreeSimpleGUI as sg
 import matplotlib
@@ -7,6 +9,8 @@ from airspeed_calibration import analyze_flight_data
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 from matplotlib.widgets import RectangleSelector
 
+warnings.filterwarnings("ignore")
+
 matplotlib.use("TkAgg")
 ground_track = {
     "lat": None,
@@ -15,12 +19,12 @@ ground_track = {
     "marker": None,
     "canvas": None,
 }
-# --- Ground track sync globals ---
-ground_track_lat = None
-ground_track_lon = None
-ground_track_time = None
-ground_track_marker = None
-ground_track_canvas = None
+# # --- Ground track sync globals ---
+# ground_track_lat = None
+# ground_track_lon = None
+# ground_track_time = None
+# ground_track_marker = None
+# ground_track_canvas = None
 
 
 def load_data(filepath):
@@ -208,16 +212,14 @@ def save_flights_to_csv(df, output_dir):
 
         # Extract date from Flight ID (assumes format: "YYYY-MM-DD ... - Flight X")
         fid_str = str(fid)
-        date_part = fid_str.split()[0]  # First token should be date
 
         # Create subfolder for that date
-        date_folder = os.path.join(output_dir, date_part)
-        if not os.path.exists(date_folder):
-            os.makedirs(date_folder)
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
 
         # Clean filename
         safe_name = fid_str.replace("/", "-").replace(":", "-")
-        filepath = os.path.join(date_folder, f"{safe_name}.csv")
+        filepath = os.path.join(output_dir, f"{safe_name}.csv")
 
         flight_data.to_csv(filepath, index=False)
 
