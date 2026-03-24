@@ -2,14 +2,8 @@ import contextily as ctx
 import FreeSimpleGUI as sg
 import matplotlib
 import matplotlib.pyplot as plt
-
-# import numpy as np
 import pandas as pd
-
-# import PySimpleGUI as sg
 from airspeed_calibration import analyze_flight_data
-
-# from geopy.distance import geodesic
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 from matplotlib.widgets import RectangleSelector
 
@@ -683,13 +677,8 @@ def identify_flight_phases_for_selected_flight(df, flight_id):
     return flight_df
 
 
-def main():
-    df = None
-    flight_stats = None
-    flight_ids = []
-    available_signals = []
-
-    layout = [
+def main_layout():
+    return [
         [
             sg.Text("Input CSV File:", font=("Arial", 16)),
             sg.Input(
@@ -815,12 +804,17 @@ def main():
         ],
     ]
 
+
+def main():
+    df = None
+    flight_stats = None
+    flight_ids = []
+    available_signals = []
+
     window = sg.Window(
-        "Dynon Flight Analyzer", layout=layout, resizable=True, finalize=True
+        "Dynon Flight Analyzer", layout=main_layout(), resizable=True, finalize=True
     )
     window.maximize()
-    # window.write_event_value(key="-FLIGHT-", value=flight_ids[-1])  # <--- REMOVE this line
-    # window.write_event_value(key="-LEFT_SIGNAL_1-", value="CHT")
 
     while True:
         event, values = window.read()

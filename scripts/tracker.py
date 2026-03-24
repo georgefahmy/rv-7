@@ -169,6 +169,7 @@ def refresh_flight_log_table(window):
     )
     rows = cursor.fetchall()
     window["flight_log_table"].update(values=rows)
+    return rows
 
 
 def refresh_table(window):
@@ -476,6 +477,13 @@ def update_total_airframe_hours(window):
 
     window["total_airframe_text"].update(f"Total Hours: {total_hours:.1f}")
 
+    # Calculate total landings
+    cursor.execute("SELECT SUM(landings) FROM flight_log")
+    result = cursor.fetchone()
+    total_landings = int(result[0]) if result and result[0] is not None else 0
+
+    window["total_landings_text"].update(f"Total Landings: {total_landings}")
+
 
 conn = sqlite3.connect("scripts/maintenance.db")
 cursor = conn.cursor()
@@ -559,6 +567,15 @@ main_layout = [
                         "Total Hours: 0",
                         font=("Arial", 18),
                         key="total_airframe_text",
+                        justification="right",
+                        expand_x=True,
+                    ),
+                ],
+                [
+                    sg.Text(
+                        "Total Landings: 0",
+                        font=("Arial", 16),
+                        key="total_landings_text",
                         justification="right",
                         expand_x=True,
                     ),
@@ -822,14 +839,16 @@ def generate_logbook_warning(window):
     return logbook_text, warning_lines
 
 
-window = sg.Window(title="MX Tracker", layout=main_layout, finalize=True)
+window = sg.Window(title="N890GF", layout=main_layout, finalize=True)
+# Bind double-click event for flight log table
+window["flight_log_table"].bind("<Double-Button-1>", "_DOUBLE_CLICK")
 
 # Initial load of table and summary
 refresh_table(window)
 update_due_dates(window)
 update_total_airframe_hours(window)
 update_database_due_dates(window)
-refresh_flight_log_table(window)
+rows = refresh_flight_log_table(window)
 
 # Initialize overdue count on startup
 initial_overdue = calculate_overdue()
@@ -842,6 +861,27 @@ while True:
     if event == "sw_db_updates":
         exec(open("scripts/sw_db_updates.py", "r").read())
 
+    if event == "flight_log_table_DOUBLE_CLICK":
+        selected = values.get("flight_log_table")
+        if selected:
+            row_index = selected[0]
+            table_data = rows
+            row = table_data[row_index]
+
+            details = (
+                f"{row[0]}\n"
+                f"From: {row[1]} to {row[2]}\n"
+                f"Hobbs: +{row[5]}hrs (Tot: {row[3]}hrs)\n"
+                f"Tach: +{row[6]}hrs (Tot: {row[4]}hrs)\n\n"
+                f"Notes: {row[8]}"
+            )
+
+            sg.popup_ok(
+                "Flight Details",
+                details,
+                title="Flight Log Details",
+                non_blocking=True,
+            )
     if event == "fuel_tracker_button":
         # Load existing fuel entries
         cursor.execute(

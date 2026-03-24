@@ -28,8 +28,8 @@ def parse_dynon_filename(filename):
 
 # Example usage
 if __name__ == "__main__":
-    filename = "2026-02-21-N890GF-SN35347-17.4.0.23677-REAL_FLITE-USER_LOG_DATA.csv"
+    filename = input("File: ")
     parsed = parse_dynon_filename(filename)
-
-    for key, value in parsed.items():
-        print(f"{key}: {value}")
+    print(f"{parsed['date']}_{parsed['user_value']}_{parsed['log_type']}")
+    # for key, value in parsed.items():
+    #     print(f"{key.title()}: {value}")
