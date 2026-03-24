@@ -617,11 +617,11 @@ if __name__ == "__main__":
     left = float(input("Input first fuel level: "))
     right = float(input("Input first fuel level: "))
 
-    gallons_1, inboard_height = calculate_fuel(left, TILT_DEG, CHORD_TILT_DEG)
-    gallons_2, inboard_height = calculate_fuel(right, TILT_DEG, CHORD_TILT_DEG)
+    gallons_1, inboard_height1 = calculate_fuel(left, TILT_DEG, CHORD_TILT_DEG)
+    gallons_2, inboard_height2 = calculate_fuel(right, TILT_DEG, CHORD_TILT_DEG)
 
     print(f"\nEstimated Fuel: {gallons_1 + gallons_2:.2f} gallons")
-    # print(f"Estimated inboard-most fuel height: {inboard_height:.2f} inches")
+    print(f"Estimated inboard-most fuel height: {inboard_height1:.2f} inches")
     # plot2d = plot_airfoil_with_tank(height, pitch_angle=pitch_angle)
     plot3d = plot_3d_wing(
         section_bounds,
