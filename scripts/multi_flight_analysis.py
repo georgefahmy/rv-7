@@ -7,23 +7,21 @@ import pandas as pd
 warnings.filterwarnings("ignore")
 
 # ====== CONFIG ======
-FOLDER_PATH = (
-    "/Users/GFahmy/Documents/projects/dynon/data_logs/clean_flights"  # <-- change this
-)
+FOLDER_PATH = "/Users/GFahmy/Documents/projects/dynon/clean_flights"
 CHT_COLUMNS = [
     "CHT 1 (deg F)",
     "CHT 2 (deg F)",
     "CHT 3 (deg F)",
     "CHT 4 (deg F)",
-]  # adjust if needed
+]
 OAT_COLUMN = "OAT (deg F)"
 POWER_COLUMN = "Percent Power"
 FUEL_FLOW_COLUMN = "Total Fuel Flow (gal/hr)"
 OIL_COLUMN = "Oil Temp (deg F)"
 
 CHT_ALERT_THRESHOLD = 420  # deg F
-ALT_FILTER = 2000
-POWER_FILTER = 70
+ALT_FILTER = 3000
+POWER_FILTER = 10
 
 
 # ====== LOAD ALL CSV FILES ======
