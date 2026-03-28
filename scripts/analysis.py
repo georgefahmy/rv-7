@@ -1,3 +1,5 @@
+import glob
+import os
 import warnings
 
 import contextily as ctx
@@ -27,12 +29,20 @@ ground_track = {
 # ground_track_canvas = None
 
 
-def load_data(filepath):
+def load_data(filepath, folder=False):
     """Loads the CSV file."""
     try:
         # Skip metadata rows if necessary, but standard read_csv usually works
-        df = pd.read_csv(filepath, low_memory=False)
-        return df
+        if folder:
+            all_files = glob.glob(os.path.join(filepath, "*.csv"))
+            dfs = [pd.read_csv(f) for f in all_files]
+            # Concatenate all DataFrames in the list into one master DataFrame
+            # ignore_index=True resets the index to a continuous sequence (0, 1, 2, ...)
+            df = pd.concat(dfs, ignore_index=True)
+            return df
+        else:
+            df = pd.read_csv(filepath, low_memory=False)
+            return df
     except Exception as e:
         print(f"Error loading file: {e}")
         return None
@@ -44,49 +54,38 @@ def process_flights(df):
     """
     # Remove rows where System Time is NaN or blank
     df = df[df["System Time"].notna() & (df["System Time"] != "")]
-
     # Remove rows where GPS Date & Time is NaN or blank
     df = df[df["GPS Date & Time"].notna() & (df["GPS Date & Time"] != "")]
-
     # Convert all temperature columns from deg C to deg F
     temp_cols = [col for col in df.columns if "(deg C)" in col]
-
     for col in temp_cols:
         try:
             # Force numeric conversion to prevent string math errors
             df[col] = pd.to_numeric(df[col], errors="coerce")
-
             # Convert C to F
             df[col] = df[col] * 9.0 / 5.0 + 32.0
-
             # Rename column to deg F
             new_name = col.replace("(deg C)", "(deg F)")
-            df.rename(columns={col: new_name}, inplace=True)
-
+            df.rename(columns={col: new_name}, inplace=False)
         except Exception as e:
             print(f"Warning: Temperature conversion failed for column '{col}': {e}")
-
     # 1. Identify Flights based on Session Time resets
     df["_orig_flight_num"] = (df["Session Time"].diff() < 0).cumsum()
     # Ensure System Time is numeric and fill NaNs with 0 to prevent aggregation errors
     df["System Time"] = pd.to_numeric(df["System Time"], errors="coerce").fillna(0)
-
     # Ensure RPM L and RPM R are numeric and fill NaNs with 0
     for col in ["RPM L", "RPM R"]:
         df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
     # Create combined RPM signal as average of left and right
     df["RPM"] = (df["RPM L"] + df["RPM R"]) / 2
-
     df["AVG_CHT"] = (
         df["CHT 1 (deg F)"]
         + df["CHT 2 (deg F)"]
         + df["CHT 3 (deg F)"]
         + df["CHT 4 (deg F)"]
     ) / 4
-
     df["CHT_OAT_Ratio"] = df["AVG_CHT"] / df["OAT (deg F)"]
     df["OIL_OAT_Ratio"] = df["Oil Temp (deg F)"] / df["OAT (deg F)"]
-
     # --- Compute Fuel Flow Integral (gallons) per flight ---
     # Ensure Fuel Flow 1 is numeric
     if "Fuel Flow 1 (gal/hr)" in df.columns:
@@ -114,7 +113,6 @@ def process_flights(df):
         avg_speed = 0.5 * (speed_fps + speed_prev)
         increment = avg_speed * dt
         df["Distance Traveled"] = increment.groupby(df["_orig_flight_num"]).cumsum()
-
     # 2. Determine if Engine was Run for each flight
     # Calculate max RPM for each flight
     flight_max_rpm = df.groupby("_orig_flight_num")[["RPM L", "RPM R"]].max()
@@ -127,37 +125,29 @@ def process_flights(df):
         ]
     ].max()
     df["Max CHT"] = df["_orig_flight_num"].map(flight_max_cht.max(axis=1))
-
     # Create a boolean Series: True if any RPM > 0 and CHT > 125
     flights_with_engine = (
         (flight_max_rpm["RPM L"] > 0) | (flight_max_rpm["RPM R"] > 0)
     ) & (flight_max_cht.max(axis=1) > 125)
-
     # Compute first GPS Date & Time for each flight
     flight_start_gps = df.groupby("_orig_flight_num")["GPS Date & Time"].first()
-
     # Map this status back to the original DataFrame
     df["Engine Run"] = df["_orig_flight_num"].map(flights_with_engine)
-
     # Assign sequential Flight IDs as "<seq> - <GPS Date & Time>" for engine-run flights, else NaN
     engine_flight_ids = [
         fid
         for fid in df["_orig_flight_num"].unique()
         if flights_with_engine.get(fid, False)
     ]
-
     # Map: _orig_flight_num -> "<seq> - <GPS Date & Time>"
     flightid_map = {
         fid: f"{flight_start_gps.get(fid, '')} - Flight {idx + 1}"
         for idx, fid in enumerate(engine_flight_ids)
     }
-
     df["Flight ID"] = df["_orig_flight_num"].map(lambda x: flightid_map.get(x, None))
     df.drop(columns=["_orig_flight_num"], inplace=True)
-
     # Fill any null or NaN values in the DataFrame with 0 to ensure consistent datatypes
     # df.fillna("0", inplace=True)
-
     # Defragment DataFrame to improve performance after many column insertions
     df = df.copy()
     return df
@@ -703,6 +693,22 @@ def main_layout():
             ),
             sg.FileBrowse(file_types=(("CSV Files", "*.csv"),), font=("Arial", 16)),
         ],
+        [
+            sg.Input(
+                key="-FOLDER-",
+                enable_events=True,
+                readonly=True,
+                size=(60, 1),
+                font=("Arial", 16),
+                disabled_readonly_background_color="white",
+            ),
+            sg.FolderBrowse(
+                button_text="Flight Data Folder",
+                key="folder",
+                font=("Arial", 16),
+                initial_folder="/Users/GFahmy/Documents/projects/dynon/clean_flights",
+            ),
+        ],
         [sg.HorizontalSeparator()],
         [
             sg.Text("Select Flight ID:", font=("Arial", 22)),
@@ -716,6 +722,7 @@ def main_layout():
             ),
             sg.Text(expand_x=True),
             sg.Button("Export Flights", font=("Arial", 16)),
+            sg.Button("Multi-Flight Plot", font=("Arial", 16)),
             sg.Button("Exit", font=("Arial", 16)),
         ],
         [sg.HorizontalSeparator()],
@@ -834,8 +841,11 @@ def main():
             break
 
         # --- Handle file selection and load ---
-        if event == "-FILE-" and values["-FILE-"]:
+        if (event == "-FILE-" and values["-FILE-"]) or (
+            event == "-FOLDER-" and values["-FOLDER-"]
+        ):
             filename = values["-FILE-"]
+            folder = values["-FOLDER-"]
 
             # Show loading spinner
             sg.popup_animated(
@@ -844,14 +854,20 @@ def main():
                 time_between_frames=50,
             )
             window.refresh()
-
-            df_loaded = load_data(filename)
+            if filename:
+                df_loaded = load_data(filename)
+            if folder:
+                df_loaded = load_data(folder, folder=True)
             if df_loaded is None:
                 sg.popup_animated(None)
                 sg.popup_error("Failed to load file.")
                 continue
 
             df = process_flights(df_loaded)
+
+            # --- Multi-flight scatter plotting support ---
+            if folder:
+                df["Flight ID"] = df["Flight ID"].fillna("Unknown")
 
             # --- MPG (nautical miles per gallon) calculation ---
             # Ensure numeric conversion for "Ground Speed (knots)" and "Fuel Flow"
@@ -970,6 +986,52 @@ def main():
             )
             window["-SUMMARY-"].update(summary_text)
             identify_flight_phases_for_selected_flight(df, fid)
+
+        if event == "Multi-Flight Plot":
+            if df is None or not values["-FOLDER-"]:
+                sg.popup("Please load a folder of flights first.")
+                continue
+
+            left_signal = values["-LEFT_SIGNAL_1-"]
+            right_signal = values["-RIGHT_SIGNAL_1-"]
+
+            if left_signal == "None" or right_signal == "None":
+                sg.popup("Select valid signals for both axes.")
+                continue
+
+            fig, ax = plt.subplots()
+
+            for fid, group in df.groupby("Flight ID"):
+                if fid is None:
+                    continue
+                ax.scatter(
+                    group[left_signal], group[right_signal], label=str(fid), alpha=0.4
+                )
+
+            ax.set_xlabel(left_signal)
+            ax.set_ylabel(right_signal)
+            ax.set_title("Multi-Flight Scatter Plot")
+            ax.legend(fontsize=6)
+
+            # Show in popup window
+            plot_window = sg.Window(
+                "Multi-Flight Plot",
+                [[sg.Canvas(key="-PLOT_CANVAS-")]],
+                finalize=True,
+                resizable=True,
+            )
+
+            canvas_elem = plot_window["-PLOT_CANVAS-"]
+            figure_canvas = FigureCanvasTkAgg(fig, canvas_elem.TKCanvas)
+            figure_canvas.draw()
+            figure_canvas.get_tk_widget().pack(fill="both", expand=1)
+
+            while True:
+                ev, _ = plot_window.read()
+                if ev in (sg.WINDOW_CLOSED, "Exit"):
+                    break
+
+            plot_window.close()
 
         if event in ("-LEFT_SIGNAL_1-", "-RIGHT_SIGNAL_1-", "-FLIGHT-"):
             flight_id = values["-FLIGHT-"]
