@@ -140,7 +140,7 @@ def process_flights(df):
     ]
     # Map: _orig_flight_num -> "<seq> - <GPS Date & Time>"
     flightid_map = {
-        fid: f"{flight_start_gps.get(fid, '')} - Flight {idx + 1}"
+        fid: f"{flight_start_gps.get(fid, '')}"
         for idx, fid in enumerate(engine_flight_ids)
     }
     df["Flight ID"] = df["_orig_flight_num"].map(lambda x: flightid_map.get(x, None))

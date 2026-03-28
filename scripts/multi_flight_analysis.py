@@ -3,11 +3,12 @@ import warnings
 
 import matplotlib.pyplot as plt
 import pandas as pd
+from analysis import process_flights
 
 warnings.filterwarnings("ignore")
 
 # ====== CONFIG ======
-FOLDER_PATH = "/Users/GFahmy/Documents/projects/dynon/clean_flights"
+FOLDER_PATH = "/Users/GFahmy/Documents/projects/dynon/data_logs"
 CHT_COLUMNS = [
     "CHT 1 (deg F)",
     "CHT 2 (deg F)",
@@ -45,8 +46,8 @@ def load_flights(folder):
 # ====== CLEAN + PREP ======
 def preprocess(df):
     # Drop rows missing key data
-    needed_cols = CHT_COLUMNS + [OAT_COLUMN, POWER_COLUMN, FUEL_FLOW_COLUMN]
-    df = df.dropna(subset=needed_cols)
+    # needed_cols = CHT_COLUMNS + [OAT_COLUMN, POWER_COLUMN, FUEL_FLOW_COLUMN]
+    # df = df.dropna(subset=needed_cols)
     # Filter to only include data where Percent Power > 50%
     df[POWER_COLUMN] = pd.to_numeric(df[POWER_COLUMN], errors="coerce")
     df = df[df[POWER_COLUMN] > POWER_FILTER]
@@ -69,10 +70,10 @@ def preprocess(df):
         df[col] = pd.to_numeric(df[col], errors="coerce")
 
     # Create average CHT
-    df["CHT_avg"] = df[CHT_COLUMNS].mean(axis=1)
+    df["AVG_CHT"] = df[CHT_COLUMNS].mean(axis=1)
     # Print average CHT for each file
     print("\nAverage CHT by file:")
-    avg_cht_per_file = df.groupby("source_file")["CHT_avg"].mean()
+    avg_cht_per_file = df.groupby("source_file")["AVG_CHT"].mean()
     avg_oat_per_file = df.groupby("source_file")[OAT_COLUMN].mean()
     avg_oil_per_file = df.groupby("source_file")[OIL_COLUMN].mean()
     for file, avg in avg_cht_per_file.items():
@@ -86,15 +87,15 @@ def preprocess(df):
 # ====== ANALYSIS ======
 def analyze(df):
     print("\n=== CORRELATIONS ===")
-    print("CHT vs % Power:", df["CHT_avg"].corr(df[POWER_COLUMN]))
-    print("CHT vs OAT:", df["CHT_avg"].corr(df[OAT_COLUMN]))
+    print("CHT vs % Power:", df["AVG_CHT"].corr(df[POWER_COLUMN]))
+    print("CHT vs OAT:", df["AVG_CHT"].corr(df[OAT_COLUMN]))
     print("Fuel Flow vs % Power:", df[FUEL_FLOW_COLUMN].corr(df[POWER_COLUMN]))
 
     print("\n=== HIGH CHT EVENTS ===")
-    hot = df[df["CHT_avg"] > CHT_ALERT_THRESHOLD]
+    hot = df[df["AVG_CHT"] > CHT_ALERT_THRESHOLD]
     print(f"Number of high CHT samples: {len(hot)}")
     if not hot.empty:
-        print(hot[["CHT_avg", POWER_COLUMN, OAT_COLUMN, FUEL_FLOW_COLUMN]].head())
+        print(hot[["AVG_CHT", POWER_COLUMN, OAT_COLUMN, FUEL_FLOW_COLUMN]].head())
 
     print("\n=== EFFICIENCY (Fuel Flow per % Power) ===")
     df["efficiency"] = df[FUEL_FLOW_COLUMN] / df[POWER_COLUMN]
@@ -108,12 +109,12 @@ def plot(df):
     ax2 = fig.add_subplot(132)
     ax3 = fig.add_subplot(133)
 
-    ax1.scatter(df[POWER_COLUMN], df["CHT_avg"], alpha=0.3)
+    ax1.scatter(df[POWER_COLUMN], df["AVG_CHT"], alpha=0.3)
     ax1.set_xlabel("% Power")
     ax1.set_ylabel("Avg CHT")
     ax1.set_title("CHT vs % Power")
 
-    ax2.scatter(df[OAT_COLUMN], df["CHT_avg"], alpha=0.3)
+    ax2.scatter(df[OAT_COLUMN], df["AVG_CHT"], alpha=0.3)
     ax2.set_xlabel("OAT")
     ax2.set_ylabel("Avg CHT")
     ax2.set_title("CHT vs OAT")
@@ -125,12 +126,46 @@ def plot(df):
     plt.show()
 
 
+def save_flights_to_csv(df, output_dir):
+    """
+    Saves each flight to its own CSV file, grouping exports into subfolders based on their GPS date.
+    """
+    import os
+
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
+    # Only keep valid flight IDs
+    flight_ids = [fid for fid in df["Flight ID"].unique() if fid not in (None, 0, "")]
+
+    for fid in flight_ids:
+        flight_data = df[df["Flight ID"] == fid]
+        if flight_data.empty:
+            continue
+
+        # Extract date from Flight ID (assumes format: "YYYY-MM-DD ... - Flight X")
+        fid_str = str(fid)
+        filename = fid_str.split(" - ")[0]
+
+        # Create subfolder for that date
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+
+        # Clean filename
+        safe_name = filename.replace("/", "-").replace(":", "-")
+        filepath = os.path.join(output_dir, f"{safe_name}.csv")
+
+        flight_data.to_csv(filepath, index=False)
+
+
 # ====== MAIN ======
 def main():
     df = load_flights(FOLDER_PATH)
-    df = preprocess(df)
+    df = process_flights(df)
     analyze(df)
     plot(df)
+    print("exporting")
+    save_flights_to_csv(df, "/Users/GFahmy/Documents/projects/dynon/clean_flights_2")
 
 
 if __name__ == "__main__":
