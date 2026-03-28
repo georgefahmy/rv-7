@@ -682,7 +682,7 @@ def identify_flight_phases_for_selected_flight(df, flight_id):
 def main_layout():
     return [
         [
-            sg.Text("Input CSV File:", font=("Arial", 16)),
+            sg.Text("Input CSV File:", font=("Arial", 16), size=(16, 1)),
             sg.Input(
                 key="-FILE-",
                 enable_events=True,
@@ -691,9 +691,15 @@ def main_layout():
                 font=("Arial", 16),
                 disabled_readonly_background_color="white",
             ),
-            sg.FileBrowse(file_types=(("CSV Files", "*.csv"),), font=("Arial", 16)),
+            sg.FileBrowse(
+                file_types=(("CSV Files", "*.csv"),),
+                font=("Arial", 16),
+                initial_folder="/Users/GFahmy/Documents/projects/dynon/data_logs",
+            ),
+            sg.Text("", font=("Arial", 16), expand_x=True),
         ],
         [
+            sg.Text("Input CSV Folder:", font=("Arial", 16), size=(16, 1)),
             sg.Input(
                 key="-FOLDER-",
                 enable_events=True,
@@ -703,11 +709,12 @@ def main_layout():
                 disabled_readonly_background_color="white",
             ),
             sg.FolderBrowse(
-                button_text="Flight Data Folder",
+                button_text="Browse",
                 key="folder",
                 font=("Arial", 16),
                 initial_folder="/Users/GFahmy/Documents/projects/dynon/clean_flights",
             ),
+            sg.Text("", font=("Arial", 16), expand_x=True),
         ],
         [sg.HorizontalSeparator()],
         [
@@ -725,6 +732,23 @@ def main_layout():
             sg.Button("Multi-Flight Plot", font=("Arial", 16)),
             sg.Button("Exit", font=("Arial", 16)),
         ],
+        [sg.HorizontalSeparator()],
+        [
+            sg.Text("Filters:", font=("Arial", 16)),
+            sg.Combo([], key="-FILTER_COL-", size=(25, 1), font=("Arial", 14)),
+            sg.Combo(
+                [">=", "<=", ">", "<", "="],
+                key="-FILTER_OP-",
+                size=(5, 1),
+                font=("Arial", 14),
+                default_value=">=",
+            ),
+            sg.Input(key="-FILTER_VAL-", size=(10, 1), font=("Arial", 14)),
+            sg.Button("Add Filter", font=("Arial", 14)),
+            sg.Button("Clear Filters", font=("Arial", 14)),
+            sg.Button("Remove Selected", font=("Arial", 14)),
+        ],
+        [sg.Listbox(values=[], key="-FILTER_LIST-", size=(50, 4), font=("Arial", 12))],
         [sg.HorizontalSeparator()],
         [
             sg.Text(
@@ -824,11 +848,41 @@ def main_layout():
     ]
 
 
+def apply_filters(df, filters):
+    filtered_df = df.copy()
+    for col, op, val in filters:
+        if col not in filtered_df.columns:
+            continue
+
+        try:
+            series = pd.to_numeric(filtered_df[col], errors="coerce")
+            val_num = float(val)
+
+            if op == ">=":
+                filtered_df = filtered_df[series >= val_num]
+            elif op == "<=":
+                filtered_df = filtered_df[series <= val_num]
+            elif op == ">":
+                filtered_df = filtered_df[series > val_num]
+            elif op == "<":
+                filtered_df = filtered_df[series < val_num]
+            elif op == "=":
+                filtered_df = filtered_df[series == val_num]
+
+        except:
+            # Fallback for non-numeric comparisons
+            if op == "=":
+                filtered_df = filtered_df[filtered_df[col] == val]
+
+    return filtered_df
+
+
 def main():
     df = None
     flight_stats = None
     flight_ids = []
     available_signals = []
+    active_filters = []
 
     window = sg.Window(
         "Dynon Flight Analyzer", layout=main_layout(), resizable=True, finalize=True
@@ -948,6 +1002,24 @@ def main():
             window["-FLIGHT-"].update(values=flight_ids)
             window["-LEFT_SIGNAL_1-"].update(values=available_signals)
             window["-RIGHT_SIGNAL_1-"].update(values=available_signals)
+            window["-FILTER_COL-"].update(values=available_signals)
+        if event == "Add Filter":
+            col = values["-FILTER_COL-"]
+            op = values["-FILTER_OP-"]
+            val = values["-FILTER_VAL-"]
+            if col and val and op:
+                try:
+                    val = float(val)
+                except:
+                    pass
+                active_filters.append((col, op, val))
+                window["-FILTER_LIST-"].update(
+                    values=[f"{c} {o} {v}" for c, o, v in active_filters]
+                )
+
+        if event == "Clear Filters":
+            active_filters = []
+            window["-FILTER_LIST-"].update(values=[])
 
             # Set default signals
             if "CHT" in available_signals:
@@ -961,6 +1033,17 @@ def main():
             if flight_ids:
                 window["-FLIGHT-"].update(value=flight_ids[-1])
                 window.write_event_value("-FLIGHT-", flight_ids[-1])
+
+        if event == "Remove Selected":
+            selected = values["-FILTER_LIST-"]
+            if selected:
+                # Remove selected filters
+                active_filters = [
+                    f for f in active_filters if f"{f[0]} {f[1]} {f[2]}" not in selected
+                ]
+                window["-FILTER_LIST-"].update(
+                    values=[f"{c} {o} {v}" for c, o, v in active_filters]
+                )
 
         if event == "Export Flights":
             folder = sg.popup_get_folder("Select folder to save flight CSV files")
@@ -1001,22 +1084,53 @@ def main():
 
             fig, ax = plt.subplots()
 
-            for fid, group in df.groupby("Flight ID"):
+            filtered_df = apply_filters(df, active_filters)
+            scatter_map = {}
+            for fid, group in filtered_df.groupby("Flight ID"):
                 if fid is None:
                     continue
-                ax.scatter(
+                sc = ax.scatter(
                     group[left_signal], group[right_signal], label=str(fid), alpha=0.4
                 )
+                scatter_map[str(fid)] = sc
 
             ax.set_xlabel(left_signal)
             ax.set_ylabel(right_signal)
             ax.set_title("Multi-Flight Scatter Plot")
-            ax.legend(fontsize=6)
+            legend = ax.legend(fontsize=6)
+
+            # Enable legend click to toggle visibility
+            for legend_entry in legend.legend_handles:
+                legend_entry.set_picker(True)
+
+            def on_pick(event):
+                legend_handle = event.artist
+                label = legend_handle.get_label()
+
+                if label in scatter_map:
+                    scatter = scatter_map[label]
+                    visible = not scatter.get_visible()
+                    scatter.set_visible(visible)
+
+                    # Fade legend entry when hidden
+                    legend_handle.set_alpha(1.0 if visible else 0.2)
+
+                    fig.canvas.draw_idle()
+
+            fig.canvas.mpl_connect("pick_event", on_pick)
 
             # Show in popup window
             plot_window = sg.Window(
                 "Multi-Flight Plot",
-                [[sg.Canvas(key="-PLOT_CANVAS-")]],
+                [
+                    [
+                        sg.Canvas(
+                            key="-PLOT_CANVAS-",
+                            expand_x=True,
+                            expand_y=True,
+                        )
+                    ]
+                ],
                 finalize=True,
                 resizable=True,
             )
@@ -1024,7 +1138,14 @@ def main():
             canvas_elem = plot_window["-PLOT_CANVAS-"]
             figure_canvas = FigureCanvasTkAgg(fig, canvas_elem.TKCanvas)
             figure_canvas.draw()
-            figure_canvas.get_tk_widget().pack(fill="both", expand=1)
+
+            plot_widget = figure_canvas.get_tk_widget()
+            plot_widget.pack(side="top", fill="both", expand=1)
+
+            # Add matplotlib navigation toolbar
+            toolbar = NavigationToolbar2Tk(figure_canvas, canvas_elem.TKCanvas)
+            toolbar.update()
+            toolbar.pack(side="bottom", fill="x")
 
             while True:
                 ev, _ = plot_window.read()
@@ -1041,8 +1162,9 @@ def main():
             if df is None or flight_id is None:
                 continue
 
+            filtered_df = apply_filters(df, active_filters)
             plot_flight(
-                df,
+                filtered_df,
                 flight_id,
                 left_signal_1,
                 right_signal_1,
