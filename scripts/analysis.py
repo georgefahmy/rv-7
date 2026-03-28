@@ -60,13 +60,12 @@ def process_flights(df):
     temp_cols = [col for col in df.columns if "(deg C)" in col]
     for col in temp_cols:
         try:
+            new_name = col.replace("(deg C)", "(deg F)")
             # Force numeric conversion to prevent string math errors
             df[col] = pd.to_numeric(df[col], errors="coerce")
             # Convert C to F
-            df[col] = df[col] * 9.0 / 5.0 + 32.0
-            # Rename column to deg F
-            new_name = col.replace("(deg C)", "(deg F)")
-            df.rename(columns={col: new_name}, inplace=False)
+            df[new_name] = df[col] * 9.0 / 5.0 + 32.0
+
         except Exception as e:
             print(f"Warning: Temperature conversion failed for column '{col}': {e}")
     # 1. Identify Flights based on Session Time resets
@@ -965,26 +964,50 @@ def main():
 
             flight_ids = sorted(flight_stats[flight_stats["Engine_Run"]].index.tolist())
 
-            available_signals = sorted(
-                [
-                    col
-                    for col in df.columns
-                    if col
-                    not in [
-                        "Flight ID",
-                        "Unnamed: 103",
-                        "Engine Run",
-                        "Max CHT",
-                        "AP Yaw Force",
-                        "AP Yaw Position",
-                        "AP Yaw Slip (bool)",
-                        "Session Time",
-                        "RPM L",
-                        "RPM R",
-                        "Fuel Flow 2 (gal/hr)",
-                    ]
-                ]
-            )
+            # Identify numeric columns only
+            numeric_cols = df.select_dtypes(include=["number"]).columns.tolist()
+
+            # Remove columns we still want to exclude manually
+            excluded_cols = [
+                "Unnamed: 103",
+                "AP Yaw Force",
+                "AP Yaw Position",
+                "AP Yaw Slip (bool)",
+                "Fuel Flow 1 (gal/hr)",
+                "Fuel Flow 2 (gal/hr)",
+                "FUEL PRESSURE (PSI)",
+                "OIL TEMPERATURE (deg C)",
+                "OIL TEMPERATURE (deg F)",
+                "OIL PRESSURE (PSI)",
+                "RPM L",
+                "RPM R",
+            ]
+
+            # Remove useless columns (all zeros, NaNs, or constant values)
+            valid_numeric_cols = []
+            for col in numeric_cols:
+                if col in excluded_cols:
+                    continue
+
+                series = pd.to_numeric(df[col], errors="coerce")
+
+                # Drop NaNs for evaluation
+                non_nan = series.dropna()
+
+                if non_nan.empty:
+                    continue
+
+                # Skip if all values are zero
+                if (non_nan == 0).all():
+                    continue
+
+                # Skip if all values are the same
+                if non_nan.nunique() <= 1:
+                    continue
+
+                valid_numeric_cols.append(col)
+
+            available_signals = sorted(valid_numeric_cols)
 
             # Add "MPG" to selectable/displayed columns if not present
             if "MPG" not in available_signals:
@@ -1003,6 +1026,13 @@ def main():
             window["-LEFT_SIGNAL_1-"].update(values=available_signals)
             window["-RIGHT_SIGNAL_1-"].update(values=available_signals)
             window["-FILTER_COL-"].update(values=available_signals)
+
+            # Auto-select the last flight and trigger load
+            if flight_ids:
+                last_flight = flight_ids[-1]
+                window["-FLIGHT-"].update(value=last_flight)
+                window.write_event_value("-FLIGHT-", last_flight)
+
         if event == "Add Filter":
             col = values["-FILTER_COL-"]
             op = values["-FILTER_OP-"]
@@ -1069,6 +1099,9 @@ def main():
             )
             window["-SUMMARY-"].update(summary_text)
             identify_flight_phases_for_selected_flight(df, fid)
+            window["-LEFT_SIGNAL_1-"].update(value="CHT")
+            window["-RIGHT_SIGNAL_1-"].update(value="EGT")
+            window.write_event_value("-LEFT_SIGNAL_1-", "CHT")
 
         if event == "Multi-Flight Plot":
             if df is None or not values["-FOLDER-"]:
@@ -1274,7 +1307,7 @@ def main():
 
         if event == "-AIRSPEED_CALIBRATION-":
             flight_id = values["-FLIGHT-"]
-            flight_data = df[df["Flight ID"] == flight_id]
+            flight_data = df[df["Flight ID"] == flight_id].copy().fillna(0)
             as_cal_df = flight_data.rename(
                 columns={
                     "Session Time": "session_time",
@@ -1304,7 +1337,7 @@ def main():
             as_cal_df = as_cal_df[essential_columns].copy()
 
             as_cal_df = as_cal_df.dropna()
-            as_cal_df = as_cal_df[as_cal_df["ias"] > 40.0]
+            as_cal_df = as_cal_df[as_cal_df["ias"] > 55.0]
 
             as_cal_df = as_cal_df.reset_index(drop=True)
             output = analyze_flight_data(
