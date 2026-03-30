@@ -182,6 +182,129 @@ def list_signals(df):
     return columns
 
 
+def find_gami_window(df, flight_id):
+    """
+    Automatically find start and end times of a GAMI sweep.
+    Criteria:
+    - RPM nearly constant (+-50)
+    - Manifold pressure nearly constant
+    - Fuel flow decreasing
+    - EGT rises then peaks
+    """
+
+    flight_df = df[df["Flight ID"] == flight_id].copy().fillna(0)
+    if flight_df.empty:
+        return None, None
+
+    rpm = flight_df["RPM"].values
+    mp = flight_df["Manifold Pressure (inHg)"].values
+    ff = flight_df["Total Fuel Flow (gal/hr)"].values
+
+    # Smooth signals slightly to reduce noise
+    rpm_s = pd.Series(rpm).rolling(5, center=True).mean().ffill().bfill()
+    mp_s = pd.Series(mp).rolling(5, center=True).mean().ffill().bfill()
+    ff_s = pd.Series(ff).rolling(5, center=True).mean().ffill().bfill()
+
+    # Compute gradient with respect to time (1 Hz sampling assumed)
+    time = flight_df["Session Time"].values
+    dt = np.gradient(time)
+    dt[dt == 0] = 1  # prevent divide by zero
+    dff = np.gradient(ff_s) / dt
+    # Normalize gradient to handle scaling differences
+    dff_norm = dff / (np.nanmax(np.abs(dff)) + 1e-6)
+
+    # Use rolling median to better capture local stability instead of global median
+    rpm_ref = pd.Series(rpm_s).rolling(30, center=True).median().ffill().bfill()
+    mp_ref = pd.Series(mp_s).rolling(30, center=True).median().ffill().bfill()
+
+    mask = (abs(rpm_s - rpm_ref) < 50) & (abs(mp_s - mp_ref) < 2.0) & (dff_norm < -0.02)
+
+    indices = np.where(mask)[0]
+    if len(indices) == 0:
+        print("No GAMI sweep detected.")
+        return None, None
+
+    # Group contiguous regions
+    groups = np.split(indices, np.where(np.diff(indices) != 1)[0] + 1)
+
+    best_group = None
+    best_length = 0
+
+    # --- EGT SHAPE VALIDATION ---
+    egt_cols = [
+        "EGT 1 (deg F)",
+        "EGT 2 (deg F)",
+        "EGT 3 (deg F)",
+        "EGT 4 (deg F)",
+    ]
+
+    for group in groups:
+        if len(group) < 15:  # slightly shorter allowed
+            continue
+
+        segment = flight_df.iloc[group]
+        valid_cylinders = 0
+
+        for col in egt_cols:
+            if col not in segment.columns:
+                continue
+
+            egt = pd.to_numeric(segment[col], errors="coerce").ffill().bfill().values
+
+            if len(egt) < 10:
+                continue
+
+            # Smooth EGT more aggressively to remove noise
+            egt_s = pd.Series(egt).rolling(7, center=True).mean().ffill().bfill().values
+
+            # Find peak index
+            peak_idx = np.argmax(egt_s)
+
+            # Allow peak closer to edges (real sweeps often truncated)
+            if peak_idx < 2 or peak_idx > len(egt_s) - 2:
+                continue
+
+            # Split before/after peak
+            before = egt_s[:peak_idx]
+            after = egt_s[peak_idx:]
+
+            if len(before) < 3 or len(after) < 3:
+                continue
+
+            # Use trend (slope) instead of absolute min/max difference
+            rise_trend = np.polyfit(range(len(before)), before, 1)[0]
+            fall_trend = np.polyfit(range(len(after)), after, 1)[0]
+
+            # Also require total rise magnitude
+            total_rise = egt_s[peak_idx] - np.min(before)
+
+            if rise_trend > 0 and fall_trend < 0 and total_rise > 10:
+                valid_cylinders += 1
+
+        # Require at least ONE valid cylinder (very tolerant for real-world data)
+        if valid_cylinders >= 1:
+            if len(group) > best_length:
+                best_group = group
+                best_length = len(group)
+
+    if best_group is None:
+        print("No valid GAMI sweep (EGT shape failed).")
+        return None, None
+
+    # Expand window slightly to capture full sweep
+    pad = int(len(best_group) * 0.1)
+    start_idx = max(0, best_group[0] - pad)
+    end_idx = min(len(flight_df) - 1, best_group[-1] + pad)
+
+    start_time = flight_df.iloc[start_idx]["Session Time"]
+    end_time = flight_df.iloc[end_idx]["Session Time"]
+
+    print(f"GAMI debug: candidates={len(groups)}, selected_length={best_length}")
+    print(f"GAMI sweep detected from {start_time} to {end_time} (EGT validated)")
+
+    return start_time, end_time
+
+
 def gami_spread(df, start_time, end_time):
     gami_columns = [
         "EGT 1 (deg F)",
@@ -256,7 +379,7 @@ def gami_spread(df, start_time, end_time):
             egt,
             f"Cyl {cyl}\n{ff:.2f} GPH",
             rotation=0,
-            verticalalignment="top",
+            verticalalignment="bottom",
             color=color,
         )
 
@@ -990,16 +1113,14 @@ def main():
         if event == "-GAMI_SPREAD-":
             flight_id = values["-FLIGHT-"]
 
-            start_time, end_time = find_gami_window(df, flight_id)
-
-            # Fallback to manual input if auto-detection fails
-            if start_time is None or end_time is None:
+            if values["-START_MANUEVER-"] and values["-END_MANUEVER-"]:
                 try:
                     start_time = float(values["-START_MANUEVER-"])
                     end_time = float(values["-END_MANUEVER-"])
                 except:
                     print("Invalid manual inputs.")
-                    continue
+            else:
+                start_time, end_time = find_gami_window(df, flight_id)
 
             flight_data = df[df["Flight ID"] == flight_id].copy().fillna(0)
 
