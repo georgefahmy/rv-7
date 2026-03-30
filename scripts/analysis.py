@@ -6,6 +6,7 @@ import contextily as ctx
 import FreeSimpleGUI as sg
 import matplotlib
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 from airspeed_calibration import analyze_flight_data
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
@@ -179,6 +180,95 @@ def list_signals(df):
     # for i, col in enumerate(columns):
     #     print(f"{i}: {col}")
     return columns
+
+
+def gami_spread(df, start_time, end_time):
+    gami_columns = [
+        "EGT 1 (deg F)",
+        "EGT 2 (deg F)",
+        "EGT 3 (deg F)",
+        "EGT 4 (deg F)",
+        "Total Fuel Flow (gal/hr)",
+    ]
+    gami_df = (
+        df[(df["Session Time"] >= start_time) & (df["Session Time"] <= end_time)]
+        .copy()[gami_columns]
+        .copy()
+    )
+
+    # Find fuel flow at peak EGT for each cylinder
+    fuel_flows_at_peak = []
+    peak_points = []
+
+    for i in range(1, 5):
+        egt_col = f"EGT {i} (deg F)"
+
+        if egt_col not in gami_df.columns:
+            continue
+
+        # Find index of max EGT
+        idx_max = gami_df[egt_col].idxmax()
+
+        if pd.isna(idx_max):
+            continue
+
+        fuel_flow = gami_df.loc[idx_max, "Total Fuel Flow (gal/hr)"]
+        egt_val = gami_df.loc[idx_max, egt_col]
+
+        fuel_flows_at_peak.append(fuel_flow)
+        peak_points.append((fuel_flow, egt_val, i))
+
+        print(f"Cylinder {i}: Peak EGT ({egt_val}) at fuel flow = {fuel_flow:.2f} GPH")
+
+    if len(fuel_flows_at_peak) >= 2:
+        min_ff = min(fuel_flows_at_peak)
+        max_ff = max(fuel_flows_at_peak)
+        spread = max_ff - min_ff
+
+        print(f"\nGAMI Spread: {spread:.2f} GPH")
+    else:
+        print("Not enough data to compute GAMI spread.")
+
+    # --- Plot EGT vs Fuel Flow with peak markers ---
+
+    fig, ax = plt.subplots()
+
+    cyl_colors = {}
+
+    # Scatter each cylinder and store its color
+    for i in range(1, 5):
+        egt_col = f"EGT {i} (deg F)"
+        if egt_col in gami_df.columns:
+            (line,) = ax.plot(
+                gami_df["Total Fuel Flow (gal/hr)"],
+                gami_df[egt_col],
+                label=f"Cylinder {i}",
+            )
+            cyl_colors[i] = line.get_color()
+
+    # Add vertical lines and labels at peak fuel flow with color matching
+    for ff, egt, cyl in peak_points:
+        color = cyl_colors.get(cyl, None)
+
+        ax.axvline(ff, linestyle="--", color=color)
+        ax.text(
+            ff,
+            egt,
+            f"Cyl {cyl}\n{ff:.2f} GPH",
+            rotation=0,
+            verticalalignment="top",
+            color=color,
+        )
+
+    ax.set_xlabel("Total Fuel Flow (GPH)")
+    ax.set_ylabel("EGT (deg F)")
+    ax.set_title("EGT vs Fuel Flow (GAMI Analysis)")
+    ax.legend()
+    ax.grid(True)
+
+    fig.show()
+
+    return
 
 
 # --- Helper function to export each flight to its own CSV file ---
@@ -621,7 +711,6 @@ def identify_flight_phases_for_selected_flight(df, flight_id):
     """
     Identify flight phases for the selected flight and print the first timestamp of each phase.
     """
-    import numpy as np
 
     # Filter the selected flight
     flight_df = df[df["Flight ID"] == flight_id].copy()
@@ -778,6 +867,11 @@ def main_layout():
                 key="-AIRSPEED_CALIBRATION-",
                 font=("Arial", 16),
             ),
+            sg.Button(
+                "Gami Spread",
+                key="-GAMI_SPREAD-",
+                font=("Arial, 16"),
+            ),
         ],
         [
             sg.Text(size=(50, 8), key="-SUMMARY-", font=("Arial", 14)),
@@ -893,6 +987,27 @@ def main():
         if event in (sg.WINDOW_CLOSED, "Exit"):
             break
 
+        if event == "-GAMI_SPREAD-":
+            flight_id = values["-FLIGHT-"]
+
+            start_time, end_time = find_gami_window(df, flight_id)
+
+            # Fallback to manual input if auto-detection fails
+            if start_time is None or end_time is None:
+                try:
+                    start_time = float(values["-START_MANUEVER-"])
+                    end_time = float(values["-END_MANUEVER-"])
+                except:
+                    print("Invalid manual inputs.")
+                    continue
+
+            flight_data = df[df["Flight ID"] == flight_id].copy().fillna(0)
+
+            gami_spread(
+                flight_data,
+                start_time=start_time,
+                end_time=end_time,
+            )
         # --- Handle file selection and load ---
         if (event == "-FILE-" and values["-FILE-"]) or (
             event == "-FOLDER-" and values["-FOLDER-"]
@@ -1385,7 +1500,8 @@ def main():
             window["-ASI_CALIBRATION-"].update(asi_calibration_summary)
 
     window.close()
+    return df
 
 
 if __name__ == "__main__":
-    main()
+    df = main()
