@@ -543,10 +543,11 @@ cursor.execute(
     """
     CREATE TABLE IF NOT EXISTS fuel_tracker (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        date TEXT,
         hours REAL,
         gallons REAL,
         price_per_gallon REAL,
-        total_cost REAL
+        total_cost REAL,
         gal_per_hour REAL
     )
     """
@@ -885,16 +886,20 @@ while True:
     if event == "fuel_tracker_button":
         # Load existing fuel entries
         cursor.execute(
-            "SELECT hours, gallons, price_per_gallon, total_cost, gal_per_hour FROM fuel_tracker ORDER BY id DESC"
+            "SELECT date, hours, gallons, price_per_gallon, total_cost, gal_per_hour FROM fuel_tracker ORDER BY id DESC"
         )
         fuel_rows = cursor.fetchall()
 
-        total_gallons = sum(r[1] for r in fuel_rows) if fuel_rows else 0
-        total_spent = sum(r[3] for r in fuel_rows) if fuel_rows else 0
-        gal_per_hour_avg = mean(list(r[4] for r in fuel_rows) if fuel_rows else 0)
-        dollar_per_hour_avg = total_spent / total_gallons * gal_per_hour_avg
+        total_gallons = sum(r[2] for r in fuel_rows) if fuel_rows else 0
+        total_spent = sum(r[4] for r in fuel_rows) if fuel_rows else 0
+        gal_per_hour_avg = mean(list(r[5] for r in fuel_rows) if fuel_rows else 0)
+        dollar_per_hour_avg = (
+            total_spent / total_gallons * gal_per_hour_avg if total_gallons else 0
+        )
         fuel_layout = [
             [
+                sg.Text("Date"),
+                sg.Input(key="fuel_date", size=(12, 1)),
                 sg.Text("Hours"),
                 sg.Input(key="fuel_hours", size=(10, 1), enable_events=True),
                 sg.Text("Fuel Fill Up (Gallons)"),
@@ -919,6 +924,7 @@ while True:
                 sg.Table(
                     values=fuel_rows,
                     headings=[
+                        "Date",
                         "Hours",
                         "Gallons",
                         "Price/Gal",
@@ -927,7 +933,7 @@ while True:
                     ],
                     key="fuel_table",
                     auto_size_columns=False,
-                    col_widths=[6, 10, 10, 10, 10],
+                    col_widths=[10, 6, 10, 10, 10, 10],
                     justification="left",
                     num_rows=8,
                     expand_x=True,
@@ -987,6 +993,7 @@ while True:
 
             if f_event == "Save":
                 try:
+                    date = f_values["fuel_date"]
                     hours = float(f_values["fuel_hours"])
                     gallons = float(f_values["fuel_gallons"])
                     price = float(f_values["fuel_price"])
@@ -994,31 +1001,36 @@ while True:
                     gal_per_hour = round(gallons / hours, 2)
 
                     cursor.execute(
-                        "INSERT INTO fuel_tracker (hours, gallons, price_per_gallon, total_cost, gal_per_hour) VALUES (?, ?, ?, ?, ?)",
-                        (hours, gallons, price, total, gal_per_hour),
+                        "INSERT INTO fuel_tracker (date, hours, gallons, price_per_gallon, total_cost, gal_per_hour) VALUES (?, ?, ?, ?, ?, ?)",
+                        (date, hours, gallons, price, total, gal_per_hour),
                     )
                     conn.commit()
 
                     sg.popup("Fuel entry saved.")
                     # Refresh the table and totals after saving
+                    fuel_window["fuel_date"].update("")
                     fuel_window["fuel_hours"].update("")
                     fuel_window["fuel_gallons"].update("")
                     fuel_window["fuel_price"].update("")
                     fuel_window["fuel_total"].update("")
                     fuel_window["gal_per_hour"].update("")
-                    fuel_window["dollar_per_hour"].update("")
+                    # fuel_window["dollar_per_hour"].update("")
                     cursor.execute(
-                        "SELECT hours, gallons, price_per_gallon, total_cost, gal_per_hour FROM fuel_tracker ORDER BY id DESC"
+                        "SELECT date, hours, gallons, price_per_gallon, total_cost, gal_per_hour FROM fuel_tracker ORDER BY id DESC"
                     )
                     fuel_rows = cursor.fetchall()
                     fuel_window["fuel_table"].update(values=fuel_rows)
 
-                    total_gallons = sum(r[1] for r in fuel_rows) if fuel_rows else 0
-                    total_spent = sum(r[3] for r in fuel_rows) if fuel_rows else 0
+                    total_gallons = sum(r[2] for r in fuel_rows) if fuel_rows else 0
+                    total_spent = sum(r[4] for r in fuel_rows) if fuel_rows else 0
                     gal_per_hour_avg = mean(
-                        list(r[4] for r in fuel_rows) if fuel_rows else 0
+                        list(r[5] for r in fuel_rows) if fuel_rows else 0
                     )
-                    dollar_per_hour_avg = total_spent / total_gallons * gal_per_hour_avg
+                    dollar_per_hour_avg = (
+                        total_spent / total_gallons * gal_per_hour_avg
+                        if total_gallons
+                        else 0
+                    )
 
                     fuel_window["fuel_total_gallons"].update(
                         f"Total Fuel Used: {round(total_gallons, 2)} gal"
@@ -1043,9 +1055,12 @@ while True:
                         continue
 
                     row_index = selected[0]
-                    hours, gallons, price, total, gal_per_hour = fuel_rows[row_index]
+                    date, hours, gallons, price, total, gal_per_hour = fuel_rows[
+                        row_index
+                    ]
 
                     # Populate fields with selected row values
+                    fuel_window["fuel_date"].update(date)
                     fuel_window["fuel_hours"].update(hours)
                     fuel_window["fuel_gallons"].update(gallons)
                     fuel_window["fuel_price"].update(price)
@@ -1066,31 +1081,37 @@ while True:
                         continue
 
                     row_index = selected[0]
-                    hours, gallons, price, total, gal_per_hour = fuel_rows[row_index]
+                    date, hours, gallons, price, total, gal_per_hour = fuel_rows[
+                        row_index
+                    ]
 
                     confirm = sg.popup_yes_no("Delete this fuel entry?")
                     if confirm != "Yes":
                         continue
 
                     cursor.execute(
-                        "DELETE FROM fuel_tracker WHERE hours=? AND gallons=? AND price_per_gallon=? AND total_cost=? AND gal_per_hour=?",
-                        (hours, gallons, price, total, gal_per_hour),
+                        "DELETE FROM fuel_tracker WHERE date=? AND hours=? AND gallons=? AND price_per_gallon=? AND total_cost=? AND gal_per_hour=?",
+                        (date, hours, gallons, price, total, gal_per_hour),
                     )
                     conn.commit()
 
                     # Refresh table
                     cursor.execute(
-                        "SELECT hours, gallons, price_per_gallon, total_cost, gal_per_hour FROM fuel_tracker ORDER BY id DESC"
+                        "SELECT date, hours, gallons, price_per_gallon, total_cost, gal_per_hour FROM fuel_tracker ORDER BY id DESC"
                     )
                     fuel_rows = cursor.fetchall()
                     fuel_window["fuel_table"].update(values=fuel_rows)
 
-                    total_gallons = sum(r[1] for r in fuel_rows) if fuel_rows else 0
-                    total_spent = sum(r[3] for r in fuel_rows) if fuel_rows else 0
+                    total_gallons = sum(r[2] for r in fuel_rows) if fuel_rows else 0
+                    total_spent = sum(r[4] for r in fuel_rows) if fuel_rows else 0
                     gal_per_hour_avg = mean(
-                        list(r[4] for r in fuel_rows) if fuel_rows else 0
+                        list(r[5] for r in fuel_rows) if fuel_rows else 0
                     )
-                    dollar_per_hour_avg = total_spent / total_gallons * gal_per_hour_avg
+                    dollar_per_hour_avg = (
+                        total_spent / total_gallons * gal_per_hour_avg
+                        if total_gallons
+                        else 0
+                    )
 
                     fuel_window["fuel_total_gallons"].update(
                         f"Total Fuel Used: {round(total_gallons, 2)} gal"
