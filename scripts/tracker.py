@@ -1,3 +1,4 @@
+import base64
 import sqlite3
 from datetime import datetime, timedelta
 
@@ -6,6 +7,8 @@ from numpy import mean
 
 sg.theme("Reddit")
 sg.set_options(font=("Arial", 14))
+sg.set_options(icon=base64.b64encode(open(str("paint_logo.png"), "rb").read()))
+
 
 # --- Maintenance Interval Configuration ---
 OIL_CHANGE_INTERVAL_HOURS = 50

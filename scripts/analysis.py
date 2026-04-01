@@ -1,3 +1,4 @@
+import base64
 import glob
 import os
 import warnings
@@ -13,7 +14,9 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolb
 from matplotlib.widgets import RectangleSelector
 
 warnings.filterwarnings("ignore")
-
+sg.theme("Reddit")
+sg.set_options(font=("Arial", 14))
+sg.set_options(icon=base64.b64encode(open(str("paint_logo.png"), "rb").read()))
 matplotlib.use("TkAgg")
 ground_track = {
     "lat": None,
