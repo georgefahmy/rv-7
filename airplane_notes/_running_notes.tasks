@@ -63,7 +63,7 @@ Backlog:
         @future PMAG controller (~$500):
         PMAG EI Controller - see advance angle on skyview
         ✔ Order PMAG EI Controller @done(26-02-25)
-        ☐ Fabricate Tx/Rx harness for Left/Right PMAG to D15 connector
+        ✔ Fabricate Tx/Rx harness for Left/Right PMAG to D15 connector @done(26-04-01)
         ☐ Power VPX J1.1 (2amp max),
         ☐ Ground to ground-tab on Firewall
         ☐ EMS GPIO1, GPIO5, GPIO7, GPIO8 available (after changing Trim to VPX) Left/Right advance and temperature monitor
@@ -123,7 +123,7 @@ Future Project Order:
 On Deck:
     investigate flaps position sensor flickering
     washers in front of static port increase TAS reading
-    washers in back of static port decrease TAS reading
+    washers in back of static port decrease TAS reading - need to add washers to the rear of the static ports
 
 
 ################################################
