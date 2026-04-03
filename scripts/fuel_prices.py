@@ -67,9 +67,11 @@ def find_best_100ll_options(airports_data):
 
     # 5. Print the top 5 options
     for i, opt in enumerate(options[:5], 1):
-        dist_str = f"{opt['distance']} nm" if opt["distance"] > 0 else "Origin"
+        dist_str = (
+            f"{opt['distance']} nm away" if opt["distance"] > 0 else "0.00 nm away"
+        )
         print(
-            f"{i}. {opt['airport']:<4} - ${opt['price']:.2f} ({dist_str} away) [{opt['date']}] | {opt['name']}"
+            f"{i}. {opt['airport']:<4} - ${opt['price']:.2f} ({dist_str}) [{opt['date']}] | {opt['name']}"
         )
     print("----------------------------------\n")
 
