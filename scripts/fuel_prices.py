@@ -2,8 +2,7 @@ import email
 import json
 import os
 import sys
-import urllib.parse
-from datetime import date
+from datetime import date, datetime, timedelta
 from email import policy
 
 import requests
@@ -55,6 +54,7 @@ def find_best_100ll_options(airports_data):
                     "name": airport["airport_name"],
                     "distance": dist_nm,
                     "price": min_price,
+                    "date": fbo["last_updated"],
                 }
             )
 
@@ -69,7 +69,7 @@ def find_best_100ll_options(airports_data):
     for i, opt in enumerate(options[:5], 1):
         dist_str = f"{opt['distance']} nm" if opt["distance"] > 0 else "Origin"
         print(
-            f"{i}. {opt['airport']} - ${opt['price']:.2f} ({dist_str} away) | {opt['name']}"
+            f"{i}. {opt['airport']:<4} - ${opt['price']:.2f} ({dist_str} away) [{opt['date']}] | {opt['name']}"
         )
     print("----------------------------------\n")
 
@@ -262,17 +262,63 @@ def extract_html_from_file(filepath):
             return f.read()
 
 
+def process_local_file(filepath):
+    try:
+        print(f"Reading local file '{filepath}'...")
+        html_content = extract_html_from_file(filepath)
+
+        if not html_content:
+            print("Error: Could not extract HTML content from the file.")
+            return
+
+        parsed_data = parse_airnav_html(html_content)
+
+        if not parsed_data:
+            print("Warning: Could not locate fuel data in the provided file.")
+            return
+
+        output_folder = "fuel_prices"
+        os.makedirs(output_folder, exist_ok=True)
+        base_name = os.path.splitext(os.path.basename(filepath))[0]
+        filename = os.path.join(output_folder, f"{base_name}_parsed.json")
+
+        with open(filename, "w", encoding="utf-8") as json_file:
+            json.dump(parsed_data, json_file, indent=4, ensure_ascii=False)
+
+        print(f"Success! Local file parsed and saved to: {filename}")
+
+        find_best_100ll_options(parsed_data)
+
+    except FileNotFoundError:
+        print(f"File not found: {filepath}")
+    except Exception as e:
+        print(f"An error occurred reading the file: {e}")
+
+
+def check_exists(airport_code):
+    output_folder = "fuel_prices"
+    os.makedirs(output_folder, exist_ok=True)
+    filename = os.path.join(output_folder, f"{airport_code.lower()}_fuel_prices.json")
+
+    return os.path.isfile(filename), filename
+
+
 def scrape_airnav_to_json(input_query):
-    if input_query.startswith("http"):
-        target_url = input_query
-        parsed_url = urllib.parse.urlparse(input_query)
-        query_params = urllib.parse.parse_qs(parsed_url.query)
-        airport_code = query_params.get("s", ["UNKNOWN"])[0].upper()
-    else:
-        airport_code = input_query.upper()
-        target_url = (
-            f"https://www.airnav.com/fuel/local.html?s={airport_code}&submit=true"
-        )
+
+    airport_code = input_query.upper()
+    exists, filename = check_exists(airport_code)
+    if exists:
+        last_updated = datetime.fromtimestamp(os.path.getmtime(filename))
+        print(f"Data last updated: {last_updated}")
+        if (datetime.now() - last_updated) < timedelta(days=7):
+            with open(filename, "r") as fp:
+                parsed_data = json.load(fp)
+                find_best_100ll_options(parsed_data)
+            return
+        else:
+            print("Outdated information - fetching new data...")
+
+    target_url = f"https://www.airnav.com/fuel/local.html?s={airport_code}&submit=true"
 
     session = requests.Session()
     session.headers.update(
@@ -313,43 +359,8 @@ def scrape_airnav_to_json(input_query):
         print(f"An unexpected error occurred during parsing: {e}")
 
 
-def process_local_file(filepath):
-    try:
-        print(f"Reading local file '{filepath}'...")
-        html_content = extract_html_from_file(filepath)
-
-        if not html_content:
-            print("Error: Could not extract HTML content from the file.")
-            return
-
-        parsed_data = parse_airnav_html(html_content)
-
-        if not parsed_data:
-            print("Warning: Could not locate fuel data in the provided file.")
-            return
-
-        output_folder = "fuel_prices"
-        os.makedirs(output_folder, exist_ok=True)
-        base_name = os.path.splitext(os.path.basename(filepath))[0]
-        filename = os.path.join(output_folder, f"{base_name}_parsed.json")
-
-        with open(filename, "w", encoding="utf-8") as json_file:
-            json.dump(parsed_data, json_file, indent=4, ensure_ascii=False)
-
-        print(f"Success! Local file parsed and saved to: {filename}")
-
-        find_best_100ll_options(parsed_data)
-
-    except FileNotFoundError:
-        print(f"File not found: {filepath}")
-    except Exception as e:
-        print(f"An error occurred reading the file: {e}")
-
-
 if __name__ == "__main__":
-    choice = input(
-        "Enter an airport code (e.g., KLAX), a full AirNav URL, or 'FILE' for local testing: "
-    ).strip()
+    choice = input("Enter an airport code (e.g., KLAX): ").strip()
 
     if choice.upper() == "FILE":
         file_path = input(
