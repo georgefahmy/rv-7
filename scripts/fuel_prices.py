@@ -48,6 +48,19 @@ def find_best_100ll_options(airports_data):
 
         # 3. Log valid findings
         if found_price:
+            fill_up_amount = 30  # gallons
+            taxi_takeoff_gal = 2  # gallons
+            speed = 150  # knots
+            avg_gal_per_hour = 8  # gal/hr
+            fuel_cost = fill_up_amount * min_price
+            if dist_nm > 0:
+                gals = (
+                    taxi_takeoff_gal + dist_nm / speed * avg_gal_per_hour
+                )  # return gallon usage
+            else:
+                gals = 0
+            calculated_cost = (gals * min_price) + fuel_cost  # price to return
+            remaining_fuel = fill_up_amount - gals
             options.append(
                 {
                     "airport": airport["airport_code"],
@@ -55,6 +68,8 @@ def find_best_100ll_options(airports_data):
                     "distance": dist_nm,
                     "price": min_price,
                     "date": fbo["last_updated"],
+                    "total_cost": calculated_cost,
+                    "remaining_fuel": remaining_fuel,
                 }
             )
 
@@ -63,7 +78,7 @@ def find_best_100ll_options(airports_data):
         return
 
     # 4. Sort: Primary by Price (ascending), Secondary by Distance (ascending)
-    options.sort(key=lambda x: (x["price"], x["distance"]))
+    options.sort(key=lambda x: (x["total_cost"], x["price"], x["distance"]))
 
     # 5. Print the top 5 options
     for i, opt in enumerate(options[:5], 1):
@@ -71,7 +86,7 @@ def find_best_100ll_options(airports_data):
             f"{opt['distance']} nm away" if opt["distance"] > 0 else "0.00 nm away"
         )
         print(
-            f"{i}. {opt['airport']:<4} - ${opt['price']:.2f} ({dist_str}) [{opt['date']}] | {opt['name']}"
+            f"{i}. {opt['airport']:<4} - ${opt['price']:.2f} ({dist_str}) [{opt['date']}] (est. ${opt['total_cost']:0.2f}) | {opt['name']}"
         )
     print("----------------------------------\n")
 

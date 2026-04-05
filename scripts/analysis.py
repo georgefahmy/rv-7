@@ -87,8 +87,9 @@ def process_flights(df):
         + df["CHT 3 (deg F)"]
         + df["CHT 4 (deg F)"]
     ) / 4
-    df["CHT_OAT_Ratio"] = df["AVG_CHT"] / df["OAT (deg F)"]
-    df["OIL_OAT_Ratio"] = df["Oil Temp (deg F)"] / df["OAT (deg F)"]
+    df["CHT_Delta_T"] = df["AVG_CHT"] - df["OAT (deg F)"]
+    df["OIL_Delta_T"] = df["Oil Temp (deg F)"] - df["OAT (deg F)"]
+
     # --- Compute Fuel Flow Integral (gallons) per flight ---
     # Ensure Fuel Flow 1 is numeric
     if "Fuel Flow 1 (gal/hr)" in df.columns:
@@ -103,6 +104,7 @@ def process_flights(df):
         avg_flow = 0.5 * (flow_gps + flow_prev)
         increment = avg_flow * dt
         df["Fuel Flow Integral"] = increment.groupby(df["_orig_flight_num"]).cumsum()
+
     if "Ground Speed (knots)" in df.columns:
         df["Ground Speed (knots)"] = pd.to_numeric(
             df["Ground Speed (knots)"], errors="coerce"
@@ -116,6 +118,7 @@ def process_flights(df):
         avg_speed = 0.5 * (speed_fps + speed_prev)
         increment = avg_speed * dt
         df["Distance Traveled"] = increment.groupby(df["_orig_flight_num"]).cumsum()
+
     # 2. Determine if Engine was Run for each flight
     # Calculate max RPM for each flight
     flight_max_rpm = df.groupby("_orig_flight_num")[["RPM L", "RPM R"]].max()
@@ -1594,10 +1597,10 @@ def main():
                 & (as_cal_df["session_time"] <= end_time)
             ]
 
-            cal_df = maneuver_df[
-                ["press_alt", "ias", "hdg", "gps_gs", "gps_trk"]
-            ].copy()
-            cal_df.to_csv("~/Documents/projects/dynon/data_logs/cal_df.csv")
+            # cal_df = maneuver_df[
+            #     ["press_alt", "ias", "hdg", "gps_gs", "gps_trk"]
+            # ].copy()
+            # cal_df.to_csv("~/Documents/projects/dynon/clean_flights/cal_df.csv")
 
             avg_wind_speed = (
                 maneuver_df["Wind Speed (knots)"].mean()

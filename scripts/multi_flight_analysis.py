@@ -8,7 +8,7 @@ from analysis import process_flights
 warnings.filterwarnings("ignore")
 
 # ====== CONFIG ======
-FOLDER_PATH = "/Users/GFahmy/Documents/projects/dynon/data_logs"
+FOLDER_PATH = "/Users/GFahmy/Documents/projects/dynon/clean_flights"
 CHT_COLUMNS = [
     "CHT 1 (deg F)",
     "CHT 2 (deg F)",
@@ -28,7 +28,6 @@ POWER_FILTER = 10
 # ====== LOAD ALL CSV FILES ======
 def load_flights(folder):
     all_data = []
-
     for file in os.listdir(folder):
         if file.endswith(".csv"):
             path = os.path.join(folder, file)
@@ -38,7 +37,6 @@ def load_flights(folder):
                 all_data.append(df)
             except Exception as e:
                 print(f"Skipping {file}: {e}")
-
     combined = pd.concat(all_data, ignore_index=True)
     return combined
 
