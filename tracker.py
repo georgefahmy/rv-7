@@ -7,19 +7,19 @@ from numpy import mean
 
 from scripts.fuel_prices import scrape_airnav_to_json
 from scripts.src.constants import (
-    CONDITION_INSPECTION_INTERVAL_MONTHS,
     CURRENT_COLOR,
     DEFAULT_COLOR,
     ELT_TEST_INTERVAL_DAYS,
     MX_CATEGORIES,
     OAS_AVIATION_DB_INTERVAL_DAYS,
-    OAS_OBSTACLE_DB_INTERVAL_DAYS,
     OIL_CHANGE_INTERVAL_HOURS,
     OVERDUE_COLOR,
     RECURRENT_ITEMS,
-    TRANSPONDER_CHECK_MONTHS,
     WARNING_COLOR,
 )
+from scripts.src.entry_layout import entry_layout
+from scripts.src.flight_layout import flight_layout
+from scripts.src.fuel_layout import fuel_layout
 from scripts.src.tracker_layout import main_layout
 
 sg.theme("Reddit")
@@ -545,103 +545,6 @@ cursor.execute(
 conn.commit()
 
 
-def generate_logbook_warning(window):
-    """Generate 30-day warning for upcoming ELT or maintenance and show separate logbook entry window."""
-    today = datetime.today().date()
-    warning_lines = []
-    logbook_lines = []
-
-    # --- ELT Test ---
-    cursor.execute(
-        "SELECT date, tach_time, airframe_time FROM maintenance_entries WHERE recurrent_item=? ORDER BY date DESC LIMIT 1",
-        ("ELT Test",),
-    )
-    result = cursor.fetchone()
-    if result and result[0]:
-        try:
-            last_dt = datetime.strptime(result[0], "%m/%d/%Y").date()
-            tach_time = result[1]
-            hobbs_time = result[2]
-            due_date = last_dt + timedelta(days=ELT_TEST_INTERVAL_DAYS)
-            days_remaining = (due_date - today).days
-            if 0 <= days_remaining <= 30:
-                warning_lines.append(
-                    f"ELT Test due in {days_remaining} days on {due_date.strftime('%Y-%m-%d')}"
-                )
-            logbook_lines.append(
-                f"ELT Test last done {last_dt.strftime('%Y-%m-%d')} - Next due {due_date.strftime('%Y-%m-%d')} | Tach: {tach_time} | Hobbs: {hobbs_time}"
-            )
-        except:
-            pass
-
-    # --- ELT Batteries ---
-    cursor.execute(
-        "SELECT date, tach_time, airframe_time FROM maintenance_entries WHERE recurrent_item=? ORDER BY date DESC LIMIT 1",
-        ("ELT Batteries",),
-    )
-    result = cursor.fetchone()
-    if result and result[0]:
-        try:
-            last_dt = datetime.strptime(result[0], "%m/%d/%Y").date()
-            tach_time = result[1]
-            hobbs_time = result[2]
-            due_date = last_dt + timedelta(days=365 * 7)
-            days_remaining = (due_date - today).days
-            if 0 <= days_remaining <= 30:
-                warning_lines.append(
-                    f"ELT Batteries due in {days_remaining} days on {due_date.strftime('%Y-%m-%d')}"
-                )
-            logbook_lines.append(
-                f"ELT Batteries last replaced {last_dt.strftime('%Y-%m-%d')} - Next due {due_date.strftime('%Y-%m-%d')} | Tach: {tach_time} | Hobbs: {hobbs_time}"
-            )
-        except:
-            pass
-
-    # --- ELT Registration ---
-    cursor.execute(
-        "SELECT date, tach_time, airframe_time FROM maintenance_entries WHERE recurrent_item=? ORDER BY date DESC LIMIT 1",
-        ("ELT Registration",),
-    )
-    result = cursor.fetchone()
-    if result and result[0]:
-        try:
-            last_dt = datetime.strptime(result[0], "%m/%d/%Y").date()
-            tach_time = result[1]
-            hobbs_time = result[2]
-            due_date = last_dt + timedelta(days=365 * 2)
-            days_remaining = (due_date - today).days
-            if 0 <= days_remaining <= 30:
-                warning_lines.append(
-                    f"ELT Registration due in {days_remaining} days on {due_date.strftime('%Y-%m-%d')}"
-                )
-            logbook_lines.append(
-                f"ELT Registration last updated {last_dt.strftime('%Y-%m-%d')} - Next due {due_date.strftime('%Y-%m-%d')} | Tach: {tach_time} | Hobbs: {hobbs_time}"
-            )
-        except:
-            pass
-
-    # --- Show 30-day warning popup ---
-    if warning_lines:
-        sg.popup_scrolled(
-            "30-Day Warnings",
-            "\n".join(warning_lines),
-            title="Upcoming Maintenance Warnings",
-            size=(60, 20),
-        )
-
-    # --- Return logbook preview separately ---
-    logbook_text = (
-        "\n".join(logbook_lines) if logbook_lines else "No recent ELT entries."
-    )
-    sg.popup_scrolled(
-        "Logbook Entry Preview",
-        logbook_text,
-        title="Logbook Entry",
-        size=(60, 20),
-    )
-    return logbook_text, warning_lines
-
-
 window = sg.Window(title="N890GF", layout=main_layout, finalize=True)
 # Bind double-click event for flight log table
 window["flight_log_table"].bind("<Double-Button-1>", "_DOUBLE_CLICK")
@@ -661,6 +564,7 @@ while True:
     event, values = window.read()
     if event in (sg.WINDOW_CLOSED, "Exit"):
         break
+
     if event == "sw_db_updates":
         exec(open("scripts/sw_db_updates.py", "r").read())
 
@@ -701,79 +605,18 @@ while True:
         dollar_per_hour_avg = (
             total_spent / total_gallons * gal_per_hour_avg if total_gallons else 0
         )
-        fuel_layout = [
-            [
-                sg.Text("Date"),
-                sg.Input(key="fuel_date", size=(12, 1)),
-                sg.Text("Hours"),
-                sg.Input(key="fuel_hours", size=(10, 1), enable_events=True),
-                sg.Text("Fuel Fill Up (Gallons)"),
-                sg.Input(key="fuel_gallons", size=(10, 1), enable_events=True),
-                sg.Text("Price Per Gallon"),
-                sg.Input(key="fuel_price", size=(10, 1), enable_events=True),
-                sg.VerticalSeparator(),
-                sg.Text("Total Cost"),
-                sg.Text(key="fuel_total", size=(10, 1), background_color="lightgray"),
-                sg.Text("Gals Per Hour"),
-                sg.Text(key="gal_per_hour", size=(10, 1), background_color="lightgray"),
-            ],
-            [
-                sg.Button("Save"),
-                sg.Button("Edit Selected"),
-                sg.Button("Delete Selected"),
-                sg.Button("Cancel"),
-                sg.Text(expand_x=True),
-                sg.Input("E16", key="fuel_price_search", size=(10, 1)),
-                sg.Button("Search", key="fuel_price_submit"),
-            ],
-            [sg.HorizontalSeparator()],
-            [sg.Text("Fuel Entries", font=("Arial", 12))],
-            [
-                sg.Table(
-                    values=fuel_rows,
-                    headings=[
-                        "Date",
-                        "Hours",
-                        "Gallons",
-                        "Price/Gal",
-                        "Total Cost",
-                        "Gallons Per Hour",
-                    ],
-                    key="fuel_table",
-                    auto_size_columns=False,
-                    col_widths=[10, 6, 10, 10, 10, 10],
-                    justification="left",
-                    num_rows=8,
-                    expand_x=True,
-                )
-            ],
-            [
-                sg.Text(
-                    f"Total Fuel Used: {round(total_gallons, 2)} gal",
-                    key="fuel_total_gallons",
-                )
-            ],
-            [
-                sg.Text(
-                    f"Total Money Spent: ${round(total_spent, 2)}",
-                    key="fuel_total_spent",
-                )
-            ],
-            [
-                sg.Text(
-                    f"Average Fuel Consumption: {round(gal_per_hour_avg, 2)} gal/hr",
-                    key="gal_per_hour_avg",
-                )
-            ],
-            [
-                sg.Text(
-                    f"Average Cost Per Hour: ${round(dollar_per_hour_avg, 2)}/hr",
-                    key="dollar_per_hour_avg",
-                )
-            ],
-        ]
 
-        fuel_window = sg.Window("Fuel Tracker", fuel_layout, modal=True)
+        fuel_window = sg.Window(
+            "Fuel Tracker",
+            fuel_layout(
+                fuel_rows=fuel_rows,
+                total_gallons=total_gallons,
+                total_spent=total_spent,
+                gal_per_hour_avg=gal_per_hour_avg,
+                dollar_per_hour_avg=dollar_per_hour_avg,
+            ),
+            modal=True,
+        )
 
         while True:
             f_event, f_values = fuel_window.read()
@@ -962,75 +805,13 @@ while True:
                 except Exception as e:
                     sg.popup(f"Error deleting entry: {e}")
 
-    if event == "generate_logbook_entry":
-        generate_logbook_warning(window)
-
     if event == "add_entry_button":
-        entry_layout = [
-            [
-                sg.Column(
-                    layout=[
-                        [sg.Text("Date", expand_x=True)],
-                        [sg.Input(key="date_input", expand_x=True, size=(10, 1))],
-                    ]
-                ),
-                sg.Column(
-                    layout=[
-                        [sg.Text("Total Hours", expand_x=True)],
-                        [
-                            sg.Input(
-                                key="total_hours_input", expand_x=True, size=(10, 1)
-                            )
-                        ],
-                    ]
-                ),
-                sg.Column(
-                    layout=[
-                        [sg.Text("Tach Hours", expand_x=True)],
-                        [sg.Input(key="tach_hours_input", expand_x=True, size=(10, 1))],
-                    ]
-                ),
-                sg.Column(
-                    layout=[
-                        [sg.Text("Notes", expand_x=True)],
-                        [sg.Input(key="notes_input", expand_x=True, size=(30, 1))],
-                    ]
-                ),
-                sg.Column(
-                    layout=[
-                        [sg.Text("Recurrent Item", expand_x=True)],
-                        [
-                            sg.DropDown(
-                                RECURRENT_ITEMS,
-                                key="recurrent_item_input",
-                                expand_x=True,
-                                size=(15, 1),
-                            ),
-                        ],
-                    ]
-                ),
-                sg.Column(
-                    layout=[
-                        [sg.Text("Category", expand_x=True)],
-                        [
-                            sg.DropDown(
-                                MX_CATEGORIES,
-                                key="category_input",
-                                expand_x=True,
-                                size=(15, 1),
-                            ),
-                        ],
-                    ]
-                ),
-                sg.Column(
-                    layout=[
-                        [sg.Text("", expand_x=True)],
-                        [sg.Button("Submit", key="submit_entry", size=(10, 1))],
-                    ]
-                ),
-            ],
-        ]
-        entry_window = sg.Window("Add Maintenance Entry", entry_layout, modal=True)
+
+        entry_window = sg.Window(
+            "Add Maintenance Entry",
+            entry_layout(recurrent_items=RECURRENT_ITEMS, mx_categories=MX_CATEGORIES),
+            modal=True,
+        )
         while True:
             e_event, e_values = entry_window.read()
             if e_event in (sg.WINDOW_CLOSED, "Cancel"):
@@ -1089,26 +870,8 @@ while True:
                     entry_window["category_input"].update("")
                     entry_window.close()
                     break
+
     if event == "flight_log_button":
-        flight_layout = [
-            [
-                sg.Text("Date"),
-                sg.Input(key="flight_date", size=(10, 1)),
-                sg.Text("Takeoff Airport"),
-                sg.Input(key="flight_takeoff", size=(10, 1)),
-                sg.Text("Landing Airport"),
-                sg.Input(key="flight_landing", size=(10, 1)),
-                sg.Text("Hobbs"),
-                sg.Input(key="flight_hobbs", size=(10, 1)),
-                sg.Text("Tach"),
-                sg.Input(key="flight_tach", size=(10, 1)),
-                sg.Text("Landings"),
-                sg.Input(key="flight_landings", size=(10, 1)),
-                sg.Text("Notes"),
-                sg.Input(key="flight_notes", size=(10, 1)),
-            ],
-            [sg.Button("Submit"), sg.Button("Cancel")],
-        ]
 
         flight_window = sg.Window("Flight Log Entry", flight_layout, modal=True)
 
@@ -1174,6 +937,7 @@ while True:
 
                 flight_window.close()
                 break
+
     if event == "Delete Selected":
         selected = values["maintenance_table"]
         if selected:
@@ -1189,6 +953,7 @@ while True:
             update_due_dates(window)
             update_total_airframe_hours(window)
             update_database_due_dates(window)
+
     if event == "Delete Flight Selected":
         selected = values["flight_log_table"]
         if selected:
@@ -1209,6 +974,7 @@ while True:
             update_due_dates(window)
             update_total_airframe_hours(window)
             update_database_due_dates(window)
+
     if event == "Edit Flight Selected":
         selected = values["flight_log_table"]
         if selected:
@@ -1265,6 +1031,7 @@ while True:
                     update_database_due_dates(window)
                     edit_window.close()
                     break
+
     if event == "Edit Selected":
         selected = values["maintenance_table"]
         if selected:

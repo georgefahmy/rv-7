@@ -117,7 +117,6 @@ main_layout = [
     ],
     [
         sg.Button("Add Flight Log", key="flight_log_button"),
-        sg.Button("Generate Logbook Entry", key="generate_logbook_entry"),
     ],
     [sg.HorizontalSeparator()],
     [
