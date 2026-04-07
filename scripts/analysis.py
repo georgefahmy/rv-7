@@ -912,7 +912,7 @@ def main_layout():
             sg.FileBrowse(
                 file_types=(("CSV Files", "*.csv"),),
                 font=("Arial", 16),
-                initial_folder="/Users/GFahmy/Documents/projects/dynon/data_logs",
+                initial_folder="/Users/GFahmy/Documents/projects/dynon/clean_flights",
             ),
             sg.Text("", font=("Arial", 16), expand_x=True),
         ],
@@ -1101,6 +1101,7 @@ def apply_filters(df, filters):
 
 
 def main():
+    sg.set_options(icon=base64.b64encode(open(str("paint_logo.png"), "rb").read()))
     df = None
     flight_stats = None
     flight_ids = []
