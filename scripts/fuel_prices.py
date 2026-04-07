@@ -28,12 +28,17 @@ def find_best_100ll_options(airports_data):
         else:
             try:
                 dist_nm = float(dist_nm)
-            except ValueError:
+            except ValueError as e:
+                print(f"value error {e}")
                 dist_nm = 999.0  # Fallback for unexpected text
 
         # 2. Dig through all FBOs to find the absolute lowest 100LL price
         for fbo in airport.get("fbos", []):
+
             prices_100ll = fbo.get("prices", {}).get("100LL", [])
+            if not len(prices_100ll):
+                prices_100ll = fbo.get("prices", {}).get("UL94", [])
+
             for p_entry in prices_100ll:
                 raw_price = (
                     p_entry.get("price", "").replace("$", "").replace(",", "").strip()
@@ -70,6 +75,7 @@ def find_best_100ll_options(airports_data):
                     "date": fbo["last_updated"],
                     "total_cost": calculated_cost,
                     "remaining_fuel": remaining_fuel,
+                    "used_to_return": gals,
                 }
             )
 
@@ -81,12 +87,12 @@ def find_best_100ll_options(airports_data):
     options.sort(key=lambda x: (x["total_cost"], x["price"], x["distance"]))
 
     # 5. Print the top 5 options
-    for i, opt in enumerate(options[:5], 1):
+    for i, opt in enumerate(options[0:-1], 1):
         dist_str = (
             f"{opt['distance']} nm away" if opt["distance"] > 0 else "0.00 nm away"
         )
         print(
-            f"{i}. {opt['airport']:<4} - ${opt['price']:.2f} ({dist_str}) [{opt['date']}] (est. ${opt['total_cost']:0.2f}) | {opt['name']}"
+            f"{i}. {opt['airport']:<4} - ${opt['price']:.2f} ({dist_str}) [{opt['date']}] (est. ${opt['total_cost']:0.2f}) {opt['used_to_return']:0.1f} gal | {opt['name']}"
         )
     print("----------------------------------\n")
 
@@ -327,7 +333,7 @@ def scrape_airnav_to_json(input_query):
     if exists:
         last_updated = datetime.fromtimestamp(os.path.getmtime(filename))
         print(f"Data last updated: {last_updated}")
-        if (datetime.now() - last_updated) < timedelta(days=7):
+        if (datetime.now() - last_updated) < timedelta(days=3):
             with open(filename, "r") as fp:
                 parsed_data = json.load(fp)
                 find_best_100ll_options(parsed_data)

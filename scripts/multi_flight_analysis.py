@@ -23,6 +23,7 @@ OIL_COLUMN = "Oil Temp (deg F)"
 CHT_ALERT_THRESHOLD = 420  # deg F
 ALT_FILTER = 3000
 POWER_FILTER = 10
+REF_IAS = 120
 
 
 # ====== LOAD ALL CSV FILES ======
@@ -100,6 +101,61 @@ def analyze(df):
     print(df["efficiency"].describe())
 
 
+def break_in_trend(df):
+    CRUISE_RPM_MIN = 2300
+    CRUISE_RPM_MAX = 2600
+    CRUISE_MAP_MIN = 21.0  # Manifold Pressure in inches Hg
+    CRUISE_MAP_MAX = 28.0
+    CRUISE_IAS_MIN = 130  # Minimum Indicated Airspeed (knots)
+    CRUISE_GPS_ALT_MIN = 3000
+    MIN_CRUISE_POWER = 65
+    MAX_CRUISE_POWER = 85
+
+    # Apply the combined filter to lock in on cruise data only
+    df = df[
+        (df["RPM"] >= CRUISE_RPM_MIN)
+        & (df["RPM"] <= CRUISE_RPM_MAX)
+        & (df["Manifold Pressure (inHg)"] >= CRUISE_MAP_MIN)
+        & (df["Manifold Pressure (inHg)"] <= CRUISE_MAP_MAX)
+        & (df["Indicated Airspeed (knots)"] >= CRUISE_IAS_MIN)
+        & (df["GPS Altitude (feet)"] >= CRUISE_GPS_ALT_MIN)
+        & (df["Percent Power"] >= MIN_CRUISE_POWER)
+        & (df["Percent Power"] <= MAX_CRUISE_POWER)
+    ].copy()
+    # 1. Calculate Oil Delta
+
+    df["Sigma"] = df["Density Altitude (ft)"].apply(
+        lambda x: ((518.67 - 0.003566 * x) / 518.67) ** 4.256
+    )
+
+    df["AVG_CHT_density_corr"] = (df["AVG_CHT"] - df[OAT_COLUMN]) / df["Sigma"]
+    df["CHT_Per_Power"] = df["AVG_CHT_density_corr"] / df["Percent Power"]
+    df["Fuel_Efficiency_Index"] = df["Total Fuel Flow (gal/hr)"] / df["Percent Power"]
+
+    df["AVG_CHT_Final_Normalized"] = (
+        df["AVG_CHT_density_corr"] * (df["Indicated Airspeed (knots)"] / REF_IAS) ** 2
+    )
+    df["Oil_Friction_Index"] = (df["Oil Pressure (PSI)"] / (df["RPM"] / 1000)) / (
+        df[OIL_COLUMN] - df[OAT_COLUMN]
+    )
+    final_analysis = (
+        df.groupby("source_file")
+        .agg(
+            {
+                "CHT_Per_Power": "mean",  # Lower trend == break in complete
+                "Fuel_Efficiency_Index": "mean",  # Lower trend == break in complete
+                "Oil_Friction_Index": "mean",  # Higher == break in complete
+                "Percent Power": "mean",
+                "AVG_CHT_Final_Normalized": "mean",  # Lower == break in complete
+            }
+        )
+        .reset_index()
+    )
+
+    print("--- ENGINE BREAK-IN PERFORMANCE DATA ---")
+    print(final_analysis.to_string(index=False))
+
+
 # ====== PLOTS ======
 def plot(df):
     fig = plt.figure(figsize=(14, 8))
@@ -161,9 +217,10 @@ def main():
     df = load_flights(FOLDER_PATH)
     df = process_flights(df)
     analyze(df)
-    plot(df)
-    print("exporting")
-    save_flights_to_csv(df, "/Users/GFahmy/Documents/projects/dynon/clean_flights_2")
+    # plot(df)
+    # print("exporting")
+    # save_flights_to_csv(df, "/Users/GFahmy/Documents/projects/dynon/clean_flights_2")
+    break_in_trend(df)
 
 
 if __name__ == "__main__":
