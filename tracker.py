@@ -5,6 +5,8 @@ from datetime import datetime, timedelta
 import FreeSimpleGUI as sg
 from numpy import mean
 
+from scripts.fuel_prices import scrape_airnav_to_json
+
 sg.theme("Reddit")
 sg.set_options(font=("Arial", 14))
 sg.set_options(icon=base64.b64encode(open(str("paint_logo.png"), "rb").read()))
@@ -587,6 +589,7 @@ main_layout = [
                 [
                     sg.Button("Fuel Tracker", key="fuel_tracker_button"),
                     sg.Button("SW DB Updates", key="sw_db_updates"),
+                    sg.Button("Analysis", key="analysis"),
                 ],
             ],
         ),
@@ -865,6 +868,9 @@ while True:
     if event == "sw_db_updates":
         exec(open("scripts/sw_db_updates.py", "r").read())
 
+    if event == "analysis":
+        exec(open("scripts/analysis.py", "r").read())
+
     if event == "flight_log_table_DOUBLE_CLICK":
         selected = values.get("flight_log_table")
         if selected:
@@ -920,6 +926,9 @@ while True:
                 sg.Button("Edit Selected"),
                 sg.Button("Delete Selected"),
                 sg.Button("Cancel"),
+                sg.Text(expand_x=True),
+                sg.Input("E16", key="fuel_price_search", size=(10, 1)),
+                sg.Button("Search", key="fuel_price_submit"),
             ],
             [sg.HorizontalSeparator()],
             [sg.Text("Fuel Entries", font=("Arial", 12))],
@@ -976,6 +985,31 @@ while True:
             if f_event in (sg.WINDOW_CLOSED, "Cancel"):
                 fuel_window.close()
                 break
+
+            if f_event == "fuel_price_submit":
+                airport = f_values["fuel_price_search"]
+                options, output = scrape_airnav_to_json(airport)
+                output_string = ""
+                for i in output:
+                    output_string += f"{i}\n"
+
+                popup_layout = [
+                    [
+                        sg.Multiline(
+                            default_text=output_string,
+                            disabled=True,
+                            background_color="white",
+                            size=(120, 20),
+                            selected_background_color="white",
+                            selected_text_color="black",
+                            no_scrollbar=True,
+                        )
+                    ]
+                ]
+                popup_window = sg.Window(
+                    "Nearby Fuel Prices", layout=popup_layout, modal=True, finalize=True
+                )
+                popup_window.read()
 
             if (
                 f_event == "fuel_price"

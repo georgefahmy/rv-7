@@ -9,12 +9,12 @@ import requests
 from bs4 import BeautifulSoup
 
 
-def find_best_100ll_options(airports_data):
+def find_best_100ll_options(airports_data, show=False):
     """
     Analyzes the parsed data to find the lowest 100LL price at each airport.
     Sorts the results by Lowest Price -> Closest Distance and prints the top options.
     """
-    print("\n--- Top 5 Best 100LL Options ---")
+
     options = []
 
     for airport in airports_data:
@@ -85,16 +85,26 @@ def find_best_100ll_options(airports_data):
 
     # 4. Sort: Primary by Price (ascending), Secondary by Distance (ascending)
     options.sort(key=lambda x: (x["total_cost"], x["price"], x["distance"]))
+    output = [
+        f"{i}. {opt['airport']:<5} - ${opt['price']:.2f} "
+        + (f"({opt['distance']} nm away)" if opt["distance"] > 0 else "(0.00 nm away)")
+        + f" [{opt['date']}] (est. ${opt['total_cost']:0.2f}) {opt['used_to_return']:0.1f} gal | {opt['name']}"
+        for i, opt in enumerate(options, 1)
+    ]
 
-    # 5. Print the top 5 options
-    for i, opt in enumerate(options[0:-1], 1):
-        dist_str = (
-            f"{opt['distance']} nm away" if opt["distance"] > 0 else "0.00 nm away"
-        )
-        print(
-            f"{i}. {opt['airport']:<4} - ${opt['price']:.2f} ({dist_str}) [{opt['date']}] (est. ${opt['total_cost']:0.2f}) {opt['used_to_return']:0.1f} gal | {opt['name']}"
-        )
-    print("----------------------------------\n")
+    if show:
+        # 5. Print the top 5 options
+        print("\n--- Top 5 Best 100LL Options ---")
+        for i, opt in enumerate(options, 1):
+            dist_str = (
+                f"{opt['distance']} nm away" if opt["distance"] > 0 else "0.00 nm away"
+            )
+
+            print(
+                f"{i}. {opt['airport']:<4} - ${opt['price']:.2f} ({dist_str}) [{opt['date']}] (est. ${opt['total_cost']:0.2f}) {opt['used_to_return']:0.1f} gal | {opt['name']}"
+            )
+        print("----------------------------------\n")
+    return options, output
 
 
 def parse_airnav_html(html_content):
@@ -336,8 +346,8 @@ def scrape_airnav_to_json(input_query):
         if (datetime.now() - last_updated) < timedelta(days=3):
             with open(filename, "r") as fp:
                 parsed_data = json.load(fp)
-                find_best_100ll_options(parsed_data)
-            return
+                options, output = find_best_100ll_options(parsed_data)
+            return options, output
         else:
             print("Outdated information - fetching new data...")
 
@@ -374,12 +384,13 @@ def scrape_airnav_to_json(input_query):
 
         print(f"Success! Data parsed and saved to: {filename}")
 
-        find_best_100ll_options(parsed_data)
+        options, output = find_best_100ll_options(parsed_data)
 
     except requests.exceptions.RequestException as e:
         print(f"Network error occurred: {e}")
     except Exception as e:
         print(f"An unexpected error occurred during parsing: {e}")
+    return options, output
 
 
 if __name__ == "__main__":
