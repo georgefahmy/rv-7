@@ -1,0 +1,338 @@
+[
+    {
+        "airport_code": "KKIC",
+        "airport_name": "Mesa Del Rey Airport King City, CA",
+        "distance": {
+            "nm": null,
+            "direction": null
+        },
+        "fbos": [
+            {
+                "fbo_name": "Aviation Specialties Unlimited",
+                "last_updated": "26-Nov-2025",
+                "prices": {
+                    "100LL": [
+                        {
+                            "service": "SS",
+                            "price": "$6.89"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "airport_code": "KSNS",
+        "airport_name": "Salinas Municipal Airport Salinas, CA",
+        "distance": {
+            "nm": 35,
+            "direction": "NW"
+        },
+        "fbos": [
+            {
+                "fbo_name": "Jet West GateOne",
+                "last_updated": "08-Apr",
+                "prices": {
+                    "100LL": [
+                        {
+                            "service": "SS",
+                            "price": "$6.62"
+                        },
+                        {
+                            "service": "FS",
+                            "price": "$7.12"
+                        }
+                    ],
+                    "Jet A": [
+                        {
+                            "service": "FS",
+                            "price": "$8.17"
+                        },
+                        {
+                            "service": "SS",
+                            "price": "$8.17"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "airport_code": "C80",
+        "airport_name": "New Coalinga Municipal Airport Coalinga, CA",
+        "distance": {
+            "nm": 40,
+            "direction": "E"
+        },
+        "fbos": [
+            {
+                "fbo_name": "New Coalinga Municipal Airport",
+                "last_updated": "25-Mar",
+                "prices": {
+                    "100LL": [
+                        {
+                            "service": "SS",
+                            "price": "$5.31"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "airport_code": "KMRY",
+        "airport_name": "Monterey Regional Airport Monterey, CA",
+        "distance": {
+            "nm": 41,
+            "direction": "WNW"
+        },
+        "fbos": [
+            {
+                "fbo_name": "Del Monte Aviation",
+                "last_updated": "30-Mar",
+                "prices": {
+                    "100LL": [
+                        {
+                            "service": "FS",
+                            "price": "$6.75"
+                        }
+                    ],
+                    "Jet A": [
+                        {
+                            "service": "FS",
+                            "price": "$11.99"
+                        }
+                    ],
+                    "SAF": [
+                        {
+                            "service": "FS",
+                            "price": "$12.99"
+                        }
+                    ]
+                }
+            },
+            {
+                "fbo_name": "Monterey Jet Center, LLC",
+                "last_updated": "01-Apr",
+                "prices": {
+                    "100LL": [
+                        {
+                            "service": "SS",
+                            "price": "$6.50"
+                        },
+                        {
+                            "service": "FS",
+                            "price": "$7.50"
+                        }
+                    ],
+                    "UL94": [
+                        {
+                            "service": "SS",
+                            "price": "$7.10"
+                        }
+                    ],
+                    "Jet A": [
+                        {
+                            "service": "FS",
+                            "price": "$11.99"
+                        }
+                    ],
+                    "SAF": [
+                        {
+                            "service": "FS",
+                            "price": "$12.99"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "airport_code": "KPRB",
+        "airport_name": "Paso Robles Municipal Airport Paso Robles, CA",
+        "distance": {
+            "nm": 41,
+            "direction": "SE"
+        },
+        "fbos": [
+            {
+                "fbo_name": "Loyd's Aviation",
+                "last_updated": "03-Apr",
+                "prices": {
+                    "100LL": [
+                        {
+                            "service": "SS",
+                            "price": "$6.65"
+                        },
+                        {
+                            "service": "FS",
+                            "price": "$7.99"
+                        }
+                    ],
+                    "Jet A": [
+                        {
+                            "service": "FS",
+                            "price": "$8.10"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "airport_code": "KOAR",
+        "airport_name": "Marina Municipal Airport Marina, CA",
+        "distance": {
+            "nm": 41,
+            "direction": "NW"
+        },
+        "fbos": [
+            {
+                "fbo_name": "City of Marina (FBO)",
+                "last_updated": "08-Apr",
+                "prices": {
+                    "100LL": [
+                        {
+                            "service": "SS",
+                            "price": "$5.99"
+                        }
+                    ],
+                    "Jet A": [
+                        {
+                            "service": "SS",
+                            "price": "$6.10"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "airport_code": "KCVH",
+        "airport_name": "Hollister Municipal Airport Hollister, CA",
+        "distance": {
+            "nm": 42,
+            "direction": "NNW"
+        },
+        "fbos": [
+            {
+                "fbo_name": "Hollister Jet Center, Inc",
+                "last_updated": "08-Apr",
+                "prices": {
+                    "100LL": [
+                        {
+                            "service": "SS",
+                            "price": "$6.92"
+                        },
+                        {
+                            "service": "FS",
+                            "price": "$7.42 $7.32"
+                        }
+                    ],
+                    "Jet A": [
+                        {
+                            "service": "SS",
+                            "price": "$5.57"
+                        },
+                        {
+                            "service": "FS",
+                            "price": "$6.07 $5.97"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "airport_code": "3O8",
+        "airport_name": "Harris Ranch Airport Coalinga, CA",
+        "distance": {
+            "nm": 43,
+            "direction": "E"
+        },
+        "fbos": [
+            {
+                "fbo_name": "Harris Ranch Inn & Restaurant",
+                "last_updated": "05-Sep-2025",
+                "prices": {
+                    "100LL": [
+                        {
+                            "service": "SS",
+                            "price": "$6.89"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "airport_code": "KLSN",
+        "airport_name": "Los Banos Municipal Airport Los Banos, CA",
+        "distance": {
+            "nm": 52,
+            "direction": "NNE"
+        },
+        "fbos": [
+            {
+                "fbo_name": "City of Los Banos (FBO)",
+                "last_updated": "06-Apr",
+                "prices": {
+                    "100LL": [
+                        {
+                            "service": "SS",
+                            "price": "$5.50"
+                        }
+                    ],
+                    "Jet A": [
+                        {
+                            "service": "SS",
+                            "price": "$5.04"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "airport_code": "KWVI",
+        "airport_name": "Watsonville Municipal Airport Watsonville, CA",
+        "distance": {
+            "nm": 53,
+            "direction": "NW"
+        },
+        "fbos": [
+            {
+                "fbo_name": "Watsonville Municipal Airport",
+                "last_updated": "08-Apr",
+                "prices": {
+                    "100LL": [
+                        {
+                            "service": "SS",
+                            "price": "$6.85"
+                        },
+                        {
+                            "service": "FS",
+                            "price": "$7.35"
+                        }
+                    ],
+                    "G100UL": [
+                        {
+                            "service": "SS",
+                            "price": "$6.25"
+                        }
+                    ],
+                    "Jet A": [
+                        {
+                            "service": "SS",
+                            "price": "$6.80"
+                        },
+                        {
+                            "service": "FS",
+                            "price": "$7.30"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+]

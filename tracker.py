@@ -638,9 +638,7 @@ while True:
                             default_text=output_string,
                             disabled=True,
                             background_color="white",
-                            size=(120, 20),
-                            selected_background_color="white",
-                            selected_text_color="black",
+                            size=(150, 22),
                             no_scrollbar=True,
                         )
                     ]

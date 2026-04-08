@@ -23,6 +23,7 @@ def find_best_100ll_options(airports_data, show=False):
 
         # 1. Safely extract distance (Origin airport will be None, treated as 0.0)
         dist_nm = airport.get("distance", {}).get("nm")
+        direction = airport.get("distance", {}).get("direction")
         if dist_nm is None:
             dist_nm = 0.0
         else:
@@ -71,6 +72,7 @@ def find_best_100ll_options(airports_data, show=False):
                     "airport": airport["airport_code"],
                     "name": airport["airport_name"],
                     "distance": dist_nm,
+                    "direction": direction,
                     "price": min_price,
                     "date": fbo["last_updated"],
                     "total_cost": calculated_cost,
@@ -85,13 +87,25 @@ def find_best_100ll_options(airports_data, show=False):
 
     # 4. Sort: Primary by Price (ascending), Secondary by Distance (ascending)
     options.sort(key=lambda x: (x["total_cost"], x["price"], x["distance"]))
+    headers = "AirportID\t\tPrice\t\tDistance\t\tDate Updated\t\tEst. Total Cost\t\tEst. to Return\t\tAirtport Name"
     output = [
-        f"{i}. {opt['airport']:<5} - ${opt['price']:.2f} "
-        + (f"({opt['distance']} nm away)" if opt["distance"] > 0 else "(0.00 nm away)")
-        + f" [{opt['date']}] (est. ${opt['total_cost']:0.2f}) {opt['used_to_return']:0.1f} gal | {opt['name']}"
+        f"{opt['airport']:<4}\t\t"
+        + f"${opt['price']:.2f}\t\t"
+        + (
+            f"{opt['distance']}nm {opt['direction']}\t\t"
+            if opt["distance"] > 0
+            else "0.00 nm\t\t"
+        )
+        + f"{opt['date']}\t\t"
+        + f"${opt['total_cost']:0.2f}\t\t"
+        + f"{opt['used_to_return']:0.1f} gal\t\t"
+        + f"{opt['name']}"
         for i, opt in enumerate(options, 1)
     ]
+    linebreak = "".join("_" * (max(len(val) for val in output) + 4 * 10))
 
+    output.insert(0, headers)
+    output.insert(1, linebreak)
     if show:
         # 5. Print the top 5 options
         print("\n--- Top 5 Best 100LL Options ---")
@@ -101,7 +115,7 @@ def find_best_100ll_options(airports_data, show=False):
             )
 
             print(
-                f"{i}. {opt['airport']:<4} - ${opt['price']:.2f} ({dist_str}) [{opt['date']}] (est. ${opt['total_cost']:0.2f}) {opt['used_to_return']:0.1f} gal | {opt['name']}"
+                f"{i}. {opt['airport']:<4}\t - ${opt['price']:.2f} ({dist_str}) [{opt['date']}] (est. ${opt['total_cost']:0.2f}) {opt['used_to_return']:0.1f} gal | {opt['name']}"
             )
         print("----------------------------------\n")
     return options, output
