@@ -20,7 +20,7 @@ payload = {
     "destination": destination.upper(),  # Replace 'destination' with the actual input name
     "aptsel": "a-u-0----1-A",
     "method": "cheap",
-    "range": "400",
+    "range": "20",
     "rangeunits": "nm",
     "speed": "160",
     "speedunits": "kt",
@@ -123,5 +123,5 @@ for i in range(0, len(rows), 2):
 # Print the parsed dictionary cleanly
 print(json.dumps(route_data, indent=2))
 
-route_string = "-".join(f"{val['airport_code']}" for val in route_data)
+route_string = " ".join(f"{val['airport_code']}" for val in route_data)
 print(route_string)
