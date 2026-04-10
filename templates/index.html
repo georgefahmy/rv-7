@@ -144,12 +144,89 @@ button:hover {
     color: #8b949e;
     opacity: 0.9;
 }
+
+/* ===== TABS ===== */
+.tab-bar {
+    display: flex;
+    gap: 10px;
+    padding: 10px 20px;
+    background: #0d1117;
+    border-bottom: 1px solid #21262d;
+}
+
+.tab-bar button {
+    background: #161b22;
+    border: 1px solid #30363d;
+    color: #e6edf3;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.tab-bar button.active {
+    background: #238636;
+}
+
+/* ===== SECTIONS ===== */
+.section {
+    display: none;
+}
+
+.section.active {
+    display: block;
+}
+
+/* ===== MODAL ===== */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+}
+
+.modal-content {
+    background: #161b22;
+    margin: 5% auto;
+    padding: 20px;
+    width: 90%;
+    max-width: 600px;
+    border-radius: 10px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.modal-close {
+    cursor: pointer;
+    color: #f85149;
+    font-size: 18px;
+}
+
+/* hide original backend forms */
+form[action="/add_flight"],
+form[action="/add_maintenance"],
+form[action="/add_fuel"] {
+    display: none;
+}
 </style>
 </head>
 
 <body>
 
 <header>✈ Aircraft Dashboard</header>
+<div class="tab-bar">
+    <button onclick="openModal('flightModal')">Log Flight</button>
+    <button onclick="openModal('maintenanceModal')">Add Maintenance</button>
+    <button onclick="openModal('fuelModal')">Fuel Tracker</button>
+</div>
 
 <div class="container">
 
@@ -181,6 +258,8 @@ button:hover {
         <div class="value" id="obstacleStatus">--</div>
     </div>
 </div>
+
+<div id="flightTab" class="section active">
 
 <!-- FLIGHTS -->
 <h2>Flight Log</h2>
@@ -240,6 +319,9 @@ button:hover {
 </tr>
 {% endfor %}
 </table>
+
+</div>
+<div id="maintenanceTab" class="section">
 
 <!-- MAINTENANCE -->
 <h2>Maintenance</h2>
@@ -355,6 +437,9 @@ button:hover {
 {% endfor %}
 </table>
 
+</div>
+<div id="fuelTab" class="section">
+
 <!-- FUEL -->
 <h2>Fuel</h2>
 
@@ -395,6 +480,7 @@ button:hover {
 {% endfor %}
 </table>
 
+</div>
 </div>
 
 <script>
@@ -490,7 +576,55 @@ function loadSummary() {
 
 loadSummary();
 setInterval(loadSummary, 30000);
+
+function openModal(id) {
+    const m = document.getElementById(id);
+    if (m) m.style.display = "block";
+}
+
+function closeModal(id) {
+    const m = document.getElementById(id);
+    if (m) m.style.display = "none";
+}
+
+window.onclick = function(event) {
+    document.querySelectorAll(".modal").forEach(m => {
+        if (event.target === m) m.style.display = "none";
+    });
+};
 </script>
+
+<!-- MODALS -->
+
+<div id="flightModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Log Flight</h3>
+      <span class="modal-close" onclick="closeModal('flightModal')">✖</span>
+    </div>
+    document.querySelector('form[action="/add_flight"]').cloneNode(true).outerHTML
+  </div>
+</div>
+
+<div id="maintenanceModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Add Maintenance</h3>
+      <span class="modal-close" onclick="closeModal('maintenanceModal')">✖</span>
+    </div>
+    document.querySelector('form[action="/add_maintenance"]').cloneNode(true).outerHTML
+  </div>
+</div>
+
+<div id="fuelModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Fuel Tracker</h3>
+      <span class="modal-close" onclick="closeModal('fuelModal')">✖</span>
+    </div>
+    document.querySelector('form[action="/add_fuel"]').cloneNode(true).outerHTML
+  </div>
+</div>
 
 </body>
 </html>
