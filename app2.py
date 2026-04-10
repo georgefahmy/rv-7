@@ -35,7 +35,11 @@ def index():
     cursor.execute("SELECT * FROM maintenance_entries ORDER BY date DESC")
     mx_logs = [dict(row) for row in cursor.fetchall()]
 
-    # 3. Fetch Totals
+    # 3. Fetch fuel logs
+    cursor.execute("SELECT * FROM fuel_tracker ORDER BY date DESC")
+    fuel_logs = [dict(row) for row in cursor.fetchall()]
+
+    # 4. Fetch Totals
     cursor.execute(
         "SELECT hobbs FROM flight_log ORDER BY date DESC, hobbs DESC LIMIT 1"
     )
@@ -53,6 +57,7 @@ def index():
         "index2.html",
         flight_logs=flight_logs,
         mx_logs=mx_logs,
+        fuel_logs=fuel_logs,
         total_hours=total_hours,
         total_landings=total_landings,
         overdue_count=0,
