@@ -1,630 +1,722 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Aircraft Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N890GF - Aircraft Maintenance & Flight Log</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding-top: 56px;
+        }
 
-<style>
-body {
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
-    background: #0b0f14;
-    color: #e6edf3;
-}
+        /* Sticky Navbar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1050;
+        }
 
-header {
-    padding: 20px;
-    background: #111827;
-    font-size: 22px;
-    font-weight: bold;
-}
+        /* Sticky Action Bar */
+        .sticky-action-bar {
+            position: sticky;
+            top: 56px;
+            background-color: #f8f9fa;
+            z-index: 1040;
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #dee2e6;
+            margin-bottom: 1.5rem;
+        }
 
-.container {
-    padding: 20px;
-}
+        .status-overdue { color: #dc3545; font-weight: bold; }
+        .status-warning { color: #ffc107; font-weight: bold; }
+        .status-current { color: #198754; font-weight: bold; }
+        .status-default { color: #6c757d; font-weight: bold; }
+        .card { box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .action-btns { min-width: 120px; }
 
-.grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 15px;
-    margin-bottom: 25px;
-}
-
-.card {
-    background: #161b22;
-    padding: 15px;
-    border-radius: 10px;
-}
-
-.card h3 {
-    margin: 0;
-    font-size: 13px;
-    color: #8b949e;
-}
-
-.card .value {
-    font-size: 22px;
-    margin-top: 5px;
-    font-weight: bold;
-}
-
-h2 {
-    margin-top: 30px;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: #161b22;
-    border-radius: 10px;
-    overflow: hidden;
-    margin-top: 10px;
-}
-
-th {
-    background: #21262d;
-    color: #8b949e;
-    font-size: 12px;
-}
-
-th, td {
-    padding: 10px;
-}
-
-tr:nth-child(even) {
-    background: #0d1117;
-}
-
-.overdue { background: #3b0d0d !important; }
-.due-soon { background: #3b2f0d !important; }
-
-.delete-btn {
-    color: #ff6b6b;
-    text-decoration: none;
-    font-weight: bold;
-}
-
-form {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 10px;
-}
-
-input {
-    padding: 8px;
-    border-radius: 6px;
-    border: none;
-    background: #0d1117;
-    color: white;
-}
-
-button {
-    padding: 8px 14px;
-    background: #238636;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-}
-
-button:hover {
-    background: #2ea043;
-}
-
-/* STATUS COLORS (FIXED) */
-.status-pill {
-    padding: 4px 10px;
-    border-radius: 999px;
-    font-size: 12px;
-    font-weight: 600;
-    display: inline-block;
-}
-
-.status-current {
-    background: rgba(46, 160, 67, 0.15);
-    color: #2ea043;
-    border: 1px solid rgba(46, 160, 67, 0.35);
-}
-
-.status-overdue {
-    background: rgba(248, 81, 73, 0.15);
-    color: #f85149;
-    border: 1px solid rgba(248, 81, 73, 0.35);
-}
-
-.status-unknown {
-    background: rgba(139, 148, 158, 0.15);
-    color: #8b949e;
-    border: 1px solid rgba(139, 148, 158, 0.35);
-}
-.subtext {
-    margin-top: 4px;
-    font-size: 11px;
-    color: #8b949e;
-    opacity: 0.9;
-}
-
-/* ===== TABS ===== */
-.tab-bar {
-    display: flex;
-    gap: 10px;
-    padding: 10px 20px;
-    background: #0d1117;
-    border-bottom: 1px solid #21262d;
-}
-
-.tab-bar button {
-    background: #161b22;
-    border: 1px solid #30363d;
-    color: #e6edf3;
-    padding: 8px 12px;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-.tab-bar button.active {
-    background: #238636;
-}
-
-/* ===== SECTIONS ===== */
-.section {
-    display: none;
-}
-
-.section.active {
-    display: block;
-}
-
-/* ===== MODAL ===== */
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 9999;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.7);
-}
-
-.modal-content {
-    background: #161b22;
-    margin: 5% auto;
-    padding: 20px;
-    width: 90%;
-    max-width: 600px;
-    border-radius: 10px;
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-}
-
-.modal-close {
-    cursor: pointer;
-    color: #f85149;
-    font-size: 18px;
-}
-
-/* hide original backend forms */
-form[action="/add_flight"],
-form[action="/add_maintenance"],
-form[action="/add_fuel"] {
-    display: none;
-}
-</style>
+        /* Stop values from wrapping in Hobbs/Tach */
+        .no-wrap-col {
+            white-space: nowrap;
+            min-width: 140px;
+        }
+    </style>
 </head>
-
 <body>
 
-<header>✈ Aircraft Dashboard</header>
-<div class="tab-bar">
-    <button onclick="openModal('flightModal')">Log Flight</button>
-    <button onclick="openModal('maintenanceModal')">Add Maintenance</button>
-    <button onclick="openModal('fuelModal')">Fuel Tracker</button>
-</div>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">✈️ N890GF Tracker</a>
+        <div class="d-flex text-white gap-3 align-items-center">
+            <span>Total Airframe: <strong>{{ "%.1f"|format(total_hours) }} hrs</strong></span>
+            <span>Total Landings: <strong>{{ total_landings }}</strong></span>
+        </div>
+    </div>
+</nav>
 
 <div class="container">
-
-<!-- SUMMARY -->
-<div class="grid">
-    <div class="card">
-        <h3>Total Fuel</h3>
-        <div class="value" id="totalFuel">--</div>
-    </div>
-    <div class="card">
-        <h3>Total Cost</h3>
-        <div class="value" id="totalCost">--</div>
-    </div>
-    <div class="card">
-        <h3>Avg GPH</h3>
-        <div class="value" id="avgGph">--</div>
-    </div>
-    <div class="card">
-        <h3>Maintenance Overdue</h3>
-        <div class="value" id="maintOverdue">--</div>
-    </div>
-    <div class="card">
-        <h3>Aviation DB Status</h3>
-        <div class="value" id="aviationStatus">--</div>
+    <!-- Sticky Action Buttons -->
+    <div class="sticky-action-bar d-flex justify-content-between align-items-center">
+        <h2 class="m-0">Dashboard</h2>
+        <div class="d-flex gap-2">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#flightModal">Log Flight</button>
+            <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#mxModal">Add Maintenance</button>
+            <div class="d-flex gap-2">
+                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#fuelModal">Fuel Tracker</button>
+                <div class="input-group" style="width: 250px;">
+                    <input type="text" id="searchAirportCode" class="form-control text-uppercase" placeholder="e.g. KOSH" aria-label="Airport Code">
+                    <button type="button" id="checkPricesBtn" class="btn btn-outline-success">Check Prices</button>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="card">
-        <h3>Obstacle DB Status</h3>
-        <div class="value" id="obstacleStatus">--</div>
+    <!-- Status Cards (5 Equal Columns) -->
+    <div class="row mb-4 g-3">
+        <div class="col">
+            <div class="card text-center p-3 border-danger h-100 d-flex flex-column justify-content-center">
+                <h6 class="text-muted mb-2">Overdue Items</h6>
+                <h3 class="status-overdue mb-0">{{ overdue_count }}</h3>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card text-center p-3 h-100 d-flex flex-column justify-content-between">
+                <h6 class="text-muted mb-2">Condition Inspection</h6>
+                <span class="{{ cond_status_class }}">{{ cond_due }}</span>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card text-center p-3 h-100 d-flex flex-column justify-content-between">
+                <h6 class="text-muted mb-2">Oil Change Due</h6>
+                <span class="{{ oil_status_class }}">{{ oil_due }}</span>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card text-center p-3 h-100 d-flex flex-column justify-content-between">
+                <h6 class="text-muted mb-2">Aviation Database</h6>
+                <span class="{{ aviation_status_class }}">{{ aviation_db_text }}</span>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card text-center p-3 h-100 d-flex flex-column justify-content-between">
+                <h6 class="text-muted mb-2">Obstacle Database</h6>
+                <span class="{{ obstacle_status_class }}">{{ obstacle_db_text }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Tables Tabs -->
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="flight-tab" data-bs-toggle="tab" data-bs-target="#flight" type="button">Flight Log</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="mx-tab" data-bs-toggle="tab" data-bs-target="#mx" type="button">Maintenance Entries</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="fuel-tab" data-bs-toggle="tab" data-bs-target="#fuel" type="button">Fuel Tracker</button>
+        </li>
+    </ul>
+
+    <div class="tab-content border border-top-0 p-3 bg-white mb-5 rounded-bottom shadow-sm" id="myTabContent">
+
+        <!-- ==============================================
+             FLIGHT LOG TAB
+        =============================================== -->
+        <div class="tab-pane fade show active" id="flight">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover m-0" id="flightTable">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Date</th>
+                            <th>Route</th>
+                            <th class="no-wrap-col">Hobbs</th>
+                            <th class="no-wrap-col">Tach</th>
+                            <th>Landings</th>
+                            <th>Notes</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in flight_logs %}
+                        <tr>
+                            <td class="text-nowrap">{{ row.display_date }}</td>
+                            <td class="text-nowrap">{{ row.takeoff_airport }} ➔ {{ row.landing_airport }}</td>
+                            <td class="no-wrap-col">{{ row.hobbs_delta }} <span class="text-muted">({{ row.hobbs }})</span></td>
+                            <td class="no-wrap-col">{{ row.tach_delta }} <span class="text-muted">({{ row.tach }})</span></td>
+                            <td>{{ row.landings }}</td>
+                            <td>{{ row.notes }}</td>
+                            <td class="text-center action-btns">
+                                <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editFlightModal{{ row.id }}">Edit</button>
+                                <a href="/delete_flight/{{ row.id }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this flight entry?');">Del</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination Controls -->
+            <nav class="mt-3">
+                <ul class="pagination justify-content-center" id="flightPagination"></ul>
+            </nav>
+
+            <!-- Edit Modals Rendered Outside the Table -->
+            {% for row in flight_logs %}
+            <div class="modal fade" id="editFlightModal{{ row.id }}" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form action="/edit_flight/{{ row.id }}" method="POST">
+                            <div class="modal-header bg-primary text-white">
+                                <h5 class="modal-title">Edit Flight</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label class="form-label">Date</label>
+                                    <input type="date" name="date" class="form-control" value="{{ row.date }}" required>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col">
+                                        <label class="form-label">Takeoff</label>
+                                        <input type="text" name="takeoff" class="form-control" value="{{ row.takeoff_airport }}" required>
+                                    </div>
+                                    <div class="col">
+                                        <label class="form-label">Landing</label>
+                                        <input type="text" name="landing" class="form-control" value="{{ row.landing_airport }}" required>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col">
+                                        <label class="form-label">Hobbs</label>
+                                        <input type="number" step="0.1" name="hobbs" class="form-control" value="{{ row.hobbs }}" required>
+                                    </div>
+                                    <div class="col">
+                                        <label class="form-label">Tach</label>
+                                        <input type="number" step="0.1" name="tach" class="form-control" value="{{ row.tach }}" required>
+                                    </div>
+                                    <div class="col">
+                                        <label class="form-label">Landings</label>
+                                        <input type="number" name="landings" class="form-control" value="{{ row.landings }}" required>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Notes</label>
+                                    <textarea name="notes" class="form-control" rows="2">{{ row.notes }}</textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Update Flight</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- ==============================================
+             MAINTENANCE TAB
+        =============================================== -->
+        <div class="tab-pane fade" id="mx">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover m-0" id="mxTable">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Date</th>
+                            <th>Item</th>
+                            <th>Category</th>
+                            <th>Tach</th>
+                            <th>Airframe</th>
+                            <th>Notes</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for mx in mx_logs %}
+                        <tr>
+                            <td class="text-nowrap">{{ mx.display_date }}</td>
+                            <td>{{ mx.recurrent_item }}</td>
+                            <td><span class="badge bg-secondary">{{ mx.category }}</span></td>
+                            <td>{{ mx.tach_time }}</td>
+                            <td>{{ mx.airframe_time }}</td>
+                            <td>{{ mx.notes }}</td>
+                            <td class="text-center action-btns">
+                                <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#editMxModal{{ mx.id }}">Edit</button>
+                                <a href="/delete_maintenance/{{ mx.id }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this maintenance entry?');">Del</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination Controls -->
+            <nav class="mt-3">
+                <ul class="pagination justify-content-center" id="mxPagination"></ul>
+            </nav>
+
+            <!-- Edit Modals Rendered Outside the Table -->
+            {% for mx in mx_logs %}
+            <div class="modal fade" id="editMxModal{{ mx.id }}" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form action="/edit_mx/{{ mx.id }}" method="POST">
+                            <div class="modal-header bg-warning text-dark">
+                                <h5 class="modal-title">Edit Maintenance</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label class="form-label">Date</label>
+                                    <input type="date" name="date" class="form-control" value="{{ mx.date }}" required>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col">
+                                        <label class="form-label">Tach Hours</label>
+                                        <input type="number" step="0.1" name="tach" class="form-control" value="{{ mx.tach_time }}">
+                                    </div>
+                                    <div class="col">
+                                        <label class="form-label">Airframe Hours</label>
+                                        <input type="number" step="0.1" name="airframe" class="form-control" value="{{ mx.airframe_time }}">
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col">
+                                        <label class="form-label">Recurrent Item</label>
+                                        <select name="recurrent_item" class="form-select">
+                                            <option value="None" {% if mx.recurrent_item == 'None' %}selected{% endif %}>None</option>
+                                            <option value="Condition Inspection" {% if mx.recurrent_item == 'Condition Inspection' %}selected{% endif %}>Condition Inspection</option>
+                                            <option value="Oil Change" {% if mx.recurrent_item == 'Oil Change' %}selected{% endif %}>Oil Change</option>
+                                            <option value="Nav Data Update" {% if mx.recurrent_item == 'Nav Data Update' %}selected{% endif %}>Nav Data Update</option>
+                                            <option value="Transponder Check" {% if mx.recurrent_item == 'Transponder Check' %}selected{% endif %}>Transponder Check</option>
+                                            <option value="ELT Test" {% if mx.recurrent_item == 'ELT Test' %}selected{% endif %}>ELT Test</option>
+                                            <option value="ELT Batteries" {% if mx.recurrent_item == 'ELT Batteries' %}selected{% endif %}>ELT Batteries</option>
+                                            <option value="ELT Registration" {% if mx.recurrent_item == 'ELT Registration' %}selected{% endif %}>ELT Registration</option>
+                                        </select>
+                                    </div>
+                                    <div class="col">
+                                        <label class="form-label">Category</label>
+                                        <select name="category" class="form-select">
+                                            <option value="Airframe" {% if mx.category == 'Airframe' %}selected{% endif %}>Airframe</option>
+                                            <option value="Engine" {% if mx.category == 'Engine' %}selected{% endif %}>Engine</option>
+                                            <option value="Propeller" {% if mx.category == 'Propeller' %}selected{% endif %}>Propeller</option>
+                                            <option value="Avionics" {% if mx.category == 'Avionics' %}selected{% endif %}>Avionics</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Notes</label>
+                                    <textarea name="notes" class="form-control" rows="3">{{ mx.notes }}</textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-warning">Update Maintenance</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- ==============================================
+             FUEL TRACKER TAB
+        =============================================== -->
+        <div class="tab-pane fade" id="fuel">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover m-0" id="fuelTable">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Date</th>
+                            <th>Hours</th>
+                            <th>Gallons</th>
+                            <th>Price</th>
+                            <th>Total Cost</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for fuel in fuel_logs %}
+                        <tr>
+                            <td class="text-nowrap">{{ fuel.display_date }}</td>
+                            <td>{{ "%.1f"|format(fuel.hours) }}</td>
+                            <td>{{ "%.1f"|format(fuel.gallons) }}</td>
+                            <td>${{ "%.2f"|format(fuel.price_per_gallon) }}</td>
+                            <td>${{ "%.2f"|format(fuel.gal_per_hour * fuel.price_per_gallon) }}</td>
+                            <td class="text-center action-btns">
+                                <button class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#editFuelModal{{ fuel.id }}">Edit</button>
+                                <a href="/delete_fuel/{{ fuel.id }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this fuel entry?');">Del</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination Controls -->
+            <nav class="mt-3">
+                <ul class="pagination justify-content-center" id="fuelPagination"></ul>
+            </nav>
+
+            <!-- Edit Modals Rendered Outside the Table -->
+            {% for fuel in fuel_logs %}
+            <div class="modal fade" id="editFuelModal{{ fuel.id }}" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form action="/edit_fuel/{{ fuel.id }}" method="POST">
+                            <div class="modal-header bg-success text-white">
+                                <h5 class="modal-title">Edit Fuel Entry</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label class="form-label">Date</label>
+                                    <input type="date" name="date" class="form-control" value="{{ fuel.date }}" required>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col">
+                                        <label class="form-label">Hours Flown</label>
+                                        <input type="number" step="0.1" name="hours" class="form-control" value="{{ fuel.hours }}" required>
+                                    </div>
+                                    <div class="col">
+                                        <label class="form-label">Gallons Added</label>
+                                        <input type="number" step="0.1" name="gallons" class="form-control" value="{{ fuel.gallons }}" required>
+                                    </div>
+                                    <div class="col">
+                                        <label class="form-label">Price per Gallon ($)</label>
+                                        <input type="number" step="0.01" name="price" class="form-control" value="{{ fuel.price_per_gallon }}" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-success">Update Fuel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
     </div>
 </div>
 
-<div id="flightTab" class="section active">
+<!-- ==============================================
+     CREATION MODALS (POPUP FORMS)
+=============================================== -->
 
-<!-- FLIGHTS -->
-<h2>Flight Log</h2>
-
-<form method="POST" action="/add_flight">
-<input name="date" placeholder="Date">
-<input name="takeoff" placeholder="From">
-<input name="landing" placeholder="To">
-<input name="hobbs" placeholder="Hobbs">
-<input name="tach" placeholder="Tach">
-<input name="landings" placeholder="Landings">
-<input name="notes" placeholder="Notes">
-<button>Add Flight</button>
-</form>
-
-<table>
-<tr>
-<th>Date</th><th>From</th><th>To</th>
-<th>Hobbs</th><th>Tach</th>
-<th>ΔH</th><th>ΔT</th>
-<th>Landings</th><th>Notes</th><th></th>
-</tr>
-{% for f in flights
-   |sort(attribute='hobbs', reverse=true)
-   |sort(attribute='tach', reverse=true)
-   |sort(attribute='date', reverse=true)
-%}
-<tr data-id="{{ f[0] }}">
-{% for col in f[1:] %}
-{% set i = loop.index0 %}
-{% if i in [3,4,5,6] %}
-<td contenteditable="true"
-    data-field="{{ i }}"
-    onblur="saveEdit('flight', {{ f[0] }}, this)"
-    onkeydown="handleKey(event,'flight',{{ f[0] }},this)">
-    {{ "%.1f"|format(col|float) }}
-</td>
-
-{% elif i == 7 %}
-<td contenteditable="true"
-    data-field="{{ i }}"
-    onblur="saveEdit('flight', {{ f[0] }}, this)"
-    onkeydown="handleKey(event,'flight',{{ f[0] }},this)">
-    {{ col|int }}
-</td>
-
-{% else %}
-<td contenteditable="true"
-    data-field="{{ i }}"
-    onblur="saveEdit('flight', {{ f[0] }}, this)"
-    onkeydown="handleKey(event,'flight',{{ f[0] }},this)">
-    {{ col }}
-</td>
-{% endif %}
-{% endfor %}
-<td><a href="/delete_flight/{{ f[0] }}" class="delete-btn">✖</a></td>
-</tr>
-{% endfor %}
-</table>
-
-</div>
-<div id="maintenanceTab" class="section">
-
-<!-- MAINTENANCE -->
-<h2>Maintenance</h2>
-
-<form method="POST" action="/add_maintenance">
-<input name="date" placeholder="Date">
-<input name="tach" placeholder="Tach">
-<input name="airframe" placeholder="Airframe">
-<input name="notes" placeholder="Notes">
-<select name="item" style="padding:8px;border-radius:6px;border:none;background:#0d1117;color:white;">
-    <option value="">Select Item</option>
-    <option value="Condition Inspection">Condition Inspection</option>
-    <option value="Oil Change">Oil Change</option>
-    <option value="ELT Test">ELT Test</option>
-    <option value="ELT Batteries">ELT Batteries</option>
-    <option value="ELT Registration">ELT Registration</option>
-    <option value="Nav Data Update">Nav Data Update</option>
-    <option value="Batteries">Batteries</option>
-    <option value="Transponder Check">Transponder Check</option>
-</select>
-<select name="category" style="padding:8px;border-radius:6px;border:none;background:#0d1117;color:white;">
-    <option value="">Select Category</option>
-    <option value="Airframe">Airframe</option>
-    <option value="Engine">Engine</option>
-    <option value="Propeller">Propeller</option>
-    <option value="Avionics">Avionics</option>
-</select>
-<button>Add Maintenance</button>
-</form>
-
-<table>
-<tr>
-<th>ID</th><th>Date</th><th>Tach</th>
-<th>Airframe</th><th>Notes</th>
-<th>Item</th><th>Category</th><th></th>
-</tr>
-
-{% for m in maintenance
-   |sort(attribute='tach_time', reverse=true)
-   |sort(attribute='date', reverse=true)
-%}
-
-<tr data-id="{{ m.id }}" class="{% if m[-1]=='overdue' %}overdue{% elif m[-1]=='due-soon' %}due-soon{% endif %}">
-
-<td>{{ m.id }}</td>
-
-<td contenteditable="true"
-    data-field="date"
-    onblur="saveEdit('maintenance', {{ m.id }}, this)"
-    onkeydown="handleKey(event,'maintenance',{{ m.id }},this)">
-    {{ m.date }}
-</td>
-
-<td contenteditable="true"
-    data-field="tach_time"
-    onblur="saveEdit('maintenance', {{ m.id }}, this)"
-    onkeydown="handleKey(event,'maintenance',{{ m.id }},this)">
-    {{ "%.1f"|format(m.tach_time|float) }}
-</td>
-
-<td contenteditable="true"
-    data-field="airframe_time"
-    onblur="saveEdit('maintenance', {{ m.id }}, this)"
-    onkeydown="handleKey(event,'maintenance',{{ m.id }},this)">
-    {{ "%.1f"|format(m.airframe_time|float) }}
-</td>
-
-<td contenteditable="true"
-    data-field="notes"
-    onblur="saveEdit('maintenance', {{ m.id }}, this)"
-    onkeydown="handleKey(event,'maintenance',{{ m.id }},this)">
-    {{ m.notes }}
-</td>
-
-<td>
-<select data-field="recurrent_item"
-    onchange="saveEdit('maintenance', {{ m.id }}, this)"
-    style="padding:6px;border-radius:6px;border:none;background:#0d1117;color:white;width:100%;">
-
-    {% set items = [
-        "Condition Inspection",
-        "Oil Change",
-        "ELT Test",
-        "ELT Batteries",
-        "ELT Registration",
-        "Nav Data Update",
-        "Batteries",
-        "Transponder Check"
-    ] %}
-
-    {% for item in items %}
-        <option value="{{ item }}" {% if m.recurrent_item == item %}selected{% endif %}>{{ item }}</option>
-    {% endfor %}
-</select>
-</td>
-
-<td>
-<select data-field="category"
-    onchange="saveEdit('maintenance', {{ m.id }}, this)"
-    style="padding:6px;border-radius:6px;border:none;background:#0d1117;color:white;width:100%;">
-
-    {% set categories = ["Airframe","Engine","Propeller","Avionics"] %}
-
-    {% for c in categories %}
-        <option value="{{ c }}" {% if m.category == c %}selected{% endif %}>{{ c }}</option>
-    {% endfor %}
-</select>
-</td>
-
-<td><a href="/delete_maintenance/{{ m.id }}" class="delete-btn">✖</a></td>
-
-</tr>
-{% endfor %}
-</table>
-
-</div>
-<div id="fuelTab" class="section">
-
-<!-- FUEL -->
-<h2>Fuel</h2>
-
-<form method="POST" action="/add_fuel">
-<input name="date" placeholder="Date">
-<input name="hours" placeholder="Hours">
-<input name="gallons" placeholder="Gallons">
-<input name="price" placeholder="Price">
-<button>Add Fuel</button>
-</form>
-
-<table>
-<tr>
-<th>Date</th><th>Hours</th><th>Gallons</th>
-<th>Price</th><th>Total</th><th>GPH</th><th></th>
-</tr>
-{% for f in fuel
-   |sort(attribute='date', reverse=true)
-%}
-<tr data-id="{{ f[0] }}">
-{% for col in f[1:] %}
-{% set i = loop.index0 %}
-<td contenteditable="true"
-    data-field="{{ i }}"
-    onblur="saveEdit('fuel', {{ f[0] }}, this)"
-    onkeydown="handleKey(event,'fuel',{{ f[0] }},this)">
-    {% if i in [3,4] %}
-        {{ "%.2f"|format(col|float) }}
-    {% elif i in [1,2,5] %}
-        {{ "%.1f"|format(col|float) }}
-    {% else %}
-        {{ col }}
-    {% endif %}
-</td>
-{% endfor %}
-<td><a href="/delete_fuel/{{ f[0] }}" class="delete-btn">✖</a></td>
-</tr>
-{% endfor %}
-</table>
-
-</div>
+<!-- Flight Log Entry Modal -->
+<div class="modal fade" id="flightModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form action="/add_flight" method="POST">
+          <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title">Log New Flight</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+              <div class="mb-3">
+                  <label class="form-label">Date</label>
+                  <input type="date" name="date" class="form-control" required>
+              </div>
+              <div class="row mb-3">
+                  <div class="col">
+                      <label class="form-label">Takeoff</label>
+                      <input type="text" name="takeoff" class="form-control" placeholder="e.g. KOSH" required>
+                  </div>
+                  <div class="col">
+                      <label class="form-label">Landing</label>
+                      <input type="text" name="landing" class="form-control" placeholder="e.g. KOSH" required>
+                  </div>
+              </div>
+              <div class="row mb-3">
+                  <div class="col">
+                      <label class="form-label">Hobbs</label>
+                      <input type="number" step="0.1" name="hobbs" class="form-control" required>
+                  </div>
+                  <div class="col">
+                      <label class="form-label">Tach</label>
+                      <input type="number" step="0.1" name="tach" class="form-control" required>
+                  </div>
+                  <div class="col">
+                      <label class="form-label">Landings</label>
+                      <input type="number" name="landings" class="form-control" required>
+                  </div>
+              </div>
+              <div class="mb-3">
+                  <label class="form-label">Notes</label>
+                  <textarea name="notes" class="form-control" rows="2"></textarea>
+              </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Flight</button>
+          </div>
+      </form>
+    </div>
+  </div>
 </div>
 
+<!-- Maintenance Entry Modal -->
+<div class="modal fade" id="mxModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form action="/add_mx" method="POST">
+          <div class="modal-header bg-warning text-dark">
+            <h5 class="modal-title">Add Maintenance Entry</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+              <div class="mb-3">
+                  <label class="form-label">Date</label>
+                  <input type="date" name="date" class="form-control" required>
+              </div>
+              <div class="row mb-3">
+                  <div class="col">
+                      <label class="form-label">Tach Hours</label>
+                      <input type="number" step="0.1" name="tach" class="form-control">
+                  </div>
+                  <div class="col">
+                      <label class="form-label">Airframe Hours</label>
+                      <input type="number" step="0.1" name="airframe" class="form-control">
+                  </div>
+              </div>
+              <div class="row mb-3">
+                  <div class="col">
+                      <label class="form-label">Recurrent Item</label>
+                      <select name="recurrent_item" class="form-select">
+                          <option value="None">None</option>
+                          <option value="Condition Inspection">Condition Inspection</option>
+                          <option value="Oil Change">Oil Change</option>
+                          <option value="Nav Data Update">Nav Data Update</option>
+                          <option value="Transponder Check">Transponder Check</option>
+                          <option value="ELT Test">ELT Test</option>
+                          <option value="ELT Batteries">ELT Batteries</option>
+                          <option value="ELT Registration">ELT Registration</option>
+                      </select>
+                  </div>
+                  <div class="col">
+                      <label class="form-label">Category</label>
+                      <select name="category" class="form-select">
+                          <option value="Airframe">Airframe</option>
+                          <option value="Engine">Engine</option>
+                          <option value="Propeller">Propeller</option>
+                          <option value="Avionics">Avionics</option>
+                      </select>
+                  </div>
+              </div>
+              <div class="mb-3">
+                  <label class="form-label">Notes</label>
+                  <textarea name="notes" class="form-control" rows="3"></textarea>
+              </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-warning">Save Maintenance</button>
+          </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Fuel Tracker Modal -->
+<div class="modal fade" id="fuelModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form action="/add_fuel" method="POST">
+          <div class="modal-header bg-success text-white">
+            <h5 class="modal-title">Fuel Tracker</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+              <div class="mb-3">
+                  <label class="form-label">Date</label>
+                  <input type="date" name="date" class="form-control" required>
+              </div>
+              <div class="row mb-3">
+                  <div class="col">
+                      <label class="form-label">Hours Flown</label>
+                      <input type="number" step="0.1" name="hours" class="form-control" required>
+                  </div>
+                  <div class="col">
+                      <label class="form-label">Gallons Added</label>
+                      <input type="number" step="0.1" name="gallons" class="form-control" required>
+                  </div>
+                  <div class="col">
+                      <label class="form-label">Price per Gallon ($)</label>
+                      <input type="number" step="0.01" name="price" class="form-control" required>
+                  </div>
+              </div>
+          </div>
+          <div class="modal-footer d-flex justify-content-between align-items-center">
+            <div>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-success">Save Fuel</button>
+            </div>
+          </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Fuel Prices Result Modal -->
+<div class="modal fade" id="pricesResultModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-dark">
+                <h5 class="modal-title">Nearby 100LL Prices</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="pricesLoader" class="text-center d-none my-4">
+                    <div class="spinner-border text-info" role="status"></div>
+                    <p class="mt-2">Scraping AirNav... Please wait.</p>
+                </div>
+                <div id="pricesError" class="alert alert-danger d-none"></div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped d-none" id="pricesTable">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Airport</th>
+                                <th>Price (100LL)</th>
+                                <th>Distance</th>
+                                <th>Est. Total Trip Cost</th>
+                                <th>Last Updated</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pricesTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Table Pagination Logic -->
 <script>
-async function saveEdit(type, id, cell) {
-    const fieldIndex = cell.dataset.field;
-    let value;
+document.addEventListener("DOMContentLoaded", function() {
+    function paginateTable(tableId, paginationId, rowsPerPage) {
+        const table = document.getElementById(tableId);
+        if (!table) return;
+        const tbody = table.querySelector('tbody');
+        const rows = tbody.querySelectorAll('tr');
+        const paginationEl = document.getElementById(paginationId);
+        if (!paginationEl || rows.length === 0) return;
 
-    if (cell.tagName === "SELECT") {
-        value = cell.value;
-    } else {
-        value = cell.innerText;
-    }
+        let currentPage = 1;
+        const totalPages = Math.ceil(rows.length / rowsPerPage);
 
-    try {
-        const res = await fetch(`/update_${type}/${id}`, {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({
-                field: fieldIndex,
-                value: value
-            })
-        });
-
-        if (res.ok) {
-            // allow backend recalculation then refresh UI
-            window.location.reload();
+        function displayPage(page) {
+            currentPage = page;
+            rows.forEach((row, index) => {
+                row.style.display = (index >= (page - 1) * rowsPerPage && index < page * rowsPerPage) ? '' : 'none';
+            });
+            updatePaginationUI();
         }
-    } catch (e) {
-        console.error(e);
-    }
-}
 
-function handleKey(event, type, id, cell) {
-    if (event.key === "Enter") {
-        event.preventDefault();
-        cell.blur();
-        saveEdit(type, id, cell);
-    }
-}
+        function updatePaginationUI() {
+            paginationEl.innerHTML = '';
+            if (totalPages <= 1) return;
 
-function applyStatusStyle(id, value) {
-    const el = document.getElementById(id);
-    if (!el) return;
+            // Prev Button
+            const prevLi = document.createElement('li');
+            prevLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+            prevLi.innerHTML = `<a class="page-link" href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a>`;
+            prevLi.addEventListener('click', (e) => { e.preventDefault(); if(currentPage > 1) displayPage(currentPage - 1); });
+            paginationEl.appendChild(prevLi);
 
-    let cls = "status-unknown";
-    if (value === "Current") cls = "status-current";
-    else if (value === "Overdue") cls = "status-overdue";
-
-    el.innerHTML = `<span class="status-pill ${cls}">${value ?? "--"}</span>`;
-}
-
-function loadSummary() {
-    fetch("/summary")
-        .then(res => res.json())
-        .then(data => {
-            document.getElementById("totalFuel").innerText = Number(data.total_gallons).toFixed(1);
-            document.getElementById("totalCost").innerText = "$" + Number(data.total_cost).toFixed(2);
-            document.getElementById("avgGph").innerText = Number(data.avg_gph).toFixed(2);
-            document.getElementById("maintOverdue").innerText = data.maint_overdue ?? "--";
-
-            const aviationDays = data.aviation_days_remaining;
-            const obstacleDays = data.obstacle_days_remaining;
-
-            function formatNav(status, days) {
-                let text = "--";
-
-                if (days !== null && days !== undefined) {
-                    if (days >= 0) {
-                        text = `${days} days remaining`;
-                    } else {
-                        text = `${Math.abs(days)} days overdue`;
-                    }
-                }
-
-                let cls = "status-unknown";
-                if (status === "Current") cls = "status-current";
-                else if (status === "Overdue") cls = "status-overdue";
-
-                return `
-                    <span class="status-pill ${cls}">${status ?? "--"}</span>
-                    <div class="subtext">${text}</div>
-                `;
+            // Page Numbers
+            for (let i = 1; i <= totalPages; i++) {
+                const li = document.createElement('li');
+                li.className = `page-item ${currentPage === i ? 'active' : ''}`;
+                li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+                li.addEventListener('click', (e) => { e.preventDefault(); displayPage(i); });
+                paginationEl.appendChild(li);
             }
 
-            document.getElementById("aviationStatus").innerHTML =
-                formatNav(data.aviation_status, aviationDays);
+            // Next Button
+            const nextLi = document.createElement('li');
+            nextLi.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
+            nextLi.innerHTML = `<a class="page-link" href="#" aria-label="Next"><span aria-hidden="true">&raquo;</span></a>`;
+            nextLi.addEventListener('click', (e) => { e.preventDefault(); if(currentPage < totalPages) displayPage(currentPage + 1); });
+            paginationEl.appendChild(nextLi);
+        }
 
-            document.getElementById("obstacleStatus").innerHTML =
-                formatNav(data.obstacle_status, obstacleDays);
-        })
-        .catch(err => console.error("summary error:", err));
-}
+        displayPage(1);
+    }
 
-loadSummary();
-setInterval(loadSummary, 30000);
-
-function openModal(id) {
-    const m = document.getElementById(id);
-    if (m) m.style.display = "block";
-}
-
-function closeModal(id) {
-    const m = document.getElementById(id);
-    if (m) m.style.display = "none";
-}
-
-window.onclick = function(event) {
-    document.querySelectorAll(".modal").forEach(m => {
-        if (event.target === m) m.style.display = "none";
-    });
-};
+    // Initialize pagination for all 3 tables (10 rows per page)
+    paginateTable("flightTable", "flightPagination", 10);
+    paginateTable("mxTable", "mxPagination", 10);
+    paginateTable("fuelTable", "fuelPagination", 10);
+});
 </script>
 
-<!-- MODALS -->
+<!-- API Fetch Logic for Fuel Scraper -->
+<script>
+document.getElementById('checkPricesBtn').addEventListener('click', function() {
+    const airport = document.getElementById('searchAirportCode').value.trim();
+    if (!airport) {
+        alert("Please enter an airport code to search!");
+        return;
+    }
 
-<div id="flightModal" class="modal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h3>Log Flight</h3>
-      <span class="modal-close" onclick="closeModal('flightModal')">✖</span>
-    </div>
-    document.querySelector('form[action="/add_flight"]').cloneNode(true).outerHTML
-  </div>
-</div>
+    const resultModal = new bootstrap.Modal(document.getElementById('pricesResultModal'));
+    resultModal.show();
 
-<div id="maintenanceModal" class="modal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h3>Add Maintenance</h3>
-      <span class="modal-close" onclick="closeModal('maintenanceModal')">✖</span>
-    </div>
-    document.querySelector('form[action="/add_maintenance"]').cloneNode(true).outerHTML
-  </div>
-</div>
+    document.getElementById('pricesLoader').classList.remove('d-none');
+    document.getElementById('pricesTable').classList.add('d-none');
+    document.getElementById('pricesError').classList.add('d-none');
+    document.getElementById('pricesTableBody').innerHTML = '';
 
-<div id="fuelModal" class="modal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h3>Fuel Tracker</h3>
-      <span class="modal-close" onclick="closeModal('fuelModal')">✖</span>
-    </div>
-    document.querySelector('form[action="/add_fuel"]').cloneNode(true).outerHTML
-  </div>
-</div>
+    fetch(`/api/fuel_prices?airport=${encodeURIComponent(airport)}`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('pricesLoader').classList.add('d-none');
 
+            if (data.error) {
+                const errDiv = document.getElementById('pricesError');
+                errDiv.textContent = data.error;
+                errDiv.classList.remove('d-none');
+            } else if (data.options && data.options.length > 0) {
+                const tbody = document.getElementById('pricesTableBody');
+
+                data.options.forEach(opt => {
+                    const tr = document.createElement('tr');
+                    const distanceStr = opt.distance > 0 ? `${opt.distance} nm ${opt.direction}` : '0 nm';
+
+                    tr.innerHTML = `
+                        <td><strong>${opt.airport}</strong><br><small class="text-muted">${opt.name}</small></td>
+                        <td class="text-success fw-bold">$${opt.price.toFixed(2)}</td>
+                        <td>${distanceStr}</td>
+                        <td>$${opt.total_cost.toFixed(2)}<br><small class="text-muted">(${opt.used_to_return.toFixed(1)} gal round trip)</small></td>
+                        <td>${opt.date}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                document.getElementById('pricesTable').classList.remove('d-none');
+            }
+        })
+        .catch(err => {
+            document.getElementById('pricesLoader').classList.add('d-none');
+            const errDiv = document.getElementById('pricesError');
+            errDiv.textContent = "Failed to connect to the server.";
+            errDiv.classList.remove('d-none');
+            console.error(err);
+        });
+});
+</script>
 </body>
 </html>
