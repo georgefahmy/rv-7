@@ -65,6 +65,7 @@
                     <input type="text" id="searchAirportCode" class="form-control text-uppercase" placeholder="e.g. KOSH" aria-label="Airport Code">
                     <button type="button" id="checkPricesBtn" class="btn btn-outline-success">Check Prices</button>
                 </div>
+            <a href="/analyzer" class="btn btn-secondary">Flight Analyzer</a>
             </div>
         </div>
     </div>
@@ -72,9 +73,18 @@
     <!-- Status Cards (5 Equal Columns) -->
     <div class="row mb-4 g-3">
         <div class="col">
-            <div class="card text-center p-3 border-danger h-100 d-flex flex-column justify-content-center">
+            <!-- Dynamic styling for the Overdue Card -->
+            <div class="card text-center p-3 h-100 d-flex flex-column justify-content-center {{ 'border-danger' if overdue_count > 0 else 'border-success' }}">
                 <h6 class="text-muted mb-2">Overdue Items</h6>
-                <h3 class="status-overdue mb-0">{{ overdue_count }}</h3>
+                <h3 class="{{ 'status-overdue mb-1' if overdue_count > 0 else 'status-current mb-0' }}">{{ overdue_count }}</h3>
+
+                {% if overdue_count > 0 %}
+                    <div class="d-flex flex-wrap justify-content-center gap-1 mt-1">
+                        {% for item in overdue_items %}
+                        <span class="badge bg-danger">{{ item }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
             </div>
         </div>
         <div class="col">

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flight Data Analyzer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Import Plotly.js -->
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <style>
+        body { background-color: #f8f9fa; padding-top: 56px; }
+        .navbar { position: fixed; top: 0; width: 100%; z-index: 1050; }
+        .graph-container { background: white; padding: 10px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); min-height: 500px; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">← Back to Dashboard</a>
+        <span class="navbar-text text-white">✈️ Flight Data Analyzer</span>
+    </div>
+</nav>
+
+<div class="container-fluid mt-4 px-4">
+    <div class="row">
+        <!-- Control Panel -->
+        <div class="col-md-3">
+            <div class="card p-3 shadow-sm mb-4">
+                <h5>Upload Flight Data</h5>
+                <form id="uploadForm">
+                    <div class="mb-3">
+                        <label class="form-label">Select Dynon CSV File</label>
+                        <input class="form-control" type="file" id="csvFile" accept=".csv" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Left Axis Signal</label>
+                        <select class="form-select" id="leftSignal" disabled>
+                            <option value="">Select a file first...</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Right Axis Signal</label>
+                        <select class="form-select" id="rightSignal" disabled>
+                            <option value="">Select a file first...</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100" id="analyzeBtn" disabled>Analyze Flight</button>
+                </form>
+            </div>
+
+            <!-- Summary Stats Box -->
+            <div class="card p-3 shadow-sm d-none" id="statsCard">
+                <h5>Flight Summary</h5>
+                <hr class="mt-1 mb-2">
+                <ul class="list-unstyled mb-0" id="statsList">
+                    <!-- Populated by JS -->
+                </ul>
+            </div>
+        </div>
+
+        <!-- Graph Display -->
+        <div class="col-md-9">
+            <div class="graph-container d-flex flex-column align-items-center justify-content-center h-100">
+                <div id="loader" class="d-none">
+                    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;"></div>
+                    <p class="mt-2 text-muted">Processing data...</p>
+                </div>
+
+                <p id="placeholderText" class="text-muted mb-0">Upload a CSV to view the interactive flight graph.</p>
+
+                <!-- Interactive Plotly Graph Container -->
+                <div id="flightGraph" class="w-100 h-100 d-none"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Fetch signals as soon as a file is selected
+document.getElementById('csvFile').addEventListener('change', function(e) {
+    const fileInput = e.target;
+    if (fileInput.files.length === 0) return;
+
+    const leftSelect = document.getElementById('leftSignal');
+    const rightSelect = document.getElementById('rightSignal');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+
+    leftSelect.innerHTML = '<option>Loading signals...</option>';
+    rightSelect.innerHTML = '<option>Loading signals...</option>';
+    leftSelect.disabled = true;
+    rightSelect.disabled = true;
+    analyzeBtn.disabled = true;
+
+    const formData = new FormData();
+    formData.append('file', fileInput.files[0]);
+
+    fetch('/api/get_signals', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert("Error: " + data.error);
+            leftSelect.innerHTML = '<option>Error loading data</option>';
+            rightSelect.innerHTML = '<option>Error loading data</option>';
+            return;
+        }
+
+        let optionsHtml = '';
+        data.signals.forEach(sig => {
+            optionsHtml += `<option value="${sig}">${sig}</option>`;
+        });
+
+        leftSelect.innerHTML = optionsHtml;
+        rightSelect.innerHTML = optionsHtml;
+
+        if (data.signals.includes("RPM")) leftSelect.value = "RPM";
+        if (data.signals.includes("AVG_CHT")) rightSelect.value = "AVG_CHT";
+
+        leftSelect.disabled = false;
+        rightSelect.disabled = false;
+        analyzeBtn.disabled = false;
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Failed to read file signals.");
+    });
+});
+
+// Process the flight and generate the Plotly graph on submit
+document.getElementById('uploadForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const fileInput = document.getElementById('csvFile');
+    const leftSignal = document.getElementById('leftSignal').value;
+    const rightSignal = document.getElementById('rightSignal').value;
+
+    if (fileInput.files.length === 0) return;
+
+    // UI Updates
+    document.getElementById('analyzeBtn').disabled = true;
+    document.getElementById('placeholderText').classList.add('d-none');
+    document.getElementById('flightGraph').classList.add('d-none');
+    document.getElementById('loader').classList.remove('d-none');
+    document.getElementById('statsCard').classList.add('d-none');
+
+    const formData = new FormData();
+    formData.append('file', fileInput.files[0]);
+    formData.append('left_signal', leftSignal);
+    formData.append('right_signal', rightSignal);
+
+    fetch('/api/analyze_flight', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('loader').classList.add('d-none');
+        document.getElementById('analyzeBtn').disabled = false;
+
+        if (data.error) {
+            alert("Error: " + data.error);
+            document.getElementById('placeholderText').classList.remove('d-none');
+            return;
+        }
+
+        // --- Build Plotly Chart ---
+        const graphDiv = document.getElementById('flightGraph');
+        graphDiv.classList.remove('d-none');
+
+        const trace1 = {
+            x: data.plot_data.x,
+            y: data.plot_data.y_left,
+            name: data.plot_data.left_name,
+            type: 'scatter',
+            mode: 'lines',
+            line: { color: '#0d6efd' } // Bootstrap Primary Blue
+        };
+
+        const trace2 = {
+            x: data.plot_data.x,
+            y: data.plot_data.y_right,
+            name: data.plot_data.right_name,
+            type: 'scatter',
+            mode: 'lines',
+            line: { color: '#dc3545', dash: 'dash' }, // Bootstrap Danger Red
+            yaxis: 'y2' // Assign to secondary axis
+        };
+
+        const layout = {
+            title: `Flight Analysis: ${data.stats.flight_id}`,
+            xaxis: { title: 'Session Time (seconds)' },
+            yaxis: {
+                title: data.plot_data.left_name,
+                titlefont: { color: '#0d6efd' },
+                tickfont: { color: '#0d6efd' }
+            },
+            yaxis2: {
+                title: data.plot_data.right_name,
+                titlefont: { color: '#dc3545' },
+                tickfont: { color: '#dc3545' },
+                overlaying: 'y',
+                side: 'right'
+            },
+            hovermode: 'x unified', // Shows both values on the same vertical line hover
+            margin: { l: 60, r: 60, t: 60, b: 40 },
+            legend: { orientation: "h", y: -0.2 } // Move legend to the bottom
+        };
+
+        // Render the interactive plot
+        Plotly.newPlot(graphDiv, [trace1, trace2], layout, {responsive: true});
+
+        // Display the Stats
+        const statsList = document.getElementById('statsList');
+        statsList.innerHTML = `
+            <li><strong>Flight ID:</strong> ${data.stats.flight_id}</li>
+            <li><strong>Duration:</strong> ${data.stats.duration_min} min</li>
+            <li><strong>Max RPM:</strong> ${data.stats.max_rpm}</li>
+            <li><strong>Max CHT:</strong> ${data.stats.max_cht} °F</li>
+            <li><strong>Total Fuel:</strong> ${data.stats.total_fuel} gal</li>
+            <li><strong>Avg Flow:</strong> ${data.stats.avg_fuel_flow} gal/hr</li>
+        `;
+        document.getElementById('statsCard').classList.remove('d-none');
+    })
+    .catch(err => {
+        alert("A network error occurred.");
+        console.error(err);
+        document.getElementById('loader').classList.add('d-none');
+        document.getElementById('analyzeBtn').disabled = false;
+        document.getElementById('placeholderText').classList.remove('d-none');
+    });
+});
+</script>
+</body>
+</html>

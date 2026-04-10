@@ -1,0 +1,274 @@
+[
+    {
+        "airport_code": "KLAS",
+        "airport_name": "Harry Reid International Airport Las Vegas, NV",
+        "distance": {
+            "nm": null,
+            "direction": null
+        },
+        "fbos": [
+            {
+                "fbo_name": "Atlantic Aviation",
+                "last_updated": "10-Apr",
+                "prices": {
+                    "100LL": [
+                        {
+                            "service": "FS",
+                            "price": "$9.89"
+                        }
+                    ],
+                    "Jet A": [
+                        {
+                            "service": "FS",
+                            "price": "$10.49"
+                        }
+                    ]
+                }
+            },
+            {
+                "fbo_name": "Signature Aviation",
+                "last_updated": "10-Apr",
+                "prices": {
+                    "100LL": [
+                        {
+                            "service": "FS",
+                            "price": "$9.89"
+                        }
+                    ],
+                    "Jet A": [
+                        {
+                            "service": "FS",
+                            "price": "$10.467"
+                        }
+                    ],
+                    "SAF": [
+                        {
+                            "service": "FS",
+                            "price": "$11.76"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "airport_code": "KHND",
+        "airport_name": "Henderson Executive Airport Las Vegas, NV",
+        "distance": {
+            "nm": 7,
+            "direction": "S"
+        },
+        "fbos": [
+            {
+                "fbo_name": "Henderson Executive Airport",
+                "last_updated": "07-Apr",
+                "prices": {
+                    "100LL": [
+                        {
+                            "service": "SS",
+                            "price": "$6.69"
+                        },
+                        {
+                            "service": "FS",
+                            "price": "$6.99"
+                        }
+                    ],
+                    "Jet A": [
+                        {
+                            "service": "FS",
+                            "price": "$8.48"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "airport_code": "KVGT",
+        "airport_name": "North Las Vegas Airport Las Vegas, NV",
+        "distance": {
+            "nm": 8,
+            "direction": "NNW"
+        },
+        "fbos": [
+            {
+                "fbo_name": "North Las Vegas Airport",
+                "last_updated": "10-Apr",
+                "prices": {
+                    "100LL": [
+                        {
+                            "service": "SS",
+                            "price": "$6.69"
+                        },
+                        {
+                            "service": "FS",
+                            "price": "$6.99"
+                        }
+                    ],
+                    "Jet A": [
+                        {
+                            "service": "FS",
+                            "price": "$8.48"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "airport_code": "KBVU",
+        "airport_name": "Boulder City Municipal Airport Boulder City, NV",
+        "distance": {
+            "nm": 16,
+            "direction": "ESE"
+        },
+        "fbos": [
+            {
+                "fbo_name": "Boulder City Aviation Services FBO",
+                "last_updated": "01-Apr",
+                "prices": {
+                    "100LL": [
+                        {
+                            "service": "FS",
+                            "price": "$7.38"
+                        }
+                    ],
+                    "Jet A": [
+                        {
+                            "service": "FS",
+                            "price": "$7.69"
+                        }
+                    ]
+                }
+            },
+            {
+                "fbo_name": "B.F.E. L.L.C.",
+                "last_updated": "10-Apr",
+                "prices": {
+                    "100LL": [
+                        {
+                            "service": "SS",
+                            "price": "$6.89"
+                        }
+                    ],
+                    "Jet A": [
+                        {
+                            "service": "SS",
+                            "price": "$7.29"
+                        },
+                        {
+                            "service": "FS",
+                            "price": "$7.79"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "airport_code": "0L7",
+        "airport_name": "Jean Airport Jean, NV",
+        "distance": {
+            "nm": 21,
+            "direction": "SSW"
+        },
+        "fbos": [
+            {
+                "fbo_name": "Jean Airport",
+                "last_updated": "07-Apr",
+                "prices": {
+                    "100LL": [
+                        {
+                            "service": "SS",
+                            "price": "$6.69"
+                        }
+                    ],
+                    "Jet A": [
+                        {
+                            "service": "SS",
+                            "price": "$8.18"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "airport_code": "NV00",
+        "airport_name": "The Airport Club Pahrump, NV",
+        "distance": {
+            "nm": 42,
+            "direction": "WNW"
+        },
+        "fbos": [
+            {
+                "fbo_name": "The Airport Club",
+                "last_updated": "06-Apr",
+                "prices": {
+                    "100LL": [
+                        {
+                            "service": "SS",
+                            "price": "$6.65"
+                        }
+                    ],
+                    "Jet A": [
+                        {
+                            "service": "FS",
+                            "price": "$8.25"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "airport_code": "74P",
+        "airport_name": "Calvada Meadows Airport Pahrump, NV",
+        "distance": {
+            "nm": 42,
+            "direction": "WNW"
+        },
+        "fbos": [
+            {
+                "fbo_name": "The Airport Club",
+                "last_updated": "06-Apr",
+                "prices": {
+                    "100LL": [
+                        {
+                            "service": "SS",
+                            "price": "$6.65"
+                        }
+                    ],
+                    "Jet A": [
+                        {
+                            "service": "FS",
+                            "price": "$8.25"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "airport_code": "U08",
+        "airport_name": "Perkins Field Airport Overton, NV",
+        "distance": {
+            "nm": 45,
+            "direction": "NE"
+        },
+        "fbos": [
+            {
+                "fbo_name": "Perkins Field",
+                "last_updated": "07-Apr",
+                "prices": {
+                    "100LL": [
+                        {
+                            "service": "SS",
+                            "price": "$6.69"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+]

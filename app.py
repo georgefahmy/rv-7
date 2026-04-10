@@ -5,12 +5,18 @@ import threading
 import time
 from datetime import datetime, timedelta
 
+import matplotlib
+import numpy as np
+import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 from flask import Flask, jsonify, redirect, render_template, request, url_for
 
+from scripts.analysis import process_flights
 from scripts.fuel_prices import scrape_airnav_to_json
 
+# Force matplotlib to not use any Xwindows backend
+matplotlib.use("Agg")
 app = Flask(__name__)
 DB_PATH = "scripts/maintenance.db"
 
@@ -127,19 +133,23 @@ def check_auto_maintenance(conn):
 
 
 def calculate_overdue(conn):
+    """Returns a list of strings representing the overdue items."""
     cursor = conn.cursor()
-    cursor.execute("SELECT recurrent_item, date FROM maintenance_entries")
+    # Group by recurrent item to grab the latest log for each type
+    cursor.execute(
+        "SELECT recurrent_item, MAX(date) FROM maintenance_entries GROUP BY recurrent_item"
+    )
     rows = cursor.fetchall()
 
     today = datetime.today().date()
-    overdue_count = 0
+    overdue_items = []
 
     cursor.execute("SELECT MAX(tach) FROM flight_log")
     tach_row = cursor.fetchone()
     current_tach = validate_float(tach_row[0] if tach_row and tach_row[0] else 0)
 
     for item, last_date in rows:
-        if not item or not last_date:
+        if not item or not last_date or item == "None":
             continue
         rule = MAINTENANCE_RULES.get(item)
         if not rule:
@@ -153,7 +163,7 @@ def calculate_overdue(conn):
         if rule["type"] == "date":
             due_date = last_dt + timedelta(days=rule["days"])
             if today > due_date:
-                overdue_count += 1
+                overdue_items.append(item)
         elif rule["type"] == "tach":
             cursor.execute(
                 "SELECT MAX(tach_time) FROM maintenance_entries WHERE recurrent_item=?",
@@ -166,13 +176,13 @@ def calculate_overdue(conn):
 
             due_tach = last_tach + rule["hours"]
             if current_tach > due_tach:
-                overdue_count += 1
+                overdue_items.append(item)
 
-    return overdue_count
+    return overdue_items
 
 
 def _get_nav_database_status_live(conn):
-    """Scrapes Dynon using lightweight requests instead of Playwright."""
+    """Scrapes Dynon using lightweight requests."""
     url = "https://dynonavionics.com/us-aviation-obstacle-data.php"
     aviation_status, obstacle_status = "--", "--"
     aviation_days_remaining, obstacle_days_remaining = None, None
@@ -180,7 +190,7 @@ def _get_nav_database_status_live(conn):
 
     try:
         headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
         }
         resp = requests.get(url, headers=headers, timeout=10)
         resp.raise_for_status()
@@ -376,10 +386,24 @@ def index():
     l_res = cursor.fetchone()
     total_landings = l_res["total_ldgs"] if l_res and l_res["total_ldgs"] else 0
 
-    overdue_count = calculate_overdue(conn)
+    overdue_items = calculate_overdue(conn)
     nav_status = get_nav_database_status(conn)
     upcoming_mx = get_upcoming_maintenance(conn)
     conn.close()
+
+    # Append Dynon statuses to the overdue list if necessary
+    if nav_status.get("aviation_status") == "Overdue":
+        overdue_items.append("Aviation DB")
+    if nav_status.get("obstacle_status") == "Overdue":
+        overdue_items.append("Obstacle DB")
+
+    # Remove redundancy if Nav Data Update is also triggered
+    if (
+        "Aviation DB" in overdue_items or "Obstacle DB" in overdue_items
+    ) and "Nav Data Update" in overdue_items:
+        overdue_items.remove("Nav Data Update")
+
+    overdue_count = len(overdue_items)
 
     # Build split Nav Strings
     aviation_status = nav_status.get("aviation_status", "--")
@@ -401,6 +425,8 @@ def index():
         fuel_logs=fuel_logs,
         total_hours=total_hours,
         total_landings=total_landings,
+        # New Overdue Parameters
+        overdue_items=overdue_items,
         overdue_count=overdue_count,
         aviation_db_text=aviation_text,
         aviation_status_class=(
@@ -584,5 +610,153 @@ def delete_fuel(id):
     return redirect(url_for("index"))
 
 
+@app.route("/analyzer")
+def analyzer():
+    """Renders the dedicated Flight Analyzer page."""
+    return render_template("analyzer.html")
+
+
+@app.route("/api/get_signals", methods=["POST"])
+def api_get_signals():
+    """Parses the CSV on file selection to populate the UI dropdowns."""
+    if "file" not in request.files:
+        return jsonify({"error": "No file part"}), 400
+
+    file = request.files["file"]
+    if file.filename == "" or not file.filename.endswith(".csv"):
+        return jsonify({"error": "Invalid file. Please upload a CSV."}), 400
+
+    try:
+        # Read and process the dataframe to generate calculated columns (RPM, AVG_CHT, etc.)
+        df = pd.read_csv(file, low_memory=False)
+        df = process_flights(df)
+
+        if df is None or df.empty:
+            return jsonify({"error": "No valid flight data found in the CSV."}), 400
+
+        # Extract only the numeric columns to prevent plotting errors with text data
+        numeric_cols = df.select_dtypes(include=["number"]).columns.tolist()
+
+        # Exclude internal/metadata columns from the dropdown
+        excluded = ["Unnamed: 103", "Engine Run", "id"]
+        signals = sorted([col for col in numeric_cols if col not in excluded])
+
+        return jsonify({"signals": signals})
+
+    except Exception as e:
+        print(f"Signal Parsing Error: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/analyze_flight", methods=["POST"])
+def api_analyze_flight():
+    """Handles CSV uploads, processes the flight, and returns raw data + stats."""
+    if "file" not in request.files:
+        return jsonify({"error": "No file part"}), 400
+
+    file = request.files["file"]
+    if file.filename == "":
+        return jsonify({"error": "No selected file"}), 400
+
+    if not file.filename.endswith(".csv"):
+        return jsonify({"error": "Only CSV files are supported."}), 400
+
+    try:
+        # Read the uploaded CSV directly into Pandas
+        df = pd.read_csv(file, low_memory=False)
+
+        # Process the dataframe using your existing function
+        df = process_flights(df)
+
+        if df is None or df.empty:
+            return jsonify({"error": "No valid flight data found in the CSV."}), 400
+
+        # Grab the requested signals from the form
+        left_signal = request.form.get("left_signal", "RPM")
+        right_signal = request.form.get("right_signal", "AVG_CHT")
+
+        flight_ids = [fid for fid in df["Flight ID"].unique() if fid]
+        if not flight_ids:
+            return (
+                jsonify({"error": "No engine-run flights detected in this file."}),
+                400,
+            )
+
+        target_flight = flight_ids[0]
+        flight_data = df[df["Flight ID"] == target_flight].copy()
+
+        # --- Extract Raw Data for Plotly ---
+        # Replace NaNs with empty strings so JSON serialization doesn't fail
+        flight_data = flight_data.replace([np.inf, -np.inf], np.nan)
+        flight_data = flight_data.fillna("")
+
+        x_data = flight_data["Session Time"].tolist()
+
+        y_left_data = (
+            flight_data[left_signal].tolist()
+            if left_signal in flight_data.columns
+            else []
+        )
+        y_right_data = (
+            flight_data[right_signal].tolist()
+            if right_signal in flight_data.columns
+            else []
+        )
+
+        plot_data = {
+            "x": x_data,
+            "y_left": y_left_data,
+            "y_right": y_right_data,
+            "left_name": left_signal,
+            "right_name": right_signal,
+        }
+
+        # --- Generate Summary Stats ---
+        # Convert session times back to numeric for duration math just in case
+        numeric_times = pd.to_numeric(flight_data["Session Time"], errors="coerce")
+        duration = (
+            numeric_times.max() - numeric_times.min() if not numeric_times.empty else 0
+        )
+
+        total_fuel = (
+            flight_data["Fuel Flow Integral"].max()
+            if "Fuel Flow Integral" in flight_data.columns
+            and flight_data["Fuel Flow Integral"].max() != ""
+            else 0
+        )
+        avg_flow = (total_fuel * 3600) / duration if duration > 0 else 0
+
+        # Safely get max values
+        def safe_max(col):
+            if col in flight_data.columns:
+                series = pd.to_numeric(flight_data[col], errors="coerce").dropna()
+                return round(series.max(), 1) if not series.empty else "N/A"
+            return "N/A"
+
+        stats = {
+            "flight_id": target_flight,
+            "duration_min": round(duration / 60, 2),
+            "max_rpm": safe_max("RPM"),
+            "max_cht": safe_max("Max CHT"),
+            "total_fuel": (
+                round(total_fuel, 2) if isinstance(total_fuel, (int, float)) else "N/A"
+            ),
+            "avg_fuel_flow": round(avg_flow, 2),
+        }
+
+        # Send everything back to the frontend
+        return jsonify(
+            {
+                "plot_data": plot_data,
+                "stats": stats,
+                "available_signals": list(df.select_dtypes(include=["number"]).columns),
+            }
+        )
+
+    except Exception as e:
+        print(f"Analysis Error: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
 if __name__ == "__main__":
-    app.run(debug=False)
+    app.run(debug=True)
