@@ -8,6 +8,8 @@ from datetime import datetime, timedelta
 from bs4 import BeautifulSoup
 from flask import Flask, jsonify, redirect, render_template, request
 
+from scripts.fuel_prices import scrape_airnav_to_json
+
 app = Flask(__name__)
 
 NAV_CACHE = {"data": None, "timestamp": 0}
@@ -571,6 +573,26 @@ def update_fuel(rowid):
     conn.commit()
 
     return jsonify({"status": "ok"})
+
+
+@app.route("/api/fuel_prices", methods=["GET"])
+def api_fuel_prices():
+    airport = request.args.get("airport", "").strip()
+    if not airport:
+        return jsonify({"error": "No airport provided"}), 400
+
+    try:
+        # Calls the scraper. Returns (options, output_string)
+        options, _ = scrape_airnav_to_json(airport)
+
+        if options:
+            return jsonify({"options": options[0:5]})
+        else:
+            return jsonify({"error": f"No fuel data found for {airport}"}), 404
+
+    except Exception as e:
+        print(f"Scraping Error: {e}")
+        return jsonify({"error": "An error occurred while fetching fuel prices."}), 500
 
 
 def nav_background_updater():
