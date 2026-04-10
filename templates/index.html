@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aircraft Dashboard</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+    background: #0b0f14;
+    color: #e6edf3;
+}
+
+header {
+    padding: 20px;
+    background: #111827;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.container {
+    padding: 20px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.card {
+    background: #161b22;
+    padding: 15px;
+    border-radius: 10px;
+}
+
+.card h3 {
+    margin: 0;
+    font-size: 13px;
+    color: #8b949e;
+}
+
+.card .value {
+    font-size: 22px;
+    margin-top: 5px;
+    font-weight: bold;
+}
+
+h2 {
+    margin-top: 30px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #161b22;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+th {
+    background: #21262d;
+    color: #8b949e;
+    font-size: 12px;
+}
+
+th, td {
+    padding: 10px;
+}
+
+tr:nth-child(even) {
+    background: #0d1117;
+}
+
+.overdue { background: #3b0d0d !important; }
+.due-soon { background: #3b2f0d !important; }
+
+.delete-btn {
+    color: #ff6b6b;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+input {
+    padding: 8px;
+    border-radius: 6px;
+    border: none;
+    background: #0d1117;
+    color: white;
+}
+
+button {
+    padding: 8px 14px;
+    background: #238636;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #2ea043;
+}
+
+/* STATUS COLORS (FIXED) */
+.status-pill {
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.status-current {
+    background: rgba(46, 160, 67, 0.15);
+    color: #2ea043;
+    border: 1px solid rgba(46, 160, 67, 0.35);
+}
+
+.status-overdue {
+    background: rgba(248, 81, 73, 0.15);
+    color: #f85149;
+    border: 1px solid rgba(248, 81, 73, 0.35);
+}
+
+.status-unknown {
+    background: rgba(139, 148, 158, 0.15);
+    color: #8b949e;
+    border: 1px solid rgba(139, 148, 158, 0.35);
+}
+.subtext {
+    margin-top: 4px;
+    font-size: 11px;
+    color: #8b949e;
+    opacity: 0.9;
+}
+</style>
+</head>
+
+<body>
+
+<header>✈ Aircraft Dashboard</header>
+
+<div class="container">
+
+<!-- SUMMARY -->
+<div class="grid">
+    <div class="card">
+        <h3>Total Fuel</h3>
+        <div class="value" id="totalFuel">--</div>
+    </div>
+    <div class="card">
+        <h3>Total Cost</h3>
+        <div class="value" id="totalCost">--</div>
+    </div>
+    <div class="card">
+        <h3>Avg GPH</h3>
+        <div class="value" id="avgGph">--</div>
+    </div>
+    <div class="card">
+        <h3>Maintenance Overdue</h3>
+        <div class="value" id="maintOverdue">--</div>
+    </div>
+    <div class="card">
+        <h3>Aviation DB Status</h3>
+        <div class="value" id="aviationStatus">--</div>
+    </div>
+
+    <div class="card">
+        <h3>Obstacle DB Status</h3>
+        <div class="value" id="obstacleStatus">--</div>
+    </div>
+</div>
+
+<!-- FLIGHTS -->
+<h2>Flight Log</h2>
+
+<form method="POST" action="/add_flight">
+<input name="date" placeholder="Date">
+<input name="takeoff" placeholder="From">
+<input name="landing" placeholder="To">
+<input name="hobbs" placeholder="Hobbs">
+<input name="tach" placeholder="Tach">
+<input name="landings" placeholder="Landings">
+<input name="notes" placeholder="Notes">
+<button>Add Flight</button>
+</form>
+
+<table>
+<tr>
+<th>Date</th><th>From</th><th>To</th>
+<th>Hobbs</th><th>Tach</th>
+<th>ΔH</th><th>ΔT</th>
+<th>Landings</th><th>Notes</th><th></th>
+</tr>
+{% for f in flights
+   |sort(attribute='hobbs', reverse=true)
+   |sort(attribute='tach', reverse=true)
+   |sort(attribute='date', reverse=true)
+%}
+<tr data-id="{{ f[0] }}">
+{% for col in f[1:] %}
+{% set i = loop.index0 %}
+{% if i in [3,4,5,6] %}
+<td contenteditable="true"
+    data-field="{{ i }}"
+    onblur="saveEdit('flight', {{ f[0] }}, this)"
+    onkeydown="handleKey(event,'flight',{{ f[0] }},this)">
+    {{ "%.1f"|format(col|float) }}
+</td>
+
+{% elif i == 7 %}
+<td contenteditable="true"
+    data-field="{{ i }}"
+    onblur="saveEdit('flight', {{ f[0] }}, this)"
+    onkeydown="handleKey(event,'flight',{{ f[0] }},this)">
+    {{ col|int }}
+</td>
+
+{% else %}
+<td contenteditable="true"
+    data-field="{{ i }}"
+    onblur="saveEdit('flight', {{ f[0] }}, this)"
+    onkeydown="handleKey(event,'flight',{{ f[0] }},this)">
+    {{ col }}
+</td>
+{% endif %}
+{% endfor %}
+<td><a href="/delete_flight/{{ f[0] }}" class="delete-btn">✖</a></td>
+</tr>
+{% endfor %}
+</table>
+
+<!-- MAINTENANCE -->
+<h2>Maintenance</h2>
+
+<form method="POST" action="/add_maintenance">
+<input name="date" placeholder="Date">
+<input name="tach" placeholder="Tach">
+<input name="airframe" placeholder="Airframe">
+<input name="notes" placeholder="Notes">
+<select name="item" style="padding:8px;border-radius:6px;border:none;background:#0d1117;color:white;">
+    <option value="">Select Item</option>
+    <option value="Condition Inspection">Condition Inspection</option>
+    <option value="Oil Change">Oil Change</option>
+    <option value="ELT Test">ELT Test</option>
+    <option value="ELT Batteries">ELT Batteries</option>
+    <option value="ELT Registration">ELT Registration</option>
+    <option value="Nav Data Update">Nav Data Update</option>
+    <option value="Batteries">Batteries</option>
+    <option value="Transponder Check">Transponder Check</option>
+</select>
+<select name="category" style="padding:8px;border-radius:6px;border:none;background:#0d1117;color:white;">
+    <option value="">Select Category</option>
+    <option value="Airframe">Airframe</option>
+    <option value="Engine">Engine</option>
+    <option value="Propeller">Propeller</option>
+    <option value="Avionics">Avionics</option>
+</select>
+<button>Add Maintenance</button>
+</form>
+
+<table>
+<tr>
+<th>ID</th><th>Date</th><th>Tach</th>
+<th>Airframe</th><th>Notes</th>
+<th>Item</th><th>Category</th><th></th>
+</tr>
+
+{% for m in maintenance
+   |sort(attribute='tach_time', reverse=true)
+   |sort(attribute='date', reverse=true)
+%}
+
+<tr data-id="{{ m.id }}" class="{% if m[-1]=='overdue' %}overdue{% elif m[-1]=='due-soon' %}due-soon{% endif %}">
+
+<td>{{ m.id }}</td>
+
+<td contenteditable="true"
+    data-field="date"
+    onblur="saveEdit('maintenance', {{ m.id }}, this)"
+    onkeydown="handleKey(event,'maintenance',{{ m.id }},this)">
+    {{ m.date }}
+</td>
+
+<td contenteditable="true"
+    data-field="tach_time"
+    onblur="saveEdit('maintenance', {{ m.id }}, this)"
+    onkeydown="handleKey(event,'maintenance',{{ m.id }},this)">
+    {{ "%.1f"|format(m.tach_time|float) }}
+</td>
+
+<td contenteditable="true"
+    data-field="airframe_time"
+    onblur="saveEdit('maintenance', {{ m.id }}, this)"
+    onkeydown="handleKey(event,'maintenance',{{ m.id }},this)">
+    {{ "%.1f"|format(m.airframe_time|float) }}
+</td>
+
+<td contenteditable="true"
+    data-field="notes"
+    onblur="saveEdit('maintenance', {{ m.id }}, this)"
+    onkeydown="handleKey(event,'maintenance',{{ m.id }},this)">
+    {{ m.notes }}
+</td>
+
+<td>
+<select data-field="recurrent_item"
+    onchange="saveEdit('maintenance', {{ m.id }}, this)"
+    style="padding:6px;border-radius:6px;border:none;background:#0d1117;color:white;width:100%;">
+
+    {% set items = [
+        "Condition Inspection",
+        "Oil Change",
+        "ELT Test",
+        "ELT Batteries",
+        "ELT Registration",
+        "Nav Data Update",
+        "Batteries",
+        "Transponder Check"
+    ] %}
+
+    {% for item in items %}
+        <option value="{{ item }}" {% if m.recurrent_item == item %}selected{% endif %}>{{ item }}</option>
+    {% endfor %}
+</select>
+</td>
+
+<td>
+<select data-field="category"
+    onchange="saveEdit('maintenance', {{ m.id }}, this)"
+    style="padding:6px;border-radius:6px;border:none;background:#0d1117;color:white;width:100%;">
+
+    {% set categories = ["Airframe","Engine","Propeller","Avionics"] %}
+
+    {% for c in categories %}
+        <option value="{{ c }}" {% if m.category == c %}selected{% endif %}>{{ c }}</option>
+    {% endfor %}
+</select>
+</td>
+
+<td><a href="/delete_maintenance/{{ m.id }}" class="delete-btn">✖</a></td>
+
+</tr>
+{% endfor %}
+</table>
+
+<!-- FUEL -->
+<h2>Fuel</h2>
+
+<form method="POST" action="/add_fuel">
+<input name="date" placeholder="Date">
+<input name="hours" placeholder="Hours">
+<input name="gallons" placeholder="Gallons">
+<input name="price" placeholder="Price">
+<button>Add Fuel</button>
+</form>
+
+<table>
+<tr>
+<th>Date</th><th>Hours</th><th>Gallons</th>
+<th>Price</th><th>Total</th><th>GPH</th><th></th>
+</tr>
+{% for f in fuel
+   |sort(attribute='date', reverse=true)
+%}
+<tr data-id="{{ f[0] }}">
+{% for col in f[1:] %}
+{% set i = loop.index0 %}
+<td contenteditable="true"
+    data-field="{{ i }}"
+    onblur="saveEdit('fuel', {{ f[0] }}, this)"
+    onkeydown="handleKey(event,'fuel',{{ f[0] }},this)">
+    {% if i in [3,4] %}
+        {{ "%.2f"|format(col|float) }}
+    {% elif i in [1,2,5] %}
+        {{ "%.1f"|format(col|float) }}
+    {% else %}
+        {{ col }}
+    {% endif %}
+</td>
+{% endfor %}
+<td><a href="/delete_fuel/{{ f[0] }}" class="delete-btn">✖</a></td>
+</tr>
+{% endfor %}
+</table>
+
+</div>
+
+<script>
+async function saveEdit(type, id, cell) {
+    const fieldIndex = cell.dataset.field;
+    let value;
+
+    if (cell.tagName === "SELECT") {
+        value = cell.value;
+    } else {
+        value = cell.innerText;
+    }
+
+    try {
+        const res = await fetch(`/update_${type}/${id}`, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                field: fieldIndex,
+                value: value
+            })
+        });
+
+        if (res.ok) {
+            // allow backend recalculation then refresh UI
+            window.location.reload();
+        }
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+function handleKey(event, type, id, cell) {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        cell.blur();
+        saveEdit(type, id, cell);
+    }
+}
+
+function applyStatusStyle(id, value) {
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    let cls = "status-unknown";
+    if (value === "Current") cls = "status-current";
+    else if (value === "Overdue") cls = "status-overdue";
+
+    el.innerHTML = `<span class="status-pill ${cls}">${value ?? "--"}</span>`;
+}
+
+function loadSummary() {
+    fetch("/summary")
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById("totalFuel").innerText = Number(data.total_gallons).toFixed(1);
+            document.getElementById("totalCost").innerText = "$" + Number(data.total_cost).toFixed(2);
+            document.getElementById("avgGph").innerText = Number(data.avg_gph).toFixed(2);
+            document.getElementById("maintOverdue").innerText = data.maint_overdue ?? "--";
+
+            const aviationDays = data.aviation_days_remaining;
+            const obstacleDays = data.obstacle_days_remaining;
+
+            function formatNav(status, days) {
+                let text = "--";
+
+                if (days !== null && days !== undefined) {
+                    if (days >= 0) {
+                        text = `${days} days remaining`;
+                    } else {
+                        text = `${Math.abs(days)} days overdue`;
+                    }
+                }
+
+                let cls = "status-unknown";
+                if (status === "Current") cls = "status-current";
+                else if (status === "Overdue") cls = "status-overdue";
+
+                return `
+                    <span class="status-pill ${cls}">${status ?? "--"}</span>
+                    <div class="subtext">${text}</div>
+                `;
+            }
+
+            document.getElementById("aviationStatus").innerHTML =
+                formatNav(data.aviation_status, aviationDays);
+
+            document.getElementById("obstacleStatus").innerHTML =
+                formatNav(data.obstacle_status, obstacleDays);
+        })
+        .catch(err => console.error("summary error:", err));
+}
+
+loadSummary();
+setInterval(loadSummary, 30000);
+</script>
+
+</body>
+</html>

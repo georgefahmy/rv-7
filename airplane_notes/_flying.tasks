@@ -6,14 +6,14 @@ backlog:
 flight tests:
     ☐ 8. Vx and Vy calcs
     ☐ 9. best glide speed
-    ☐ 12. static longitudinal stability
-    ☐ 13. static directional stability
-    ☐ 14. static lateral and spiral stability
-    ☐ 15. dynamic longitudanl stability
-    ☐ 16. accelerated stalls (may not do)
+    ☐ 15. dynamic longitudinal stability
     ☐ 19. range and endurance
 
 Archive:
+    ✔ 12. static longitudinal stability @done(26-04-10) @project(flight tests)
+    ✔ 13. static directional stability @done(26-04-10) @project(flight tests)
+    ✔ 14. static lateral and spiral stability @done(26-04-10) @project(flight tests)
+    ✔ 16. accelerated stalls (may not do) @done(26-04-10) @project(flight tests)
     ✔ 20. takeoff performance @done(26-03-15) @project(flight tests)
     ✔ 21. landing performance @done(26-03-15) @project(flight tests)
     ✔ 6. wings level stalls @done(26-03-15) @project(flight tests)
