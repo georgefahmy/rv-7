@@ -1,8 +1,8 @@
 import re
 import sqlite3
-from datetime import datetime, timedelta
 import threading
 import time
+from datetime import datetime, timedelta
 
 # import requests
 from bs4 import BeautifulSoup
@@ -10,10 +10,7 @@ from flask import Flask, jsonify, redirect, render_template, request
 
 app = Flask(__name__)
 
-NAV_CACHE = {
-    "data": None,
-    "timestamp": 0
-}
+NAV_CACHE = {"data": None, "timestamp": 0}
 
 NAV_CACHE_TTL = 6 * 60 * 60  # 6 hours
 
