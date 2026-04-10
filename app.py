@@ -5,45 +5,17 @@ import threading
 import time
 from datetime import datetime, timedelta
 
+import requests
 from bs4 import BeautifulSoup
 from flask import Flask, jsonify, redirect, render_template, request, url_for
 
-# Import your scraper function
 from scripts.fuel_prices import scrape_airnav_to_json
 
 app = Flask(__name__)
 DB_PATH = "scripts/maintenance.db"
-FLIGHT_FIELDS = [
-    "date",
-    "takeoff_airport",
-    "landing_airport",
-    "hobbs",
-    "tach",
-    "hobbs_delta",
-    "tach_delta",
-    "landings",
-    "notes",
-]
 
-MAINT_FIELDS = [
-    "date",
-    "tach_time",
-    "airframe_time",
-    "notes",
-    "recurrent_item",
-    "category",
-]
-
-FUEL_FIELDS = [
-    "date",
-    "hours",
-    "gallons",
-    "price_per_gallon",
-    "total_cost",
-    "gal_per_hour",
-]
-OIL_CHANGE_INTERVAL_HOURS = 10
-
+# Constants
+OIL_CHANGE_INTERVAL_HOURS = 25
 MAINTENANCE_RULES = {
     "Condition Inspection": {"type": "date", "days": 365},
     "ELT Test": {"type": "date", "days": 90},
@@ -53,10 +25,10 @@ MAINTENANCE_RULES = {
     "Transponder Check": {"type": "date", "days": 365 * 2},
     "Oil Change": {"type": "tach", "hours": OIL_CHANGE_INTERVAL_HOURS},
 }
+
+# In-Memory Cache for Nav Data (Prevents spamming the Dynon endpoint)
 NAV_CACHE = {"data": None, "timestamp": 0}
-
 NAV_CACHE_TTL = 6 * 60 * 60  # 6 hours
-
 NAV_CACHE_LOCK = threading.Lock()
 
 
@@ -69,35 +41,40 @@ def get_db_connection():
 def validate_float(value, default=0.0):
     if value is None:
         return default
-
-    # Catch literal strings like "None", "Null", or empty strings
-    if isinstance(value, str) and value.strip().lower() in ["None", None]:
+    if isinstance(value, str) and value.strip().lower() in ["none", "null", ""]:
         return default
-
     try:
         return round(float(value), 1)
     except (ValueError, TypeError):
         return default
 
 
+def parse_date_safe(value):
+    """Force all incoming dates to ISO format (YYYY-MM-DD) for database integrity."""
+    if not value:
+        return datetime.today().strftime("%Y-%m-%d")
+    for fmt in ("%Y-%m-%d", "%m/%d/%Y", "%m-%d-%Y"):
+        try:
+            return datetime.strptime(value, fmt).strftime("%Y-%m-%d")
+        except ValueError:
+            continue
+    return datetime.today().strftime("%Y-%m-%d")
+
+
 def recompute_flight_history(conn):
-    """Recalculates deltas across all flights sequentially."""
     cur = conn.execute(
-        "SELECT rowid, hobbs, tach FROM flight_log ORDER BY date ASC, rowid ASC"
+        "SELECT id, hobbs, tach FROM flight_log ORDER BY date ASC, id ASC"
     )
     rows = cur.fetchall()
 
-    # Start these as None so we know when we are on the very first row
     prev_hobbs = None
     prev_tach = None
 
     for r in rows:
-        rowid = r
-        hobbs = validate_float(r)
-        tach = validate_float(r)
+        row_id = r["id"]
+        hobbs = validate_float(r["hobbs"])
+        tach = validate_float(r["tach"])
 
-        # If this is the first entry, delta is 0.
-        # Otherwise, subtract the previous value from the current value.
         if prev_hobbs is None:
             hobbs_delta = 0.0
             tach_delta = 0.0
@@ -105,45 +82,45 @@ def recompute_flight_history(conn):
             hobbs_delta = round(hobbs - prev_hobbs, 1)
             tach_delta = round(tach - prev_tach, 1)
 
-        # Optional safeguard: Prevent negative deltas if out-of-order entries occur
         if hobbs_delta < 0:
             hobbs_delta = 0.0
         if tach_delta < 0:
             tach_delta = 0.0
 
         conn.execute(
-            "UPDATE flight_log SET hobbs_delta = ?, tach_delta = ? WHERE rowid = ?",
-            (hobbs_delta, tach_delta, rowid),
+            "UPDATE flight_log SET hobbs_delta = ?, tach_delta = ? WHERE id = ?",
+            (hobbs_delta, tach_delta, row_id),
         )
 
-        # Update previous values for the next loop iteration
         prev_hobbs = hobbs
         prev_tach = tach
-
     conn.commit()
 
 
 def check_auto_maintenance(conn):
-    cur = conn.execute("SELECT MAX(tach_time) FROM maintenance_entries")
-    last = validate_float(cur.fetchone()[0])
+    cur = conn.execute(
+        "SELECT MAX(tach_time) FROM maintenance_entries WHERE recurrent_item='Oil Change'"
+    )
+    last_row = cur.fetchone()
+    last = validate_float(last_row[0] if last_row and last_row[0] else 0)
 
     cur2 = conn.execute("SELECT MAX(tach) FROM flight_log")
-    current = validate_float(cur2.fetchone()[0])
+    curr_row = cur2.fetchone()
+    current = validate_float(curr_row[0] if curr_row and curr_row[0] else 0)
 
-    if current - last >= 25:
+    if current - last >= OIL_CHANGE_INTERVAL_HOURS:
         conn.execute(
             """
-            INSERT INTO maintenance_entries
-            (date, tach_time, airframe_time, notes, recurrent_item, category)
+            INSERT INTO maintenance_entries (date, tach_time, airframe_time, notes, recurrent_item, category)
             VALUES (date('now'), ?, ?, ?, ?, ?)
             """,
             (
                 current,
                 current,
                 "AUTO",
-                "Auto oil change reminder",
-                "oil_change",
-                "auto",
+                f"Auto oil change reminder (>{OIL_CHANGE_INTERVAL_HOURS} hrs)",
+                "Oil Change",
+                "Engine",
             ),
         )
         conn.commit()
@@ -151,32 +128,25 @@ def check_auto_maintenance(conn):
 
 def calculate_overdue(conn):
     cursor = conn.cursor()
-
-    cursor.execute(
-        """
-        SELECT recurrent_item, date
-        FROM maintenance_entries
-    """
-    )
+    cursor.execute("SELECT recurrent_item, date FROM maintenance_entries")
     rows = cursor.fetchall()
 
     today = datetime.today().date()
     overdue_count = 0
 
     cursor.execute("SELECT MAX(tach) FROM flight_log")
-    current_tach = validate_float(cursor.fetchone()[0])
+    tach_row = cursor.fetchone()
+    current_tach = validate_float(tach_row[0] if tach_row and tach_row[0] else 0)
 
     for item, last_date in rows:
         if not item or not last_date:
             continue
-
         rule = MAINTENANCE_RULES.get(item)
         if not rule:
             continue
 
-        # SAFE: now ALL dates are ISO
         try:
-            last_dt = datetime.strptime(last_date, "%Y-%m-%d").date()
+            last_dt = datetime.strptime(parse_date_safe(last_date), "%Y-%m-%d").date()
         except:
             continue
 
@@ -184,22 +154,17 @@ def calculate_overdue(conn):
             due_date = last_dt + timedelta(days=rule["days"])
             if today > due_date:
                 overdue_count += 1
-
         elif rule["type"] == "tach":
             cursor.execute(
-                """
-                SELECT MAX(tach_time)
-                FROM maintenance_entries
-                WHERE recurrent_item=?
-            """,
+                "SELECT MAX(tach_time) FROM maintenance_entries WHERE recurrent_item=?",
                 (item,),
             )
-
             last_tach_row = cursor.fetchone()
-            last_tach = validate_float(last_tach_row[0])
+            last_tach = validate_float(
+                last_tach_row[0] if last_tach_row and last_tach_row[0] else 0
+            )
 
             due_tach = last_tach + rule["hours"]
-
             if current_tach > due_tach:
                 overdue_count += 1
 
@@ -207,112 +172,80 @@ def calculate_overdue(conn):
 
 
 def _get_nav_database_status_live(conn):
+    """Scrapes Dynon using lightweight requests instead of Playwright."""
     url = "https://dynonavionics.com/us-aviation-obstacle-data.php"
-
-    aviation_status = "--"
-    obstacle_status = "--"
-    aviation_days_remaining = None
-    obstacle_days_remaining = None
+    aviation_status, obstacle_status = "--", "--"
+    aviation_days_remaining, obstacle_days_remaining = None, None
+    html = None
 
     try:
-        from playwright.sync_api import sync_playwright
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        }
+        resp = requests.get(url, headers=headers, timeout=10)
+        resp.raise_for_status()
+        html = resp.text
+    except Exception as e:
+        print("Requests fetch failed:", e)
 
-        html = None
-
+    if html:
         try:
-            with sync_playwright() as p:
-                browser = p.chromium.launch(headless=True)
-                page = browser.new_page()
+            soup = BeautifulSoup(html, "html.parser")
+            spans = soup.find_all(string=lambda t: t and "Valid:" in t)
 
-                page.goto(url, timeout=30000, wait_until="domcontentloaded")
-                html = page.content()
+            if len(spans) >= 2:
+                aviation_valid_text = spans[0].split("Valid:")[-1].strip()
+                obstacle_valid_text = spans[1].split("Valid:")[-1].strip()
+                today = datetime.today().date()
 
-                browser.close()
+                match_aviation = re.search(r"([A-Za-z]+ \d{1,2})", aviation_valid_text)
+                match_obstacle = re.search(r"([A-Za-z]+ \d{1,2})", obstacle_valid_text)
+
+                date_aviation = (
+                    datetime.strptime(
+                        match_aviation.group(1) + f" {today.year}", "%B %d %Y"
+                    ).date()
+                    if match_aviation
+                    else None
+                )
+                date_obstacle = (
+                    datetime.strptime(
+                        match_obstacle.group(1) + f" {today.year}", "%B %d %Y"
+                    ).date()
+                    if match_obstacle
+                    else None
+                )
+
+                cursor = conn.cursor()
+                cursor.execute(
+                    "SELECT date FROM maintenance_entries WHERE recurrent_item='Nav Data Update' ORDER BY date DESC LIMIT 1"
+                )
+                nav_entry = cursor.fetchone()
+
+                if nav_entry and nav_entry[0] and date_aviation and date_obstacle:
+                    nav_date = datetime.strptime(
+                        parse_date_safe(nav_entry[0]), "%Y-%m-%d"
+                    ).date()
+                    aviation_status = (
+                        "Current" if nav_date >= date_aviation else "Overdue"
+                    )
+                    obstacle_status = (
+                        "Current" if nav_date >= date_obstacle else "Overdue"
+                    )
+                else:
+                    aviation_status = obstacle_status = "Overdue"
+
+                if date_aviation:
+                    aviation_days_remaining = (
+                        (date_aviation + timedelta(days=28)) - today
+                    ).days
+                if date_obstacle:
+                    obstacle_days_remaining = (
+                        (date_obstacle + timedelta(days=56)) - today
+                    ).days
 
         except Exception as e:
-            print("Playwright fetch failed:", e)
-            html = None
-
-        if not html:
-            return {
-                "aviation_status": aviation_status,
-                "obstacle_status": obstacle_status,
-                "aviation_days_remaining": aviation_days_remaining,
-                "obstacle_days_remaining": obstacle_days_remaining,
-            }
-
-        soup = BeautifulSoup(html, "html.parser")
-
-        spans = soup.find_all(string=lambda t: "Valid:" in t)
-
-        if len(spans) >= 2:
-            aviation_valid_text = spans[0].split("Valid:")[-1].strip()
-            obstacle_valid_text = spans[1].split("Valid:")[-1].strip()
-
-            today = datetime.today().date()
-
-            match_aviation = re.search(r"([A-Za-z]+ \d{1,2})", aviation_valid_text)
-            match_obstacle = re.search(r"([A-Za-z]+ \d{1,2})", obstacle_valid_text)
-
-            date_aviation = None
-            date_obstacle = None
-
-            if match_aviation:
-                date_aviation = datetime.strptime(
-                    match_aviation.group(1) + f" {today.year}", "%B %d %Y"
-                ).date()
-
-            if match_obstacle:
-                date_obstacle = datetime.strptime(
-                    match_obstacle.group(1) + f" {today.year}", "%B %d %Y"
-                ).date()
-
-            cursor = conn.cursor()
-
-            cursor.execute(
-                """
-                SELECT date
-                FROM maintenance_entries
-                WHERE recurrent_item='Nav Data Update'
-                ORDER BY date DESC
-                LIMIT 1
-                """
-            )
-            nav_entry = cursor.fetchone()
-
-            if nav_entry and nav_entry[0] and date_aviation and date_obstacle:
-                try:
-                    nav_date = datetime.strptime(nav_entry[0], "%m/%d/%Y").date()
-                except:
-                    nav_date = None
-
-                if nav_date:
-                    if date_aviation:
-                        aviation_status = (
-                            "Current" if nav_date >= date_aviation else "Overdue"
-                        )
-                    if date_obstacle:
-                        obstacle_status = (
-                            "Current" if nav_date >= date_obstacle else "Overdue"
-                        )
-                else:
-                    aviation_status = "Overdue"
-                    obstacle_status = "Overdue"
-            else:
-                aviation_status = "Overdue"
-                obstacle_status = "Overdue"
-
-            # Always compute expiry countdown (EFB-style)
-            if date_aviation:
-                aviation_expiry = date_aviation + timedelta(days=28)
-                aviation_days_remaining = (aviation_expiry - today).days
-
-            if date_obstacle:
-                obstacle_expiry = date_obstacle + timedelta(days=56)
-                obstacle_days_remaining = (obstacle_expiry - today).days
-
-    except Exception as e:
-        print("Nav DB fetch failed:", e)
+            print("Nav parsing failed:", e)
 
     return {
         "aviation_status": aviation_status,
@@ -324,15 +257,12 @@ def _get_nav_database_status_live(conn):
 
 def get_nav_database_status(conn):
     global NAV_CACHE
-
     now = time.time()
-
     with NAV_CACHE_LOCK:
         if NAV_CACHE["data"] and (now - NAV_CACHE["timestamp"] < NAV_CACHE_TTL):
             return NAV_CACHE["data"]
 
     live = _get_nav_database_status_live(conn)
-
     with NAV_CACHE_LOCK:
         NAV_CACHE["data"] = live
         NAV_CACHE["timestamp"] = now
@@ -340,36 +270,14 @@ def get_nav_database_status(conn):
     return live
 
 
-def parse_date_safe(value):
-    """
-    Normalize all incoming dates to ISO format (YYYY-MM-DD).
-    Accepts:
-    - YYYY-MM-DD
-    - MM/DD/YYYY
-    - invalid values fallback to today
-    """
-    if not value:
-        return datetime.today().strftime("%Y-%m-%d")
-
-    for fmt in ("%Y-%m-%d", "%m/%d/%Y"):
-        try:
-            return datetime.strptime(value, fmt).strftime("%Y-%m-%d")
-        except:
-            continue
-
-    return datetime.today().strftime("%Y-%m-%d")
-
-
 def get_upcoming_maintenance(conn):
     cursor = conn.cursor()
     today = datetime.today().date()
 
-    # 1. Get Current Aircraft Tach
     cursor.execute("SELECT MAX(tach) FROM flight_log")
     tach_row = cursor.fetchone()
     current_tach = validate_float(tach_row[0] if tach_row and tach_row[0] else 0)
 
-    # 2. Condition Inspection Calculation
     cond_due_str = "--"
     cond_class = "status-default"
     cursor.execute(
@@ -379,29 +287,23 @@ def get_upcoming_maintenance(conn):
 
     if ci_row and ci_row[0]:
         try:
-            last_dt = datetime.strptime(ci_row[0], "%m/%d/%Y").date()
+            last_dt = datetime.strptime(parse_date_safe(ci_row[0]), "%Y-%m-%d").date()
             prelim_due = last_dt + timedelta(
                 days=MAINTENANCE_RULES["Condition Inspection"]["days"]
             )
-
-            # Aviation rule: Inspections are due on the last day of the month
             last_day = calendar.monthrange(prelim_due.year, prelim_due.month)[1]
             due_date = prelim_due.replace(day=last_day)
-
             days_left = (due_date - today).days
-            cond_due_str = f"{due_date.strftime('%m/%d/%Y')} ({days_left} days)"
 
-            if days_left < 0:
-                cond_class = "status-overdue"
-            elif days_left <= 30:
-                cond_class = "status-warning"
-            else:
-                cond_class = "status-current"
-        except Exception as e:
-            print(e)
+            cond_due_str = f"{due_date.strftime('%m/%d/%Y')} ({days_left} days)"
+            cond_class = (
+                "status-overdue"
+                if days_left < 0
+                else "status-warning" if days_left <= 30 else "status-current"
+            )
+        except Exception:
             pass
 
-    # 3. Oil Change Calculation
     oil_due_str = "--"
     oil_class = "status-default"
     cursor.execute(
@@ -415,13 +317,11 @@ def get_upcoming_maintenance(conn):
         hrs_left = round(due_tach - current_tach, 1)
 
         oil_due_str = f"{due_tach:.1f} hrs ({hrs_left:.1f} hrs left)"
-
-        if hrs_left < 0:
-            oil_class = "status-overdue"
-        elif hrs_left <= 5.0:
-            oil_class = "status-warning"
-        else:
-            oil_class = "status-current"
+        oil_class = (
+            "status-overdue"
+            if hrs_left < 0
+            else "status-warning" if hrs_left <= 5.0 else "status-current"
+        )
 
     return {
         "cond_due": cond_due_str,
@@ -436,7 +336,6 @@ def index():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Helper function to sort and create dual-format dates
     def sort_and_format_logs(logs_list):
         def parse_to_datetime(d):
             if not d:
@@ -451,38 +350,24 @@ def index():
         sorted_logs = sorted(
             logs_list, key=lambda x: parse_to_datetime(x["date"]), reverse=True
         )
-
         for log in sorted_logs:
             dt = parse_to_datetime(log["date"])
             if dt != datetime.min:
-                # 'date' stays ISO for HTML5 <input type="date"> fields
                 log["date"] = dt.strftime("%Y-%m-%d")
-                # 'display_date' becomes American format for UI tables
                 log["display_date"] = dt.strftime("%m/%d/%Y")
             else:
                 log["display_date"] = log.get("date", "")
-
         return sorted_logs
 
-    # 1. Fetch Flight Logs
-    cursor.execute(
-        """
-        SELECT id, date, takeoff_airport, landing_airport, hobbs, tach,
-               hobbs_delta, tach_delta, landings, notes
-        FROM flight_log
-    """
-    )
+    cursor.execute("SELECT * FROM flight_log")
     flight_logs = sort_and_format_logs([dict(row) for row in cursor.fetchall()])
 
-    # 2. Fetch Maintenance Logs
     cursor.execute("SELECT * FROM maintenance_entries")
     mx_logs = sort_and_format_logs([dict(row) for row in cursor.fetchall()])
 
-    # 3. Fetch Fuel Logs
     cursor.execute("SELECT * FROM fuel_tracker")
     fuel_logs = sort_and_format_logs([dict(row) for row in cursor.fetchall()])
 
-    # 4. Fetch Totals
     cursor.execute("SELECT hobbs FROM flight_log ORDER BY hobbs DESC LIMIT 1")
     hobbs_res = cursor.fetchone()
     total_hours = hobbs_res["hobbs"] if hobbs_res and hobbs_res["hobbs"] else 0.0
@@ -493,13 +378,10 @@ def index():
 
     overdue_count = calculate_overdue(conn)
     nav_status = get_nav_database_status(conn)
-
-    # FETCH LIVE MAINTENANCE STATUS HERE
     upcoming_mx = get_upcoming_maintenance(conn)
-
     conn.close()
 
-    # 5. Extract Nav Status and Days Remaining
+    # Build split Nav Strings
     aviation_status = nav_status.get("aviation_status", "--")
     aviation_days = nav_status.get("aviation_days_remaining")
     aviation_text = aviation_status
@@ -528,7 +410,6 @@ def index():
         obstacle_status_class=(
             "status-current" if obstacle_status == "Current" else "status-overdue"
         ),
-        # REPLACE STATIC PLACEHOLDERS WITH LIVE DATA
         cond_due=upcoming_mx["cond_due"],
         cond_status_class=upcoming_mx["cond_status_class"],
         oil_due=upcoming_mx["oil_due"],
@@ -538,98 +419,6 @@ def index():
 
 @app.route("/add_flight", methods=["POST"])
 def add_flight():
-    date = request.form.get("date")
-    takeoff = request.form.get("takeoff")
-    landing = request.form.get("landing")
-    hobbs = request.form.get("hobbs")
-    tach = request.form.get("tach")
-    landings = request.form.get("landings")
-    notes = request.form.get("notes")
-
-    conn = get_db_connection()
-    conn.execute(
-        """
-        INSERT INTO flight_log (date, takeoff_airport, landing_airport, hobbs, tach, landings, notes)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-    """,
-        (date, takeoff, landing, hobbs, tach, landings, notes),
-    )
-    conn.commit()
-    conn.close()
-
-    return redirect(url_for("index"))
-
-
-@app.route("/add_mx", methods=["POST"])
-def add_mx():
-    date = request.form.get("date")
-    tach = request.form.get("tach")
-    airframe = request.form.get("airframe")
-    recurrent_item = request.form.get("recurrent_item")
-    category = request.form.get("category")
-    notes = request.form.get("notes")
-
-    conn = get_db_connection()
-    conn.execute(
-        """
-        INSERT INTO maintenance_entries (date, tach_time, airframe_time, recurrent_item, category, notes)
-        VALUES (?, ?, ?, ?, ?, ?)
-    """,
-        (date, tach, airframe, recurrent_item, category, notes),
-    )
-    conn.commit()
-    conn.close()
-
-    return redirect(url_for("index"))
-
-
-@app.route("/add_fuel", methods=["POST"])
-def add_fuel():
-    date = request.form.get("date")
-    hours = float(request.form.get("hours", 0))
-    gallons = float(request.form.get("gallons", 0))
-    price = float(request.form.get("price", 0))
-
-    total_cost = round(gallons * price, 2)
-    gal_per_hour = round(gallons / hours, 2) if hours > 0 else 0
-
-    conn = get_db_connection()
-    conn.execute(
-        """
-        INSERT INTO fuel_tracker (date, hours, gallons, price_per_gallon, total_cost, gal_per_hour)
-        VALUES (?, ?, ?, ?, ?, ?)
-    """,
-        (date, hours, gallons, price, total_cost, gal_per_hour),
-    )
-    conn.commit()
-    conn.close()
-
-    return redirect(url_for("index"))
-
-
-@app.route("/api/fuel_prices", methods=["GET"])
-def api_fuel_prices():
-    airport = request.args.get("airport", "").strip()
-    if not airport:
-        return jsonify({"error": "No airport provided"}), 400
-
-    try:
-        # Calls the scraper. Returns (options, output_string)
-        options, _ = scrape_airnav_to_json(airport)
-
-        if options:
-            return jsonify({"options": options[0:5]})
-        else:
-            return jsonify({"error": f"No fuel data found for {airport}"}), 404
-
-    except Exception as e:
-        print(f"Scraping Error: {e}")
-        return jsonify({"error": "An error occurred while fetching fuel prices."}), 500
-
-
-@app.route("/edit_flight/<int:id>", methods=["POST"])
-def edit_flight(id):
-    # 1. Grab all the inputs from the HTML form
     date = parse_date_safe(request.form.get("date"))
     takeoff = request.form.get("takeoff")
     landing = request.form.get("landing")
@@ -638,75 +427,132 @@ def edit_flight(id):
     landings = request.form.get("landings", 0)
     notes = request.form.get("notes")
 
-    # 2. Update the specific row in the database
     conn = get_db_connection()
     conn.execute(
-        """
-        UPDATE flight_log
-        SET date = ?, takeoff_airport = ?, landing_airport = ?,
-            hobbs = ?, tach = ?, landings = ?, notes = ?
-        WHERE id = ?
-        """,
-        (date, takeoff, landing, hobbs, tach, landings, notes, id),
+        "INSERT INTO flight_log (date, takeoff_airport, landing_airport, hobbs, tach, landings, notes) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        (date, takeoff, landing, hobbs, tach, landings, notes),
     )
     conn.commit()
-
-    # 3. Recalculate everything and close up
-    # recompute_flight_history(conn)
+    recompute_flight_history(conn)
     check_auto_maintenance(conn)
     conn.close()
-
     return redirect(url_for("index"))
 
 
-@app.route("/edit_mx/<int:id>", methods=["POST"])
-def edit_mx(id):
-    date = request.form.get("date")
-    tach = request.form.get("tach")
-    airframe = request.form.get("airframe")
+@app.route("/add_mx", methods=["POST"])
+def add_mx():
+    date = parse_date_safe(request.form.get("date"))
+    tach = validate_float(request.form.get("tach"))
+    airframe = validate_float(request.form.get("airframe"))
     recurrent_item = request.form.get("recurrent_item")
     category = request.form.get("category")
     notes = request.form.get("notes")
 
     conn = get_db_connection()
     conn.execute(
-        """
-        UPDATE maintenance_entries
-        SET date = ?, tach_time = ?, airframe_time = ?,
-            recurrent_item = ?, category = ?, notes = ?
-        WHERE id=?
-        """,
-        (date, tach, airframe, recurrent_item, category, notes, id),
+        "INSERT INTO maintenance_entries (date, tach_time, airframe_time, recurrent_item, category, notes) VALUES (?, ?, ?, ?, ?, ?)",
+        (date, tach, airframe, recurrent_item, category, notes),
     )
     conn.commit()
     conn.close()
-
     return redirect(url_for("index"))
 
 
-@app.route("/edit_fuel/<int:id>", methods=["POST"])
-def edit_fuel(id):
-    date = request.form.get("date")
-    hours = float(request.form.get("hours", 0))
-    gallons = float(request.form.get("gallons", 0))
-    price = float(request.form.get("price", 0))
+@app.route("/add_fuel", methods=["POST"])
+def add_fuel():
+    date = parse_date_safe(request.form.get("date"))
+    hours = validate_float(request.form.get("hours", 0))
+    gallons = validate_float(request.form.get("gallons", 0))
+    price = validate_float(request.form.get("price", 0))
 
     total_cost = round(gallons * price, 2)
     gal_per_hour = round(gallons / hours, 2) if hours > 0 else 0
 
     conn = get_db_connection()
     conn.execute(
-        """
-        UPDATE fuel_tracker
-        SET date =?, hours =?, gallons =?, price_per_gallon =?,
-            total_cost =?, gal_per_hour =?
-        WHERE id = ?
-        """,
+        "INSERT INTO fuel_tracker (date, hours, gallons, price_per_gallon, total_cost, gal_per_hour) VALUES (?, ?, ?, ?, ?, ?)",
+        (date, hours, gallons, price, total_cost, gal_per_hour),
+    )
+    conn.commit()
+    conn.close()
+    return redirect(url_for("index"))
+
+
+@app.route("/api/fuel_prices", methods=["GET"])
+def api_fuel_prices():
+    airport = request.args.get("airport", "").strip()
+    if not airport:
+        return jsonify({"error": "No airport provided"}), 400
+    try:
+        options, _ = scrape_airnav_to_json(airport)
+        return (
+            jsonify({"options": options[0:5]})
+            if options
+            else jsonify({"error": f"No fuel data found for {airport}"})
+        ), 404
+    except Exception as e:
+        print(f"Scraping Error: {e}")
+        return jsonify({"error": "An error occurred while fetching fuel prices."}), 500
+
+
+@app.route("/edit_flight/<int:id>", methods=["POST"])
+def edit_flight(id):
+    date = parse_date_safe(request.form.get("date"))
+    takeoff = request.form.get("takeoff")
+    landing = request.form.get("landing")
+    hobbs = validate_float(request.form.get("hobbs"))
+    tach = validate_float(request.form.get("tach"))
+    landings = request.form.get("landings", 0)
+    notes = request.form.get("notes")
+
+    conn = get_db_connection()
+    conn.execute(
+        "UPDATE flight_log SET date = ?, takeoff_airport = ?, landing_airport = ?, hobbs = ?, tach = ?, landings = ?, notes = ? WHERE id = ?",
+        (date, takeoff, landing, hobbs, tach, landings, notes, id),
+    )
+    conn.commit()
+    recompute_flight_history(conn)
+    check_auto_maintenance(conn)
+    conn.close()
+    return redirect(url_for("index"))
+
+
+@app.route("/edit_mx/<int:id>", methods=["POST"])
+def edit_mx(id):
+    date = parse_date_safe(request.form.get("date"))
+    tach = validate_float(request.form.get("tach"))
+    airframe = validate_float(request.form.get("airframe"))
+    recurrent_item = request.form.get("recurrent_item")
+    category = request.form.get("category")
+    notes = request.form.get("notes")
+
+    conn = get_db_connection()
+    conn.execute(
+        "UPDATE maintenance_entries SET date = ?, tach_time = ?, airframe_time = ?, recurrent_item = ?, category = ?, notes = ? WHERE id=?",
+        (date, tach, airframe, recurrent_item, category, notes, id),
+    )
+    conn.commit()
+    conn.close()
+    return redirect(url_for("index"))
+
+
+@app.route("/edit_fuel/<int:id>", methods=["POST"])
+def edit_fuel(id):
+    date = parse_date_safe(request.form.get("date"))
+    hours = validate_float(request.form.get("hours", 0))
+    gallons = validate_float(request.form.get("gallons", 0))
+    price = validate_float(request.form.get("price", 0))
+
+    total_cost = round(gallons * price, 2)
+    gal_per_hour = round(gallons / hours, 2) if hours > 0 else 0
+
+    conn = get_db_connection()
+    conn.execute(
+        "UPDATE fuel_tracker SET date =?, hours =?, gallons =?, price_per_gallon =?, total_cost =?, gal_per_hour =? WHERE id = ?",
         (date, hours, gallons, price, total_cost, gal_per_hour, id),
     )
     conn.commit()
     conn.close()
-
     return redirect(url_for("index"))
 
 
@@ -715,6 +561,8 @@ def delete_flight(id):
     conn = get_db_connection()
     conn.execute("DELETE FROM flight_log WHERE id = ?", (id,))
     conn.commit()
+    recompute_flight_history(conn)
+    conn.close()
     return redirect(url_for("index"))
 
 
@@ -723,14 +571,16 @@ def delete_maintenance(id):
     conn = get_db_connection()
     conn.execute("DELETE FROM maintenance_entries WHERE id = ?", (id,))
     conn.commit()
+    conn.close()
     return redirect(url_for("index"))
 
 
 @app.route("/delete_fuel/<int:id>")
 def delete_fuel(id):
     conn = get_db_connection()
-    conn.execute("DELETE FROM fuel_tracker WHERE rowid = ?", (id,))
+    conn.execute("DELETE FROM fuel_tracker WHERE id = ?", (id,))
     conn.commit()
+    conn.close()
     return redirect(url_for("index"))
 
 
