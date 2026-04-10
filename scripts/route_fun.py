@@ -7,6 +7,7 @@ from urllib.parse import quote
 
 import airportsdata
 import networkx as nx
+import pyperclip
 import requests
 from bs4 import BeautifulSoup
 
@@ -80,6 +81,7 @@ def find_optimal_route(
     min_leg=None,
     max_leg=None,
     altitude_penalty_factor=0,
+    max_radius_from_start=None,
 ):
     # --- START TOTAL TIMER ---
     start_time = time.time()
@@ -121,6 +123,36 @@ def find_optimal_route(
             resolved_start = f"K{start_code}"
         else:
             print(f"Error: The starting airport '{start_airport}' was not found.")
+            return
+
+    # --- OPTIONAL FILTER: LIMIT DISTANCE FROM START AIRPORT ---
+    if resolved_start and max_radius_from_start is not None:
+        print(
+            f"Filtering airports within {max_radius_from_start} nm of {resolved_start}..."
+        )
+
+        start_lat = valid_airports[resolved_start]["lat"]
+        start_lon = valid_airports[resolved_start]["lon"]
+
+        filtered_airports = {}
+        for code, data in valid_airports.items():
+            lat, lon = data["lat"], data["lon"]
+            dist_from_start = haversine_distance(start_lat, start_lon, lat, lon)
+
+            if dist_from_start <= max_radius_from_start or code == resolved_start:
+                filtered_airports[code] = data
+
+        removed_count = len(valid_airports) - len(filtered_airports)
+        if removed_count > 0:
+            print(f"-> Removed {removed_count} airports outside radius")
+
+        valid_airports = filtered_airports
+        codes = list(valid_airports.keys())
+
+        if len(codes) < 2:
+            print(
+                "Not enough airports within the specified radius to calculate a route."
+            )
             return
 
     print(f"Building distance matrix for {len(codes)} airports...")
@@ -262,24 +294,27 @@ def get_airports(state="CA"):
                 airport_id = link.get_text(strip=True)
                 airport_ids.append(airport_id)
 
-    return " ".join(airport_ids)
+    return airport_ids
 
 
 if __name__ == "__main__":
     # raw_input = "A26 L70 KAAT A24 2O3 KAPV KACV KMER KAUN KAVX 0O2 KBFL L45 KBNG O02 O55 L35 KBIH KBLH D83 L08 KBWC O57 KBUR L62 C83 KCXL L71 KCLR KCMA O61 KCRQ O59 49X O05 KCIC KCNO L77 2O6 O60 3O8 C80 O22 O08 KCPM KCCR 0O4 KAJO O09 KCEC KDAG KEDU KDWA L06 L09 KDLO D63 A32 1O6 KEMT KBLU KEKA O19 O33 O89 L18 L73 F34 A28 A30 KFOT F72 KFAT KFCH E79 KFUL O16 0O9 E36 KGOO E45 E55 3O1 KHAF KHJO 36S KHHR F62 KHWD KHES KHMT H37 L26 KCVH 1C9 O21 H47 KIPL 2O7 KIYK KJAQ L78 L05 KKIC S51 KPOC 1O2 KWJF O24 KLHM KLLR KLVK 1O3 O20 L53 KLPC O26 L80 KLGB KWHP KLAX KLSN KMAE KMMH KOAR KMPI M45 KMYV KMCE KMOD KMHV KSIY 1O5 KMRY F70 KAPC KEED L88 KDVO O27 KOAK L52 KOKB L90 KONT O37 KOVE KOXR KPSP KTRM KUDD KPMD KPAO KPRB L65 O69 KPVF KPTV 2O1 KRNM KRIU O39 KRBL KRDD O85 KREI O32 L36 O88 KRAL KRIV KRIR L00 T42 KSMF KSAC KMHR KMCC KSNS KSAS KCPU KSBD KSQL KMYF KSDM KSAN KSEE KSFO KSJC KRHV KSBP E16 KSNA KSBA KSMX KSMO KSZP KSTS KIZA 0Q3 0Q4 KMIT 0Q5 L61 O79 0Q9 KTVL KSCK 1Q1 KSVE 1Q2 L17 KTSP L94 KTOA KTCY 1Q4 O86 L72 KTRK KTLR O81 O15 KTNP KUKI KCCB 1Q5 KVCB KVNY KVCV KVIS D86 L19 KWVI O54 O46 O28 KWLW O42 O41 O52 L22"
-    raw_input = get_airports(state="NV")
-    airport_list = raw_input.split()
+    # airport_list = raw_input.split()
+    airport_list = get_airports(state="CA")
 
     route = find_optimal_route(
         airport_codes=airport_list,
-        start_airport=None,
+        start_airport="E16",
         min_leg=1.0,
         max_leg=300.0,
         altitude_penalty_factor=0,
+        max_radius_from_start=50,
     )
 
     session = requests.Session()
     route_string = " ".join(route)
+    pyperclip.copy(route_string)
+
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"
     }
@@ -291,4 +326,4 @@ if __name__ == "__main__":
     # print(quote(route_string))
     # webbrowser.open(response.url)
     route_dict = response.json()
-    print(route_dict.keys())
+    # print(route_dict.keys())

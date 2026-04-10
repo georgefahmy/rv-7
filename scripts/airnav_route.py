@@ -1,9 +1,11 @@
 import json
 import re
-from pprint import pprint
 
 import requests
 from bs4 import BeautifulSoup
+
+# from pprint import pprint
+
 
 BASE_URL = "https://www.airnav.com/cgi-bin/"
 session = requests.Session()
@@ -20,7 +22,7 @@ payload = {
     "destination": destination.upper(),  # Replace 'destination' with the actual input name
     "aptsel": "a-u-0----1-A",
     "method": "cheap",
-    "range": "20",
+    "range": "400",
     "rangeunits": "nm",
     "speed": "160",
     "speedunits": "kt",
@@ -53,9 +55,10 @@ for line in pre_text.split("\n"):
             "savings": float(match.group(5)),
         }
         parsed_routes.append(route_data)
-pprint(parsed_routes)
-selected_route = input("Which route? ")
-
+# pprint(parsed_routes)
+# selected_route = input("Which route? ")
+selected_route = 0
+print(parsed_routes[int(selected_route)])
 
 route_data = BeautifulSoup(
     requests.get(parsed_routes[int(selected_route)]["url"]).text, "html.parser"

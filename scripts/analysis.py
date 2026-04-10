@@ -912,7 +912,7 @@ def main_layout():
             sg.FileBrowse(
                 file_types=(("CSV Files", "*.csv"),),
                 font=("Arial", 16),
-                initial_folder="/Users/GFahmy/Documents/projects/dynon/clean_flights",
+                initial_folder="/Users/GFahmy/Documents/projects/dynon",
             ),
             sg.Text("", font=("Arial", 16), expand_x=True),
         ],
