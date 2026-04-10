@@ -1004,7 +1004,7 @@ def main_layout():
             ),
         ],
         [
-            sg.Text(size=(50, 8), key="-SUMMARY-", font=("Arial", 14)),
+            sg.Text(size=(50, 10), key="-SUMMARY-", font=("Arial", 14)),
             sg.Text(expand_x=True),
             sg.Text(size=(50, 8), key="-ASI_CALIBRATION-", font=("Arial", 14)),
         ],
@@ -1204,7 +1204,15 @@ def main():
                 Engine_Run=("Engine Run", "first"),
                 Max_RPM=("RPM L", "max"),
                 Max_CHT=("Max CHT", "max"),
+                Total_Fuel_Used=("Fuel Flow Integral", "max"),
             )
+            # Compute average fuel flow (gal/hr)
+            flight_stats["Avg_Fuel_Flow (gal/hr)"] = (
+                flight_stats["Total_Fuel_Used"] * 3600
+            ) / flight_stats["Duration"].replace(0, np.nan)
+            flight_stats["Avg_Fuel_Flow (gal/hr)"] = flight_stats[
+                "Avg_Fuel_Flow (gal/hr)"
+            ].fillna(0)
 
             flight_ids = sorted(flight_stats[flight_stats["Engine_Run"]].index.tolist())
 
@@ -1332,6 +1340,9 @@ def main():
         ):
             fid = values["-FLIGHT-"]
             stats = flight_stats.loc[fid]
+            total_fuel = stats.get("Total_Fuel_Used", 0)
+            avg_flow = stats.get("Avg_Fuel_Flow (gal/hr)", 0)
+
             summary_text = (
                 f"Flight ID: {fid}\n"
                 f"Start Time: {stats['Start_Time']}\n"
@@ -1340,6 +1351,8 @@ def main():
                 f"Data Points: {stats['Data_Points']}\n"
                 f"Max RPM: {stats['Max_RPM']}\n"
                 f"Max CHT: {stats['Max_CHT']}\n"
+                f"Total Fuel Used: {total_fuel:.2f} gal\n"
+                f"Avg Fuel Flow: {avg_flow:.2f} gal/hr\n"
             )
             window["-SUMMARY-"].update(summary_text)
             identify_flight_phases_for_selected_flight(df, fid)
