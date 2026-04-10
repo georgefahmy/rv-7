@@ -1,4 +1,5 @@
 import calendar
+import os
 import re
 import sqlite3
 import threading
@@ -11,6 +12,7 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 from flask import Flask, jsonify, redirect, render_template, request, url_for
+from werkzeug.utils import secure_filename
 
 from scripts.analysis import process_flights
 from scripts.fuel_prices import scrape_airnav_to_json
@@ -19,6 +21,10 @@ from scripts.fuel_prices import scrape_airnav_to_json
 matplotlib.use("Agg")
 app = Flask(__name__)
 DB_PATH = "scripts/maintenance.db"
+
+# --- Directory for saving processed dataframes ---
+SAVE_DIR = "clean_flights"
+os.makedirs(SAVE_DIR, exist_ok=True)
 
 # Constants
 OIL_CHANGE_INTERVAL_HOURS = 25
@@ -72,22 +78,16 @@ def recompute_flight_history(conn):
         "SELECT id, hobbs, tach FROM flight_log ORDER BY date ASC, id ASC"
     )
     rows = cur.fetchall()
-
-    prev_hobbs = None
-    prev_tach = None
+    prev_hobbs, prev_tach = None, None
 
     for r in rows:
-        row_id = r["id"]
-        hobbs = validate_float(r["hobbs"])
-        tach = validate_float(r["tach"])
-
-        if prev_hobbs is None:
-            hobbs_delta = 0.0
-            tach_delta = 0.0
-        else:
-            hobbs_delta = round(hobbs - prev_hobbs, 1)
-            tach_delta = round(tach - prev_tach, 1)
-
+        row_id, hobbs, tach = (
+            r["id"],
+            validate_float(r["hobbs"]),
+            validate_float(r["tach"]),
+        )
+        hobbs_delta = round(hobbs - prev_hobbs, 1) if prev_hobbs is not None else 0.0
+        tach_delta = round(tach - prev_tach, 1) if prev_tach is not None else 0.0
         if hobbs_delta < 0:
             hobbs_delta = 0.0
         if tach_delta < 0:
@@ -97,9 +97,7 @@ def recompute_flight_history(conn):
             "UPDATE flight_log SET hobbs_delta = ?, tach_delta = ? WHERE id = ?",
             (hobbs_delta, tach_delta, row_id),
         )
-
-        prev_hobbs = hobbs
-        prev_tach = tach
+        prev_hobbs, prev_tach = hobbs, tach
     conn.commit()
 
 
@@ -116,10 +114,7 @@ def check_auto_maintenance(conn):
 
     if current - last >= OIL_CHANGE_INTERVAL_HOURS:
         conn.execute(
-            """
-            INSERT INTO maintenance_entries (date, tach_time, airframe_time, notes, recurrent_item, category)
-            VALUES (date('now'), ?, ?, ?, ?, ?)
-            """,
+            "INSERT INTO maintenance_entries (date, tach_time, airframe_time, notes, recurrent_item, category) VALUES (date('now'), ?, ?, ?, ?, ?)",
             (
                 current,
                 current,
@@ -133,14 +128,11 @@ def check_auto_maintenance(conn):
 
 
 def calculate_overdue(conn):
-    """Returns a list of strings representing the overdue items."""
     cursor = conn.cursor()
-    # Group by recurrent item to grab the latest log for each type
     cursor.execute(
         "SELECT recurrent_item, MAX(date) FROM maintenance_entries GROUP BY recurrent_item"
     )
     rows = cursor.fetchall()
-
     today = datetime.today().date()
     overdue_items = []
 
@@ -154,16 +146,13 @@ def calculate_overdue(conn):
         rule = MAINTENANCE_RULES.get(item)
         if not rule:
             continue
-
         try:
             last_dt = datetime.strptime(parse_date_safe(last_date), "%Y-%m-%d").date()
         except:
             continue
 
-        if rule["type"] == "date":
-            due_date = last_dt + timedelta(days=rule["days"])
-            if today > due_date:
-                overdue_items.append(item)
+        if rule["type"] == "date" and today > (last_dt + timedelta(days=rule["days"])):
+            overdue_items.append(item)
         elif rule["type"] == "tach":
             cursor.execute(
                 "SELECT MAX(tach_time) FROM maintenance_entries WHERE recurrent_item=?",
@@ -173,25 +162,19 @@ def calculate_overdue(conn):
             last_tach = validate_float(
                 last_tach_row[0] if last_tach_row and last_tach_row[0] else 0
             )
-
-            due_tach = last_tach + rule["hours"]
-            if current_tach > due_tach:
+            if current_tach > (last_tach + rule["hours"]):
                 overdue_items.append(item)
-
     return overdue_items
 
 
 def _get_nav_database_status_live(conn):
-    """Scrapes Dynon using lightweight requests."""
     url = "https://dynonavionics.com/us-aviation-obstacle-data.php"
     aviation_status, obstacle_status = "--", "--"
     aviation_days_remaining, obstacle_days_remaining = None, None
     html = None
 
     try:
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-        }
+        headers = {"User-Agent": "Mozilla/5.0"}
         resp = requests.get(url, headers=headers, timeout=10)
         resp.raise_for_status()
         html = resp.text
@@ -202,14 +185,14 @@ def _get_nav_database_status_live(conn):
         try:
             soup = BeautifulSoup(html, "html.parser")
             spans = soup.find_all(string=lambda t: t and "Valid:" in t)
-
             if len(spans) >= 2:
-                aviation_valid_text = spans[0].split("Valid:")[-1].strip()
-                obstacle_valid_text = spans[1].split("Valid:")[-1].strip()
                 today = datetime.today().date()
-
-                match_aviation = re.search(r"([A-Za-z]+ \d{1,2})", aviation_valid_text)
-                match_obstacle = re.search(r"([A-Za-z]+ \d{1,2})", obstacle_valid_text)
+                match_aviation = re.search(
+                    r"([A-Za-z]+ \d{1,2})", spans[0].split("Valid:")[-1].strip()
+                )
+                match_obstacle = re.search(
+                    r"([A-Za-z]+ \d{1,2})", spans[1].split("Valid:")[-1].strip()
+                )
 
                 date_aviation = (
                     datetime.strptime(
@@ -253,7 +236,6 @@ def _get_nav_database_status_live(conn):
                     obstacle_days_remaining = (
                         (date_obstacle + timedelta(days=56)) - today
                     ).days
-
         except Exception as e:
             print("Nav parsing failed:", e)
 
@@ -271,40 +253,35 @@ def get_nav_database_status(conn):
     with NAV_CACHE_LOCK:
         if NAV_CACHE["data"] and (now - NAV_CACHE["timestamp"] < NAV_CACHE_TTL):
             return NAV_CACHE["data"]
-
     live = _get_nav_database_status_live(conn)
     with NAV_CACHE_LOCK:
         NAV_CACHE["data"] = live
         NAV_CACHE["timestamp"] = now
-
     return live
 
 
 def get_upcoming_maintenance(conn):
     cursor = conn.cursor()
     today = datetime.today().date()
-
     cursor.execute("SELECT MAX(tach) FROM flight_log")
     tach_row = cursor.fetchone()
     current_tach = validate_float(tach_row[0] if tach_row and tach_row[0] else 0)
 
-    cond_due_str = "--"
-    cond_class = "status-default"
+    cond_due_str, cond_class = "--", "status-default"
     cursor.execute(
         "SELECT date FROM maintenance_entries WHERE recurrent_item='Condition Inspection' ORDER BY date DESC LIMIT 1"
     )
     ci_row = cursor.fetchone()
-
     if ci_row and ci_row[0]:
         try:
             last_dt = datetime.strptime(parse_date_safe(ci_row[0]), "%Y-%m-%d").date()
             prelim_due = last_dt + timedelta(
                 days=MAINTENANCE_RULES["Condition Inspection"]["days"]
             )
-            last_day = calendar.monthrange(prelim_due.year, prelim_due.month)[1]
-            due_date = prelim_due.replace(day=last_day)
+            due_date = prelim_due.replace(
+                day=calendar.monthrange(prelim_due.year, prelim_due.month)[1]
+            )
             days_left = (due_date - today).days
-
             cond_due_str = f"{due_date.strftime('%m/%d/%Y')} ({days_left} days)"
             cond_class = (
                 "status-overdue"
@@ -314,19 +291,18 @@ def get_upcoming_maintenance(conn):
         except Exception:
             pass
 
-    oil_due_str = "--"
-    oil_class = "status-default"
+    oil_due_str, oil_class = "--", "status-default"
     cursor.execute(
         "SELECT tach_time FROM maintenance_entries WHERE recurrent_item='Oil Change' ORDER BY date DESC, tach_time DESC LIMIT 1"
     )
     oil_row = cursor.fetchone()
-
     if oil_row and oil_row[0] is not None:
-        last_tach = validate_float(oil_row[0])
-        due_tach = last_tach + MAINTENANCE_RULES["Oil Change"]["hours"]
-        hrs_left = round(due_tach - current_tach, 1)
-
-        oil_due_str = f"{due_tach:.1f} hrs ({hrs_left:.1f} hrs left)"
+        hrs_left = round(
+            (validate_float(oil_row[0]) + MAINTENANCE_RULES["Oil Change"]["hours"])
+            - current_tach,
+            1,
+        )
+        oil_due_str = f"{(validate_float(oil_row[0]) + MAINTENANCE_RULES['Oil Change']['hours']):.1f} hrs ({hrs_left:.1f} hrs left)"
         oil_class = (
             "status-overdue"
             if hrs_left < 0
@@ -371,10 +347,8 @@ def index():
 
     cursor.execute("SELECT * FROM flight_log")
     flight_logs = sort_and_format_logs([dict(row) for row in cursor.fetchall()])
-
     cursor.execute("SELECT * FROM maintenance_entries")
     mx_logs = sort_and_format_logs([dict(row) for row in cursor.fetchall()])
-
     cursor.execute("SELECT * FROM fuel_tracker")
     fuel_logs = sort_and_format_logs([dict(row) for row in cursor.fetchall()])
 
@@ -391,32 +365,27 @@ def index():
     upcoming_mx = get_upcoming_maintenance(conn)
     conn.close()
 
-    # Append Dynon statuses to the overdue list if necessary
     if nav_status.get("aviation_status") == "Overdue":
         overdue_items.append("Aviation DB")
     if nav_status.get("obstacle_status") == "Overdue":
         overdue_items.append("Obstacle DB")
-
-    # Remove redundancy if Nav Data Update is also triggered
     if (
         "Aviation DB" in overdue_items or "Obstacle DB" in overdue_items
     ) and "Nav Data Update" in overdue_items:
         overdue_items.remove("Nav Data Update")
 
-    overdue_count = len(overdue_items)
-
-    # Build split Nav Strings
-    aviation_status = nav_status.get("aviation_status", "--")
-    aviation_days = nav_status.get("aviation_days_remaining")
-    aviation_text = aviation_status
-    if aviation_days is not None and aviation_status != "--":
-        aviation_text += f" ({aviation_days} days)"
-
-    obstacle_status = nav_status.get("obstacle_status", "--")
-    obstacle_days = nav_status.get("obstacle_days_remaining")
-    obstacle_text = obstacle_status
-    if obstacle_days is not None and obstacle_status != "--":
-        obstacle_text += f" ({obstacle_days} days)"
+    aviation_text = nav_status.get("aviation_status", "--") + (
+        f" ({nav_status['aviation_days_remaining']} days)"
+        if nav_status.get("aviation_days_remaining") is not None
+        and nav_status.get("aviation_status") != "--"
+        else ""
+    )
+    obstacle_text = nav_status.get("obstacle_status", "--") + (
+        f" ({nav_status['obstacle_days_remaining']} days)"
+        if nav_status.get("obstacle_days_remaining") is not None
+        and nav_status.get("obstacle_status") != "--"
+        else ""
+    )
 
     return render_template(
         "index.html",
@@ -425,16 +394,19 @@ def index():
         fuel_logs=fuel_logs,
         total_hours=total_hours,
         total_landings=total_landings,
-        # New Overdue Parameters
         overdue_items=overdue_items,
-        overdue_count=overdue_count,
+        overdue_count=len(overdue_items),
         aviation_db_text=aviation_text,
         aviation_status_class=(
-            "status-current" if aviation_status == "Current" else "status-overdue"
+            "status-current"
+            if nav_status.get("aviation_status") == "Current"
+            else "status-overdue"
         ),
         obstacle_db_text=obstacle_text,
         obstacle_status_class=(
-            "status-current" if obstacle_status == "Current" else "status-overdue"
+            "status-current"
+            if nav_status.get("obstacle_status") == "Current"
+            else "status-overdue"
         ),
         cond_due=upcoming_mx["cond_due"],
         cond_status_class=upcoming_mx["cond_status_class"],
@@ -445,18 +417,18 @@ def index():
 
 @app.route("/add_flight", methods=["POST"])
 def add_flight():
-    date = parse_date_safe(request.form.get("date"))
-    takeoff = request.form.get("takeoff")
-    landing = request.form.get("landing")
-    hobbs = validate_float(request.form.get("hobbs"))
-    tach = validate_float(request.form.get("tach"))
-    landings = request.form.get("landings", 0)
-    notes = request.form.get("notes")
-
     conn = get_db_connection()
     conn.execute(
         "INSERT INTO flight_log (date, takeoff_airport, landing_airport, hobbs, tach, landings, notes) VALUES (?, ?, ?, ?, ?, ?, ?)",
-        (date, takeoff, landing, hobbs, tach, landings, notes),
+        (
+            parse_date_safe(request.form.get("date")),
+            request.form.get("takeoff"),
+            request.form.get("landing"),
+            validate_float(request.form.get("hobbs")),
+            validate_float(request.form.get("tach")),
+            request.form.get("landings", 0),
+            request.form.get("notes"),
+        ),
     )
     conn.commit()
     recompute_flight_history(conn)
@@ -467,17 +439,17 @@ def add_flight():
 
 @app.route("/add_mx", methods=["POST"])
 def add_mx():
-    date = parse_date_safe(request.form.get("date"))
-    tach = validate_float(request.form.get("tach"))
-    airframe = validate_float(request.form.get("airframe"))
-    recurrent_item = request.form.get("recurrent_item")
-    category = request.form.get("category")
-    notes = request.form.get("notes")
-
     conn = get_db_connection()
     conn.execute(
         "INSERT INTO maintenance_entries (date, tach_time, airframe_time, recurrent_item, category, notes) VALUES (?, ?, ?, ?, ?, ?)",
-        (date, tach, airframe, recurrent_item, category, notes),
+        (
+            parse_date_safe(request.form.get("date")),
+            validate_float(request.form.get("tach")),
+            validate_float(request.form.get("airframe")),
+            request.form.get("recurrent_item"),
+            request.form.get("category"),
+            request.form.get("notes"),
+        ),
     )
     conn.commit()
     conn.close()
@@ -486,18 +458,22 @@ def add_mx():
 
 @app.route("/add_fuel", methods=["POST"])
 def add_fuel():
-    date = parse_date_safe(request.form.get("date"))
-    hours = validate_float(request.form.get("hours", 0))
-    gallons = validate_float(request.form.get("gallons", 0))
-    price = validate_float(request.form.get("price", 0))
-
-    total_cost = round(gallons * price, 2)
-    gal_per_hour = round(gallons / hours, 2) if hours > 0 else 0
-
+    hours, gallons, price = (
+        validate_float(request.form.get("hours", 0)),
+        validate_float(request.form.get("gallons", 0)),
+        validate_float(request.form.get("price", 0)),
+    )
     conn = get_db_connection()
     conn.execute(
         "INSERT INTO fuel_tracker (date, hours, gallons, price_per_gallon, total_cost, gal_per_hour) VALUES (?, ?, ?, ?, ?, ?)",
-        (date, hours, gallons, price, total_cost, gal_per_hour),
+        (
+            parse_date_safe(request.form.get("date")),
+            hours,
+            gallons,
+            price,
+            round(gallons * price, 2),
+            round(gallons / hours, 2) if hours > 0 else 0,
+        ),
     )
     conn.commit()
     conn.close()
@@ -516,25 +492,25 @@ def api_fuel_prices():
             if options
             else jsonify({"error": f"No fuel data found for {airport}"})
         ), 404
-    except Exception as e:
-        print(f"Scraping Error: {e}")
+    except Exception:
         return jsonify({"error": "An error occurred while fetching fuel prices."}), 500
 
 
 @app.route("/edit_flight/<int:id>", methods=["POST"])
 def edit_flight(id):
-    date = parse_date_safe(request.form.get("date"))
-    takeoff = request.form.get("takeoff")
-    landing = request.form.get("landing")
-    hobbs = validate_float(request.form.get("hobbs"))
-    tach = validate_float(request.form.get("tach"))
-    landings = request.form.get("landings", 0)
-    notes = request.form.get("notes")
-
     conn = get_db_connection()
     conn.execute(
         "UPDATE flight_log SET date = ?, takeoff_airport = ?, landing_airport = ?, hobbs = ?, tach = ?, landings = ?, notes = ? WHERE id = ?",
-        (date, takeoff, landing, hobbs, tach, landings, notes, id),
+        (
+            parse_date_safe(request.form.get("date")),
+            request.form.get("takeoff"),
+            request.form.get("landing"),
+            validate_float(request.form.get("hobbs")),
+            validate_float(request.form.get("tach")),
+            request.form.get("landings", 0),
+            request.form.get("notes"),
+            id,
+        ),
     )
     conn.commit()
     recompute_flight_history(conn)
@@ -545,17 +521,18 @@ def edit_flight(id):
 
 @app.route("/edit_mx/<int:id>", methods=["POST"])
 def edit_mx(id):
-    date = parse_date_safe(request.form.get("date"))
-    tach = validate_float(request.form.get("tach"))
-    airframe = validate_float(request.form.get("airframe"))
-    recurrent_item = request.form.get("recurrent_item")
-    category = request.form.get("category")
-    notes = request.form.get("notes")
-
     conn = get_db_connection()
     conn.execute(
         "UPDATE maintenance_entries SET date = ?, tach_time = ?, airframe_time = ?, recurrent_item = ?, category = ?, notes = ? WHERE id=?",
-        (date, tach, airframe, recurrent_item, category, notes, id),
+        (
+            parse_date_safe(request.form.get("date")),
+            validate_float(request.form.get("tach")),
+            validate_float(request.form.get("airframe")),
+            request.form.get("recurrent_item"),
+            request.form.get("category"),
+            request.form.get("notes"),
+            id,
+        ),
     )
     conn.commit()
     conn.close()
@@ -564,18 +541,23 @@ def edit_mx(id):
 
 @app.route("/edit_fuel/<int:id>", methods=["POST"])
 def edit_fuel(id):
-    date = parse_date_safe(request.form.get("date"))
-    hours = validate_float(request.form.get("hours", 0))
-    gallons = validate_float(request.form.get("gallons", 0))
-    price = validate_float(request.form.get("price", 0))
-
-    total_cost = round(gallons * price, 2)
-    gal_per_hour = round(gallons / hours, 2) if hours > 0 else 0
-
+    hours, gallons, price = (
+        validate_float(request.form.get("hours", 0)),
+        validate_float(request.form.get("gallons", 0)),
+        validate_float(request.form.get("price", 0)),
+    )
     conn = get_db_connection()
     conn.execute(
         "UPDATE fuel_tracker SET date =?, hours =?, gallons =?, price_per_gallon =?, total_cost =?, gal_per_hour =? WHERE id = ?",
-        (date, hours, gallons, price, total_cost, gal_per_hour, id),
+        (
+            parse_date_safe(request.form.get("date")),
+            hours,
+            gallons,
+            price,
+            round(gallons * price, 2),
+            round(gallons / hours, 2) if hours > 0 else 0,
+            id,
+        ),
     )
     conn.commit()
     conn.close()
@@ -612,36 +594,60 @@ def delete_fuel(id):
 
 @app.route("/analyzer")
 def analyzer():
-    """Renders the dedicated Flight Analyzer page."""
     return render_template("analyzer.html")
+
+
+@app.route("/api/saved_flights", methods=["GET"])
+def api_saved_flights():
+    """Lists all previously uploaded and processed flight data files."""
+    files = [f for f in os.listdir(SAVE_DIR) if f.endswith(".csv")]
+    # Sort by newest first
+    files.sort(key=lambda x: os.path.getmtime(os.path.join(SAVE_DIR, x)), reverse=True)
+    return jsonify({"files": files})
 
 
 @app.route("/api/get_signals", methods=["POST"])
 def api_get_signals():
-    """Parses the CSV on file selection to populate the UI dropdowns."""
-    if "file" not in request.files:
-        return jsonify({"error": "No file part"}), 400
-
-    file = request.files["file"]
-    if file.filename == "" or not file.filename.endswith(".csv"):
-        return jsonify({"error": "Invalid file. Please upload a CSV."}), 400
+    """Parses a new CSV or loads an existing one to populate the UI dropdowns."""
+    saved_filename = request.form.get("saved_filename")
 
     try:
-        # Read and process the dataframe to generate calculated columns (RPM, AVG_CHT, etc.)
-        df = pd.read_csv(file, low_memory=False)
-        df = process_flights(df)
+        # 1. Load an existing file if selected from dropdown
+        if saved_filename:
+            filepath = os.path.join(SAVE_DIR, saved_filename)
+            if not os.path.exists(filepath):
+                return jsonify({"error": "Saved file not found."}), 404
+            df = pd.read_csv(filepath, low_memory=False)
 
-        if df is None or df.empty:
-            return jsonify({"error": "No valid flight data found in the CSV."}), 400
+        # 2. Otherwise process a newly uploaded file
+        else:
+            if "file" not in request.files:
+                return jsonify({"error": "No file part"}), 400
+            file = request.files["file"]
+            if file.filename == "" or not file.filename.endswith(".csv"):
+                return jsonify({"error": "Invalid file. Please upload a CSV."}), 400
 
-        # Extract only the numeric columns to prevent plotting errors with text data
+            df = pd.read_csv(file, low_memory=False)
+            df = process_flights(df)
+
+            if df is None or df.empty:
+                return jsonify({"error": "No valid flight data found in the CSV."}), 400
+
+            # Save the processed dataframe so we don't have to parse it again
+            safe_name = secure_filename(file.filename)
+            base_name, ext = os.path.splitext(safe_name)
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            saved_filename = f"{base_name}_{timestamp}{ext}"
+
+            filepath = os.path.join(SAVE_DIR, saved_filename)
+            df.to_csv(filepath, index=False)
+
+        # Extract numeric columns for plotting
         numeric_cols = df.select_dtypes(include=["number"]).columns.tolist()
-
-        # Exclude internal/metadata columns from the dropdown
         excluded = ["Unnamed: 103", "Engine Run", "id"]
         signals = sorted([col for col in numeric_cols if col not in excluded])
 
-        return jsonify({"signals": signals})
+        return jsonify({"signals": signals, "saved_filename": saved_filename})
 
     except Exception as e:
         print(f"Signal Parsing Error: {e}")
@@ -650,32 +656,24 @@ def api_get_signals():
 
 @app.route("/api/analyze_flight", methods=["POST"])
 def api_analyze_flight():
-    """Handles CSV uploads, processes the flight, and returns raw data + stats."""
-    if "file" not in request.files:
-        return jsonify({"error": "No file part"}), 400
-
-    file = request.files["file"]
-    if file.filename == "":
-        return jsonify({"error": "No selected file"}), 400
-
-    if not file.filename.endswith(".csv"):
-        return jsonify({"error": "Only CSV files are supported."}), 400
+    """Loads the pre-saved dataframe and extracts plot data."""
+    saved_filename = request.form.get("saved_filename")
+    if not saved_filename:
+        return jsonify({"error": "No data file specified."}), 400
 
     try:
-        # Read the uploaded CSV directly into Pandas
-        df = pd.read_csv(file, low_memory=False)
+        filepath = os.path.join(SAVE_DIR, saved_filename)
+        if not os.path.exists(filepath):
+            return jsonify({"error": "Saved file not found on server."}), 404
 
-        # Process the dataframe using your existing function
-        df = process_flights(df)
+        df = pd.read_csv(filepath, low_memory=False)
 
-        if df is None or df.empty:
-            return jsonify({"error": "No valid flight data found in the CSV."}), 400
-
-        # Grab the requested signals from the form
         left_signal = request.form.get("left_signal", "RPM")
         right_signal = request.form.get("right_signal", "AVG_CHT")
 
-        flight_ids = [fid for fid in df["Flight ID"].unique() if fid]
+        flight_ids = [
+            fid for fid in df["Flight ID"].unique() if pd.notna(fid) and fid != ""
+        ]
         if not flight_ids:
             return (
                 jsonify({"error": "No engine-run flights detected in this file."}),
@@ -686,12 +684,10 @@ def api_analyze_flight():
         flight_data = df[df["Flight ID"] == target_flight].copy()
 
         # --- Extract Raw Data for Plotly ---
-        # Replace NaNs with empty strings so JSON serialization doesn't fail
         flight_data = flight_data.replace([np.inf, -np.inf], np.nan)
         flight_data = flight_data.fillna("")
 
         x_data = flight_data["Session Time"].tolist()
-
         y_left_data = (
             flight_data[left_signal].tolist()
             if left_signal in flight_data.columns
@@ -712,7 +708,6 @@ def api_analyze_flight():
         }
 
         # --- Generate Summary Stats ---
-        # Convert session times back to numeric for duration math just in case
         numeric_times = pd.to_numeric(flight_data["Session Time"], errors="coerce")
         duration = (
             numeric_times.max() - numeric_times.min() if not numeric_times.empty else 0
@@ -726,7 +721,6 @@ def api_analyze_flight():
         )
         avg_flow = (total_fuel * 3600) / duration if duration > 0 else 0
 
-        # Safely get max values
         def safe_max(col):
             if col in flight_data.columns:
                 series = pd.to_numeric(flight_data[col], errors="coerce").dropna()
@@ -744,14 +738,7 @@ def api_analyze_flight():
             "avg_fuel_flow": round(avg_flow, 2),
         }
 
-        # Send everything back to the frontend
-        return jsonify(
-            {
-                "plot_data": plot_data,
-                "stats": stats,
-                "available_signals": list(df.select_dtypes(include=["number"]).columns),
-            }
-        )
+        return jsonify({"plot_data": plot_data, "stats": stats})
 
     except Exception as e:
         print(f"Analysis Error: {e}")

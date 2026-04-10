@@ -27,14 +27,35 @@
         <!-- Control Panel -->
         <div class="col-md-3">
             <div class="card p-3 shadow-sm mb-4">
-                <h5>Upload Flight Data</h5>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0">Flight Data Source</h5>
+
+                    <!-- Temp Unit Toggle -->
+                    <div class="btn-group" role="group">
+                        <input type="radio" class="btn-check" name="tempUnit" id="unitF" autocomplete="off" value="F" checked>
+                        <label class="btn btn-outline-primary btn-sm" for="unitF">°F</label>
+
+                        <input type="radio" class="btn-check" name="tempUnit" id="unitC" autocomplete="off" value="C">
+                        <label class="btn btn-outline-primary btn-sm" for="unitC">°C</label>
+                    </div>
+                </div>
+
                 <form id="uploadForm">
                     <div class="mb-3">
-                        <label class="form-label">Select Dynon CSV File</label>
-                        <input class="form-control" type="file" id="csvFile" accept=".csv" required>
+                        <label class="form-label text-muted small mb-1">Previously Saved Flights</label>
+                        <select class="form-select" id="savedFlights">
+                            <option value="">-- Upload New File Below --</option>
+                        </select>
                     </div>
 
+                    <hr>
+
                     <div class="mb-3">
+                        <label class="form-label text-muted small mb-1">Upload New File</label>
+                        <input class="form-control" type="file" id="csvFile" accept=".csv">
+                    </div>
+
+                    <div class="mb-3 mt-4">
                         <label class="form-label">Left Axis Signal</label>
                         <select class="form-select" id="leftSignal" disabled>
                             <option value="">Select a file first...</option>
@@ -48,7 +69,8 @@
                         </select>
                     </div>
 
-                    <button type="submit" class="btn btn-primary w-100" id="analyzeBtn" disabled>Analyze Flight</button>
+                    <!-- Hidden but retained for fallback submission -->
+                    <button type="submit" class="btn btn-primary w-100 d-none" id="analyzeBtn" disabled>Analyze Flight</button>
                 </form>
             </div>
 
@@ -70,7 +92,7 @@
                     <p class="mt-2 text-muted">Processing data...</p>
                 </div>
 
-                <p id="placeholderText" class="text-muted mb-0">Upload a CSV to view the interactive flight graph.</p>
+                <p id="placeholderText" class="text-muted mb-0">Select or upload a flight to view the interactive graph.</p>
 
                 <!-- Interactive Plotly Graph Container -->
                 <div id="flightGraph" class="w-100 h-100 d-none"></div>
@@ -80,23 +102,31 @@
 </div>
 
 <script>
-// Fetch signals as soon as a file is selected
-document.getElementById('csvFile').addEventListener('change', function(e) {
-    const fileInput = e.target;
-    if (fileInput.files.length === 0) return;
+// Global state
+let currentSavedFilename = "";
+let masterSignalsList = [];
 
+// 1. Fetch saved flights on page load
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('/api/saved_flights')
+        .then(res => res.json())
+        .then(data => {
+            const select = document.getElementById('savedFlights');
+            data.files.forEach(f => {
+                select.options.add(new Option(f, f));
+            });
+        });
+});
+
+// 2. Centralized function to request signals (called by both upload & dropdown)
+function loadSignals(formData) {
     const leftSelect = document.getElementById('leftSignal');
     const rightSelect = document.getElementById('rightSignal');
-    const analyzeBtn = document.getElementById('analyzeBtn');
 
     leftSelect.innerHTML = '<option>Loading signals...</option>';
     rightSelect.innerHTML = '<option>Loading signals...</option>';
     leftSelect.disabled = true;
     rightSelect.disabled = true;
-    analyzeBtn.disabled = true;
-
-    const formData = new FormData();
-    formData.append('file', fileInput.files[0]);
 
     fetch('/api/get_signals', {
         method: 'POST',
@@ -111,46 +141,110 @@ document.getElementById('csvFile').addEventListener('change', function(e) {
             return;
         }
 
-        let optionsHtml = '';
-        data.signals.forEach(sig => {
-            optionsHtml += `<option value="${sig}">${sig}</option>`;
-        });
+        currentSavedFilename = data.saved_filename;
+        masterSignalsList = data.signals; // Save master list
 
-        leftSelect.innerHTML = optionsHtml;
-        rightSelect.innerHTML = optionsHtml;
+        // Populate dropdowns based on the currently selected toggle
+        populateDropdowns();
 
-        if (data.signals.includes("RPM")) leftSelect.value = "RPM";
-        if (data.signals.includes("AVG_CHT")) rightSelect.value = "AVG_CHT";
-
+        // Enable UI
         leftSelect.disabled = false;
         rightSelect.disabled = false;
-        analyzeBtn.disabled = false;
+
+        // Auto-trigger the first analysis plot
+        triggerAnalysis();
     })
     .catch(err => {
         console.error(err);
         alert("Failed to read file signals.");
     });
+}
+
+// Helper to filter and populate dropdowns based on the temp toggle
+function populateDropdowns() {
+    if (masterSignalsList.length === 0) return;
+
+    const unitF = document.getElementById('unitF').checked;
+    const hideString = unitF ? "(deg C)" : "(deg F)";
+
+    const leftSelect = document.getElementById('leftSignal');
+    const rightSelect = document.getElementById('rightSignal');
+
+    // Save currently selected values to attempt to restore them after repopulating
+    const currentLeft = leftSelect.value;
+    const currentRight = rightSelect.value;
+
+    let optionsHtml = '';
+
+    // Filter out the opposite temperature unit
+    const filteredSignals = masterSignalsList.filter(sig => !sig.includes(hideString));
+
+    filteredSignals.forEach(sig => {
+        optionsHtml += `<option value="${sig}">${sig}</option>`;
+    });
+
+    leftSelect.innerHTML = optionsHtml;
+    rightSelect.innerHTML = optionsHtml;
+
+    // Try to restore previous selections, otherwise apply intelligent defaults
+    if (filteredSignals.includes(currentLeft)) {
+        leftSelect.value = currentLeft;
+    } else if (filteredSignals.includes("RPM")) {
+        leftSelect.value = "RPM";
+    }
+
+    if (filteredSignals.includes(currentRight)) {
+        rightSelect.value = currentRight;
+    } else if (filteredSignals.includes("AVG_CHT")) {
+        rightSelect.value = "AVG_CHT";
+    }
+}
+
+// 3. Handle File Upload
+document.getElementById('csvFile').addEventListener('change', function(e) {
+    if (e.target.files.length === 0) return;
+
+    document.getElementById('savedFlights').value = "";
+
+    const formData = new FormData();
+    formData.append('file', e.target.files[0]);
+    loadSignals(formData);
 });
 
-// Process the flight and generate the Plotly graph on submit
-document.getElementById('uploadForm').addEventListener('submit', function(e) {
-    e.preventDefault();
+// 4. Handle Saved Flight Selection
+document.getElementById('savedFlights').addEventListener('change', function(e) {
+    if (!e.target.value) return;
 
-    const fileInput = document.getElementById('csvFile');
+    document.getElementById('csvFile').value = "";
+
+    const formData = new FormData();
+    formData.append('saved_filename', e.target.value);
+    loadSignals(formData);
+});
+
+// Handle Unit Toggle Change
+document.querySelectorAll('input[name="tempUnit"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        populateDropdowns();
+        triggerAnalysis(); // Update graph immediately if a temp var is currently selected
+    });
+});
+
+// 5. The core analysis function that handles fetching and plotting
+function triggerAnalysis() {
+    if (!currentSavedFilename) return;
+
     const leftSignal = document.getElementById('leftSignal').value;
     const rightSignal = document.getElementById('rightSignal').value;
 
-    if (fileInput.files.length === 0) return;
-
     // UI Updates
-    document.getElementById('analyzeBtn').disabled = true;
     document.getElementById('placeholderText').classList.add('d-none');
     document.getElementById('flightGraph').classList.add('d-none');
     document.getElementById('loader').classList.remove('d-none');
     document.getElementById('statsCard').classList.add('d-none');
 
     const formData = new FormData();
-    formData.append('file', fileInput.files[0]);
+    formData.append('saved_filename', currentSavedFilename);
     formData.append('left_signal', leftSignal);
     formData.append('right_signal', rightSignal);
 
@@ -161,7 +255,6 @@ document.getElementById('uploadForm').addEventListener('submit', function(e) {
     .then(response => response.json())
     .then(data => {
         document.getElementById('loader').classList.add('d-none');
-        document.getElementById('analyzeBtn').disabled = false;
 
         if (data.error) {
             alert("Error: " + data.error);
@@ -207,12 +300,11 @@ document.getElementById('uploadForm').addEventListener('submit', function(e) {
                 overlaying: 'y',
                 side: 'right'
             },
-            hovermode: 'x unified', // Shows both values on the same vertical line hover
+            hovermode: 'x unified',
             margin: { l: 60, r: 60, t: 60, b: 40 },
-            legend: { orientation: "h", y: -0.2 } // Move legend to the bottom
+            legend: { orientation: "h", y: -0.2 }
         };
 
-        // Render the interactive plot
         Plotly.newPlot(graphDiv, [trace1, trace2], layout, {responsive: true});
 
         // Display the Stats
@@ -231,9 +323,17 @@ document.getElementById('uploadForm').addEventListener('submit', function(e) {
         alert("A network error occurred.");
         console.error(err);
         document.getElementById('loader').classList.add('d-none');
-        document.getElementById('analyzeBtn').disabled = false;
         document.getElementById('placeholderText').classList.remove('d-none');
     });
+}
+
+// Auto-trigger analysis when a dropdown is changed
+document.getElementById('leftSignal').addEventListener('change', triggerAnalysis);
+document.getElementById('rightSignal').addEventListener('change', triggerAnalysis);
+
+// Prevent default form submission
+document.getElementById('uploadForm').addEventListener('submit', function(e) {
+    e.preventDefault();
 });
 </script>
 </body>
