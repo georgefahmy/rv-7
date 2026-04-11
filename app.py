@@ -21,6 +21,7 @@ from scripts.fuel_prices import scrape_airnav_to_json
 # Force matplotlib to not use any Xwindows backend
 matplotlib.use("Agg")
 app = Flask(__name__)
+app.config["SERVER_NAME"] = None
 DB_PATH = "scripts/maintenance.db"
 
 # --- Directory for saving processed dataframes ---
@@ -315,6 +316,13 @@ def get_upcoming_maintenance(conn):
         "oil_due": oil_due_str,
         "oil_status_class": oil_class,
     }
+
+
+@app.before_request
+def redirect_www():
+    host = request.host.split(":")[0]
+    if host == "www.n890gf.local":
+        return redirect("http://n890gf.local:5001" + request.path)
 
 
 @app.route("/")
@@ -848,4 +856,4 @@ def api_analyze_flight():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5001, debug=True)
