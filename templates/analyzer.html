@@ -6,6 +6,7 @@
     <title>Flight Data Analyzer</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <style>
         body { background-color: #f8f9fa; padding-top: 56px; }
         .navbar { position: fixed; top: 0; width: 100%; z-index: 1050; }
@@ -83,6 +84,10 @@
 
         <button class="btn btn-outline-primary btn-sm ms-2" onclick="window.location.href='/gami'">
             GAMI Spread
+        </button>
+
+        <button class="btn btn-outline-secondary btn-sm ms-2" onclick="openAirspeedCalModal()">
+            Airspeed Calibration
         </button>
     </div>
 
@@ -178,7 +183,19 @@
         <!-- RIGHT: MAP -->
         <div class="col-md-4">
             <div class="card p-2 shadow-sm mb-4">
-                <h6 class="text-secondary text-center">Flight Map</h6>
+                <div class="d-flex justify-content-between align-items-center px-2">
+                    <h6 class="text-secondary text-center mb-0">Flight Map</h6>
+
+                    <div class="form-check form-switch m-0">
+                        <input class="form-check-input"
+                            type="checkbox"
+                            id="followAircraftToggle"
+                            onchange="toggleFollowAircraft(this.checked)">
+                        <label class="form-check-label small" for="followAircraftToggle">
+                            Follow
+                        </label>
+                    </div>
+                </div>
 
                 <div id="mapGraph" style="height:420px;"></div>
                 <div id="mapMetrics" class="small text-muted px-2 pb-1"></div>
@@ -187,6 +204,50 @@
         </div>
     </div>
 
+<!-- Airspeed Calibration Modal -->
+<div class="modal fade" id="airspeedCalModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title">Airspeed Calibration Analysis</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+
+        <div class="row g-3 mb-3">
+          <div class="col-md-4">
+            <label class="form-label">Start Maneuver (s)</label>
+            <input type="number" class="form-control" id="calStartTime" placeholder="Start time">
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">End Maneuver (s)</label>
+            <input type="number" class="form-control" id="calEndTime" placeholder="End time">
+          </div>
+
+          <div class="col-md-4 d-flex align-items-end">
+            <button class="btn btn-primary w-100" onclick="submitAirspeedCalibration()">
+              Run Calibration
+            </button>
+          </div>
+        </div>
+
+        <hr>
+
+        <pre id="calibrationResult" class="bg-light p-3 rounded small text-dark" style="white-space: pre-wrap;">
+Results will appear here...
+        </pre>
+
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+
+    </div>
+  </div>
 </div>
 
 <script>
@@ -197,6 +258,11 @@ let plotIdCounter = 0;
 let plotFilters = {}; // { plotId: [filters] }
 let xyFilters = [];
 let xyOverlay = false;
+let followAircraft = false;
+
+function toggleFollowAircraft(state) {
+    followAircraft = state;
+}
 
 function toggleXYTab() {
     const tab = document.getElementById('xyTab');
@@ -812,6 +878,103 @@ function renderXYFilters() {
         list.appendChild(li);
     });
 }
+// Airspeed Calibration modal opener
+function openAirspeedCalModal() {
+    const el = document.getElementById('airspeedCalModal');
+    if (!el) return;
+
+    // Reset fields when opening
+    const startInput = document.getElementById('calStartTime');
+    const endInput = document.getElementById('calEndTime');
+    const resultBox = document.getElementById('calibrationResult');
+    if (startInput) startInput.value = '';
+    if (endInput) endInput.value = '';
+    if (resultBox) resultBox.innerText = 'Results will appear here...';
+
+    const modal = new bootstrap.Modal(el);
+    modal.show();
+}
+
+function submitAirspeedCalibration() {
+    const start = parseFloat(document.getElementById('calStartTime').value);
+    const end = parseFloat(document.getElementById('calEndTime').value);
+
+    const resultBox = document.getElementById('calibrationResult');
+
+    if (isNaN(start) || isNaN(end)) {
+        resultBox.innerText = "Please enter valid start and end maneuver times.";
+        return;
+    }
+
+    if (!currentSavedFilename) {
+        resultBox.innerText = "No flight loaded.";
+        return;
+    }
+
+    resultBox.innerText = "Running calibration analysis...";
+
+    const formData = new FormData();
+    formData.append('saved_filename', currentSavedFilename);
+    formData.append('start_time', start);
+    formData.append('end_time', end);
+
+    fetch('/api/airspeed_calibration', {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.error) {
+            resultBox.innerText = "Error: " + data.error;
+            return;
+        }
+
+        const summary = data.summary || "No summary returned.";
+        resultBox.innerText = summary;
+
+        // ----------------------------
+        // PARSE SUMMARY FOR DASHBOARD
+        // ----------------------------
+        const lines = summary.split('\n');
+        const parsed = {};
+
+        lines.forEach(line => {
+            const parts = line.split(':');
+            if (parts.length >= 2) {
+                const key = parts[0].trim();
+                const value = parts.slice(1).join(':').trim();
+                parsed[key] = value;
+            }
+        });
+
+        const statsList = document.getElementById('statsList');
+        if (statsList) {
+            // Remove old airspeed calibration section if it exists
+            let existing = document.getElementById('airspeed-summary-block');
+            if (existing) existing.remove();
+
+            const block = document.createElement('div');
+            block.id = 'airspeed-summary-block';
+            block.className = 'col-12 mt-3 p-2 border rounded bg-light';
+
+            block.innerHTML = `
+                <h6 class="text-primary mb-2">Airspeed Calibration</h6>
+                <div class="row">
+                    <div class="col-md-3"><strong>CAS Correction:</strong><br>${parsed['CAS Correction'] || 'N/A'}</div>
+                    <div class="col-md-3"><strong>Airspeed Error:</strong><br>${parsed['Airspeed Error'] || 'N/A'}</div>
+                    <div class="col-md-3"><strong>Uncorrected TAS:</strong><br>${parsed['Uncorr. Avg TAS'] || 'N/A'}</div>
+                    <div class="col-md-3"><strong>Corrected TAS:</strong><br>${parsed['Corrected Avg TAS'] || 'N/A'}</div>
+                </div>
+            `;
+
+            statsList.appendChild(block);
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        resultBox.innerText = "Network error during calibration.";
+    });
+}
 </script>
 <script>
 // Helper to compute heading (bearing) between two lat/lon points
@@ -965,6 +1128,12 @@ function syncAircraftToTime(t) {
         lat: [[window._mapLat[bestIndex]]],
         lon: [[window._mapLon[bestIndex]]]
     }, [1]);
+    if (followAircraft) {
+        Plotly.relayout('mapGraph', {
+            'mapbox.center.lat': window._mapLat[bestIndex],
+            'mapbox.center.lon': window._mapLon[bestIndex]
+        });
+    }
 }
 </script>
 <script>

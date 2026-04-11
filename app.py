@@ -16,7 +16,7 @@ from flask import Flask, jsonify, redirect, render_template, request, url_for
 from werkzeug.utils import secure_filename
 
 from scripts.airnav_route import fetch_route
-from scripts.analysis import process_flights
+from scripts.analysis import analyze_flight_data, process_flights
 from scripts.fuel_prices import scrape_airnav_to_json
 
 # Force matplotlib to not use any Xwindows backend
@@ -895,6 +895,106 @@ def api_analyze_flight():
 
     except Exception as e:
         print(f"Analysis Error: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/airspeed_calibration", methods=["POST"])
+def api_airspeed_calibration():
+    saved_filename = request.form.get("saved_filename")
+    start_time = request.form.get("start_time", type=float)
+    end_time = request.form.get("end_time", type=float)
+
+    if not saved_filename:
+        return jsonify({"error": "No file specified"}), 400
+
+    try:
+        filepath = os.path.join(SAVE_DIR, saved_filename)
+        if not os.path.exists(filepath):
+            return jsonify({"error": "File not found"}), 404
+
+        df = pd.read_csv(filepath, low_memory=False)
+
+        # pick first flight
+        flight_ids = [
+            fid for fid in df["Flight ID"].unique() if pd.notna(fid) and fid != ""
+        ]
+
+        if not flight_ids:
+            return jsonify({"error": "No flight data found"}), 400
+
+        flight_id = flight_ids[0]
+        flight_data = df[df["Flight ID"] == flight_id].copy().fillna(0)
+
+        as_cal_df = flight_data.rename(
+            columns={
+                "Session Time": "session_time",
+                "Indicated Airspeed (knots)": "ias",
+                "Pressure Altitude (ft)": "press_alt",
+                "Magnetic Heading (deg)": "hdg",
+                "Ground Speed (knots)": "gps_gs",
+                "Ground Track (deg)": "gps_trk",
+                "OAT (deg F)": "oat",
+                "Barometer Setting (inHg)": "baro",
+            }
+        )
+
+        essential_columns = [
+            "session_time",
+            "ias",
+            "press_alt",
+            "hdg",
+            "gps_gs",
+            "gps_trk",
+            "oat",
+            "baro",
+            "Wind Speed (knots)",
+            "Wind Direction (deg)",
+        ]
+
+        as_cal_df = as_cal_df[essential_columns].copy()
+        as_cal_df = as_cal_df.dropna()
+        as_cal_df = as_cal_df[as_cal_df["ias"] > 55.0]
+        as_cal_df = as_cal_df.reset_index(drop=True)
+
+        output = analyze_flight_data(
+            as_cal_df,
+            start_time=start_time,
+            end_time=end_time,
+            show_plot=False,
+        )
+
+        maneuver_df = as_cal_df[
+            (as_cal_df["session_time"] >= start_time)
+            & (as_cal_df["session_time"] <= end_time)
+        ]
+
+        avg_wind_speed = (
+            maneuver_df["Wind Speed (knots)"].mean()
+            if not maneuver_df.empty
+            else float("nan")
+        )
+
+        avg_wind_dir = (
+            maneuver_df["Wind Direction (deg)"].mean()
+            if not maneuver_df.empty
+            else float("nan")
+        )
+
+        summary = (
+            f"Data Points Analyzed:  {output['analyzed_data_points']}\n"
+            f"CAS Correction:        {output['calibrated_airspeed_correction_kts']} kts\n"
+            f"Airspeed Error:        {output['airspeed_error_kts']} kts\n"
+            f"HDG Correction:        {output['calibrated_heading_correction_deg']} deg\n"
+            f"Wind Direction:        {output['wind_direction_deg']} deg (Avg: {avg_wind_dir:.1f})\n"
+            f"Wind Speed:            {output['wind_speed_kts']} kts (Avg: {avg_wind_speed:.1f})\n"
+            f"Uncorr. Avg TAS:       {output['uncorrected_average_true_airspeed_kts']} kts\n"
+            f"Corrected Avg TAS:     {output['corrected_average_true_airspeed_kts']} kts\n"
+        )
+
+        return jsonify({"summary": summary})
+
+    except Exception as e:
+        print("Airspeed calibration error:", e)
         return jsonify({"error": str(e)}), 500
 
 
