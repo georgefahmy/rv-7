@@ -1,0 +1,618 @@
+[
+    {
+        "airport_code": "O08",
+        "airport_name": "Colusa County Airport Colusa, CA",
+        "distance": {
+            "nm": null,
+            "direction": null
+        },
+        "fbos": [
+            {
+                "fbo_name": "Colusa County Airport",
+                "last_updated": "11-Apr",
+                "prices": {
+                    "100LL": [
+                        {
+                            "service": "SS",
+                            "price": "$5.17"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "airport_code": "O52",
+        "airport_name": "Sutter County Airport Yuba City, CA",
+        "distance": {
+            "nm": 18,
+            "direction": "E"
+        },
+        "fbos": [
+            {
+                "fbo_name": "County of Sutter (FBO)",
+                "last_updated": "25-Mar",
+                "prices": {
+                    "100LL": [
+                        {
+                            "service": "SS",
+                            "price": "$6.07"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "airport_code": "KMYV",
+        "airport_name": "Yuba County Airport Marysville, CA",
+        "distance": {
+            "nm": 20,
+            "direction": "ESE"
+        },
+        "fbos": [
+            {
+                "fbo_name": "Honeycutt Aviation",
+                "last_updated": "09-Apr",
+                "prices": {
+                    "100LL": [
+                        {
+                            "service": "SS",
+                            "price": "$6.79"
+                        },
+                        {
+                            "service": "FS",
+                            "price": "$7.29"
+                        }
+                    ],
+                    "Jet A": [
+                        {
+                            "service": "FS",
+                            "price": "$7.99"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "airport_code": "KOVE",
+        "airport_name": "Oroville Municipal Airport Oroville, CA",
+        "distance": {
+            "nm": 25,
+            "direction": "NE"
+        },
+        "fbos": [
+            {
+                "fbo_name": "City of Oroville",
+                "last_updated": "05-Mar",
+                "prices": {
+                    "100LL": [
+                        {
+                            "service": "SS",
+                            "price": "$5.90"
+                        }
+                    ],
+                    "Jet A": [
+                        {
+                            "service": "SS",
+                            "price": "$6.10"
+                        },
+                        {
+                            "service": "FS",
+                            "price": "$6.20"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "airport_code": "O41",
+        "airport_name": "Watts-Woodland Airport Woodland, CA",
+        "distance": {
+            "nm": 31,
+            "direction": "S"
+        },
+        "fbos": [
+            {
+                "fbo_name": "Watts-Woodland Airport, Inc.",
+                "last_updated": "11-Apr",
+                "prices": {
+                    "100LL": [
+                        {
+                            "service": "SS",
+                            "price": "$5.99"
+                        }
+                    ],
+                    "Jet A": [
+                        {
+                            "service": "SS",
+                            "price": "$6.14"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "airport_code": "CL56",
+        "airport_name": "Ranchaero Airport Chico, CA",
+        "distance": {
+            "nm": 33,
+            "direction": "N"
+        },
+        "fbos": [
+            {
+                "fbo_name": "Ranchaero Airport",
+                "last_updated": "06-Apr",
+                "prices": {
+                    "100LL": [
+                        {
+                            "service": "SS",
+                            "price": "$5.95"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "airport_code": "O37",
+        "airport_name": "Haigh Field Airport Orland, CA",
+        "distance": {
+            "nm": 33,
+            "direction": "NNW"
+        },
+        "fbos": [
+            {
+                "fbo_name": "Haigh Field Airport",
+                "last_updated": "30-Mar",
+                "prices": {
+                    "100LL": [
+                        {
+                            "service": "SS",
+                            "price": "$7.09"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "airport_code": "O06",
+        "airport_name": "Lake Oroville Landing Area Seaplane Base Oroville, CA",
+        "distance": {
+            "nm": 34,
+            "direction": "NE"
+        },
+        "fbos": [
+            {
+                "fbo_name": "Bidwell Canyon Marina",
+                "last_updated": "07-Apr",
+                "prices": {
+                    "Mogas": [
+                        {
+                            "service": "PS",
+                            "price": "$9.20"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "airport_code": "KLHM",
+        "airport_name": "Lincoln Regional Airport/Karl Harder Field Lincoln, CA",
+        "distance": {
+            "nm": 34,
+            "direction": "ESE"
+        },
+        "fbos": [
+            {
+                "fbo_name": "Lincoln Regional Airport/Karl Harder Field",
+                "last_updated": "20-Mar",
+                "prices": {
+                    "100LL": [
+                        {
+                            "service": "SS",
+                            "price": "$6.79"
+                        },
+                        {
+                            "service": "FS",
+                            "price": "$7.09"
+                        }
+                    ],
+                    "Jet A": [
+                        {
+                            "service": "SS",
+                            "price": "$8.11"
+                        },
+                        {
+                            "service": "FS",
+                            "price": "$8.16"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "airport_code": "KSMF",
+        "airport_name": "Sacramento International Airport Sacramento, CA",
+        "distance": {
+            "nm": 35,
+            "direction": "SSE"
+        },
+        "fbos": [
+            {
+                "fbo_name": "Modern Aviation International",
+                "last_updated": "03-Apr",
+                "prices": {
+                    "100LL": [
+                        {
+                            "service": "FS",
+                            "price": "$7.96"
+                        }
+                    ],
+                    "Jet A": [
+                        {
+                            "service": "FS",
+                            "price": "$9.40"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "airport_code": "KDWA",
+        "airport_name": "Yolo County Airport Davis/Woodland/Winters, CA",
+        "distance": {
+            "nm": 37,
+            "direction": "S"
+        },
+        "fbos": [
+            {
+                "fbo_name": "Davis Flight Support, LLC",
+                "last_updated": "11-Apr",
+                "prices": {
+                    "100LL": [
+                        {
+                            "service": "FS",
+                            "price": "$7.02"
+                        }
+                    ],
+                    "Jet A": [
+                        {
+                            "service": "FS",
+                            "price": "$7.86"
+                        }
+                    ]
+                }
+            },
+            {
+                "fbo_name": "PreStar / SkyDance SkyDiving",
+                "last_updated": "06-Apr",
+                "prices": {
+                    "100LL": [
+                        {
+                            "service": "SS",
+                            "price": "$6.79"
+                        }
+                    ],
+                    "Jet A": [
+                        {
+                            "service": "FS",
+                            "price": "$6.99"
+                        },
+                        {
+                            "service": "SS",
+                            "price": "$6.99"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "airport_code": "KCIC",
+        "airport_name": "Chico Regional Airport Chico, CA",
+        "distance": {
+            "nm": 38,
+            "direction": "N"
+        },
+        "fbos": [
+            {
+                "fbo_name": "Northgate Aviation Chico Jet Center",
+                "last_updated": "11-Apr",
+                "prices": {
+                    "100LL": [
+                        {
+                            "service": "FS",
+                            "price": "$7.20"
+                        }
+                    ],
+                    "Jet A": [
+                        {
+                            "service": "FS",
+                            "price": "$7.35"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "airport_code": "L36",
+        "airport_name": "Rio Linda Airport Rio Linda, CA",
+        "distance": {
+            "nm": 40,
+            "direction": "SE"
+        },
+        "fbos": [
+            {
+                "fbo_name": "Mauser Aviation",
+                "last_updated": "02-Apr",
+                "prices": {
+                    "100LL": [
+                        {
+                            "service": "SS",
+                            "price": "$5.99"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "airport_code": "KEDU",
+        "airport_name": "University Airport Davis, CA",
+        "distance": {
+            "nm": 40,
+            "direction": "SSE"
+        },
+        "fbos": [
+            {
+                "fbo_name": "University Airport Services",
+                "last_updated": "30-Oct-2025",
+                "prices": {
+                    "100LL": [
+                        {
+                            "service": "SS",
+                            "price": "$5.99"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "airport_code": "KMCC",
+        "airport_name": "Mc Clellan Airfield Sacramento, CA",
+        "distance": {
+            "nm": 41,
+            "direction": "SE"
+        },
+        "fbos": [
+            {
+                "fbo_name": "McClellan Jet Services",
+                "last_updated": "11-Apr",
+                "prices": {
+                    "100LL": [
+                        {
+                            "service": "SS",
+                            "price": "$6.74"
+                        },
+                        {
+                            "service": "FS",
+                            "price": "$7.74"
+                        }
+                    ],
+                    "Jet A": [
+                        {
+                            "service": "FS",
+                            "price": "$8.51"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "airport_code": "2O3",
+        "airport_name": "Angwin Airport-Parrett Field Angwin, CA",
+        "distance": {
+            "nm": 41,
+            "direction": "SSW"
+        },
+        "fbos": [
+            {
+                "fbo_name": "PUC (Pacific Union College) Flight Center",
+                "last_updated": "01-Apr",
+                "prices": {
+                    "100LL": [
+                        {
+                            "service": "SS",
+                            "price": "$7.60"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "airport_code": "1O2",
+        "airport_name": "Lampson Field Airport Lakeport, CA",
+        "distance": {
+            "nm": 44,
+            "direction": "WSW"
+        },
+        "fbos": [
+            {
+                "fbo_name": "Westgate Petroleum",
+                "last_updated": "08-Apr",
+                "prices": {
+                    "100LL": [
+                        {
+                            "service": "SS",
+                            "price": "$5.899"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "airport_code": "KAUN",
+        "airport_name": "Auburn Municipal Airport Auburn, CA",
+        "distance": {
+            "nm": 45,
+            "direction": "ESE"
+        },
+        "fbos": [
+            {
+                "fbo_name": "Threshold Technologies, Inc.",
+                "last_updated": "11-Apr",
+                "prices": {
+                    "100LL": [
+                        {
+                            "service": "SS",
+                            "price": "$6.85"
+                        },
+                        {
+                            "service": "FS",
+                            "price": "$7.05"
+                        }
+                    ],
+                    "Jet A": [
+                        {
+                            "service": "SS",
+                            "price": "$7.63"
+                        },
+                        {
+                            "service": "FS",
+                            "price": "$7.83"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "airport_code": "KGOO",
+        "airport_name": "Nevada County Airport Grass Valley, CA",
+        "distance": {
+            "nm": 46,
+            "direction": "E"
+        },
+        "fbos": [
+            {
+                "fbo_name": "Nevada County Airport",
+                "last_updated": "03-Apr",
+                "prices": {
+                    "100LL": [
+                        {
+                            "service": "SS",
+                            "price": "$6.63"
+                        },
+                        {
+                            "service": "FS",
+                            "price": "$7.05"
+                        }
+                    ],
+                    "Jet A": [
+                        {
+                            "service": "FS",
+                            "price": "$6.65"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "airport_code": "KSAC",
+        "airport_name": "Sacramento Executive Airport Sacramento, CA",
+        "distance": {
+            "nm": 46,
+            "direction": "SSE"
+        },
+        "fbos": [
+            {
+                "fbo_name": "Modern Aviation Executive",
+                "last_updated": "03-Apr",
+                "prices": {
+                    "100LL": [
+                        {
+                            "service": "SS",
+                            "price": "$6.81"
+                        },
+                        {
+                            "service": "FS",
+                            "price": "$7.12"
+                        }
+                    ],
+                    "Jet A": [
+                        {
+                            "service": "FS",
+                            "price": "$9.32"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "airport_code": "KMHR",
+        "airport_name": "Sacramento Mather Airport Sacramento, CA",
+        "distance": {
+            "nm": 50,
+            "direction": "SE"
+        },
+        "fbos": [
+            {
+                "fbo_name": "Modern Aviation Mather",
+                "last_updated": "03-Apr",
+                "prices": {
+                    "100LL": [
+                        {
+                            "service": "FS",
+                            "price": "$7.45"
+                        }
+                    ],
+                    "Jet A": [
+                        {
+                            "service": "FS",
+                            "price": "$6.90"
+                        }
+                    ],
+                    "SAF": [
+                        {
+                            "service": "FS",
+                            "price": "$7.80"
+                        }
+                    ]
+                }
+            },
+            {
+                "fbo_name": "Mather Jet Center",
+                "last_updated": "06-Apr",
+                "prices": {
+                    "100LL": [
+                        {
+                            "service": "FS",
+                            "price": "$7.45"
+                        }
+                    ],
+                    "Jet A": [
+                        {
+                            "service": "FS",
+                            "price": "$6.90"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+]

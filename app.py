@@ -15,6 +15,7 @@ from bs4 import BeautifulSoup
 from flask import Flask, jsonify, redirect, render_template, request, url_for
 from werkzeug.utils import secure_filename
 
+from scripts.airnav_route import fetch_route
 from scripts.analysis import process_flights
 from scripts.fuel_prices import scrape_airnav_to_json
 
@@ -496,7 +497,7 @@ def api_fuel_prices():
     try:
         options, _ = scrape_airnav_to_json(airport)
         return (
-            jsonify({"options": options[0:5]})
+            jsonify({"options": options})
             if options
             else jsonify({"error": f"No fuel data found for {airport}"})
         ), 404
@@ -706,6 +707,21 @@ def api_get_signals():
     except Exception as e:
         print(f"Signal Parsing Error: {e}")
         return jsonify({"error": str(e)}), 500
+
+
+@app.route("/route_advisor", methods=["POST"])
+def route_advisor():
+    origin = request.form["origin"]
+    destination = request.form["destination"]
+    range_value = request.form["range_nm"]
+
+    result = fetch_route(
+        origin,
+        destination,
+        range_value,
+    )
+
+    return jsonify(result)
 
 
 @app.route("/api/analyze_flight", methods=["POST"])

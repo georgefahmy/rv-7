@@ -41,12 +41,12 @@
         "fbos": [
             {
                 "fbo_name": "Watsonville Municipal Airport",
-                "last_updated": "10-Apr",
+                "last_updated": "11-Apr",
                 "prices": {
                     "100LL": [
                         {
                             "service": "SS",
-                            "price": "$6.85"
+                            "price": "$5.45"
                         },
                         {
                             "service": "FS",
@@ -56,13 +56,13 @@
                     "G100UL": [
                         {
                             "service": "SS",
-                            "price": "$6.25"
+                            "price": "$5.75"
                         }
                     ],
                     "Jet A": [
                         {
                             "service": "SS",
-                            "price": "$6.80"
+                            "price": "$4.95"
                         },
                         {
                             "service": "FS",
@@ -83,7 +83,7 @@
         "fbos": [
             {
                 "fbo_name": "Hollister Jet Center, Inc",
-                "last_updated": "10-Apr",
+                "last_updated": "11-Apr",
                 "prices": {
                     "100LL": [
                         {
@@ -151,7 +151,7 @@
         "fbos": [
             {
                 "fbo_name": "Atlantic Aviation",
-                "last_updated": "10-Apr",
+                "last_updated": "11-Apr",
                 "prices": {
                     "100LL": [
                         {
@@ -203,7 +203,7 @@
         "fbos": [
             {
                 "fbo_name": "Jet West GateOne",
-                "last_updated": "10-Apr",
+                "last_updated": "11-Apr",
                 "prices": {
                     "100LL": [
                         {
@@ -239,7 +239,7 @@
         "fbos": [
             {
                 "fbo_name": "City of Marina (FBO)",
-                "last_updated": "10-Apr",
+                "last_updated": "11-Apr",
                 "prices": {
                     "100LL": [
                         {
@@ -267,7 +267,7 @@
         "fbos": [
             {
                 "fbo_name": "Avports Moffett Field",
-                "last_updated": "10-Apr",
+                "last_updated": "11-Apr",
                 "prices": {
                     "Jet A": [
                         {
@@ -313,12 +313,12 @@
             },
             {
                 "fbo_name": "Monterey Jet Center, LLC",
-                "last_updated": "01-Apr",
+                "last_updated": "10-Apr",
                 "prices": {
                     "100LL": [
                         {
                             "service": "SS",
-                            "price": "$6.50"
+                            "price": "$5.99"
                         },
                         {
                             "service": "FS",
@@ -357,7 +357,7 @@
         "fbos": [
             {
                 "fbo_name": "Rossi Aircraft",
-                "last_updated": "10-Apr",
+                "last_updated": "11-Apr",
                 "prices": {
                     "100LL": [
                         {
@@ -519,7 +519,7 @@
             },
             {
                 "fbo_name": "Signature Aviation (formerly Meridian Hayward)",
-                "last_updated": "10-Apr",
+                "last_updated": "11-Apr",
                 "prices": {
                     "100LL": [
                         {
@@ -547,7 +547,7 @@
         "fbos": [
             {
                 "fbo_name": "Modesto Jet Center",
-                "last_updated": "10-Apr",
+                "last_updated": "11-Apr",
                 "prices": {
                     "100LL": [
                         {
@@ -579,7 +579,7 @@
         "fbos": [
             {
                 "fbo_name": "Contra Costa County (FBO)",
-                "last_updated": "10-Apr",
+                "last_updated": "11-Apr",
                 "prices": {
                     "100LL": [
                         {
@@ -601,7 +601,7 @@
         "fbos": [
             {
                 "fbo_name": "KaiserAir, Inc.",
-                "last_updated": "10-Apr",
+                "last_updated": "11-Apr",
                 "prices": {
                     "100LL": [
                         {

@@ -6,6 +6,8 @@
     <title>N890GF - Aircraft Maintenance & Flight Log</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Leaflet Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         body {
             background-color: #f8f9fa;
@@ -39,6 +41,18 @@
             white-space: nowrap;
             min-width: 140px;
         }
+
+        .route-advisor-btn {
+            color: #6f42c1;
+            border: 1px solid #6f42c1;
+            background: transparent;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .route-advisor-btn:hover {
+            background: #6f42c1;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -61,14 +75,16 @@
             <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#mxModal">Add Maintenance</button>
             <div class="d-flex gap-2">
                 <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#fuelModal">Fuel Tracker</button>
-                <div class="input-group" style="width: 250px;">
+                <div class="input-group" style="width: 380px;">
                     <input type="text" id="searchAirportCode" class="form-control text-uppercase" placeholder="e.g. KOSH" aria-label="Airport Code">
-                    <button type="button" id="checkPricesBtn" class="btn btn-outline-success">Check Prices</button>
+                    <button type="button" id="checkPricesBtn" class="btn btn-outline-success">
+                        Check Prices
+                    </button>
                 </div>
             </div>
             <div class="d-flex gap-2">
                 <a href="/analyzer" class="btn btn-outline-primary">Flight Analyzer</a>
-                <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#routeAdvisorModal">
+                <button class="btn route-advisor-btn" data-bs-toggle="modal" data-bs-target="#routeAdvisorModal">
                     Route Advisor
                 </button>
             </div>
@@ -572,9 +588,20 @@
 <div class="modal fade" id="pricesResultModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header bg-info text-dark">
-                <h5 class="modal-title">Nearby 100LL Prices</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <div class="modal-header bg-info text-dark d-flex align-items-center">
+                <h5 class="modal-title mb-0">Nearby 100LL Prices</h5>
+
+                <div class="ms-auto d-flex align-items-center gap-2">
+                    <label class="small mb-0">Limit</label>
+                    <select id="priceLimitSelect" class="form-select form-select-sm" style="width: 90px;">
+                        <option value="3" selected>3</option>
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="all">All</option>
+                    </select>
+                </div>
+
+                <button type="button" class="btn-close ms-2" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <div id="pricesLoader" class="text-center d-none my-4">
@@ -604,25 +631,31 @@
 
 <!-- Route Advisor Modal -->
 <div class="modal fade" id="routeAdvisorModal" tabindex="-1" aria-labelledby="routeAdvisorModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content">
-
-            <form action="/route_advisor" method="POST">
+            <form id="routeAdvisorForm">
                 <div class="modal-header bg-secondary text-white">
                     <h5 class="modal-title" id="routeAdvisorModalLabel">Route Advisor</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
 
                 <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">Origin Airport</label>
-                        <input type="text" name="origin" class="form-control text-uppercase" placeholder="e.g. KJFK" required>
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Origin Airport</label>
+                            <input type="text" name="origin" class="form-control text-uppercase" placeholder="e.g. KJFK" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Destination Airport</label>
+                            <input type="text" name="destination" class="form-control text-uppercase" placeholder="e.g. KLAX" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Max Leg Range (NM)</label>
+                            <input type="number" name="range_nm" class="form-control" placeholder="e.g. 600" min="0">
+                        </div>
                     </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Destination Airport</label>
-                        <input type="text" name="destination" class="form-control text-uppercase" placeholder="e.g. KLAX" required>
-                    </div>
+                    <div id="routeMap" class="d-none" style="height: 300px; width: 100%; border-radius: 8px; margin-top: 10px;"></div>
+                    <div id="routeResult" class="alert alert-info d-none mt-3"></div>
                 </div>
 
                 <div class="modal-footer">
@@ -630,12 +663,12 @@
                     <button type="submit" class="btn btn-primary">Submit</button>
                 </div>
             </form>
-
         </div>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
@@ -689,62 +722,231 @@ document.addEventListener("DOMContentLoaded", function() {
     paginateTable("flightTable", "flightPagination", 10);
     paginateTable("mxTable", "mxPagination", 10);
     paginateTable("fuelTable", "fuelPagination", 10);
-});
-</script>
 
-<script>
-document.getElementById('checkPricesBtn').addEventListener('click', function() {
-    const airport = document.getElementById('searchAirportCode').value.trim();
-    if (!airport) {
-        alert("Please enter an airport code to search!");
-        return;
+    // ====== FUEL PRICE LOGIC ======
+    let fuelOptionsCache = [];
+    function renderFuelPrices(limit) {
+        const tbody = document.getElementById('pricesTableBody');
+        tbody.innerHTML = '';
+
+        let filtered = [...fuelOptionsCache];
+
+        if (limit !== "all") {
+            filtered = filtered.slice(0, parseInt(limit));
+        }
+
+        filtered.forEach(opt => {
+            const tr = document.createElement('tr');
+            const distanceStr = opt.distance > 0 ? `${opt.distance} nm ${opt.direction}` : '0 nm';
+
+            tr.innerHTML = `
+                <td><strong>${opt.airport}</strong><br><small class="text-muted">${opt.name}</small></td>
+                <td class="text-success fw-bold">$${opt.price.toFixed(2)}</td>
+                <td>${distanceStr}</td>
+                <td>$${opt.total_cost.toFixed(2)}<br><small class="text-muted">(${opt.used_to_return.toFixed(1)} gal round trip)</small></td>
+                <td>${opt.date}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        document.getElementById('pricesTable').classList.remove('d-none');
     }
 
-    const resultModal = new bootstrap.Modal(document.getElementById('pricesResultModal'));
-    resultModal.show();
+    function loadFuelPrices() {
+        const airport = document.getElementById('searchAirportCode').value.trim();
+        const limit = document.getElementById('priceLimitSelect').value;
 
-    document.getElementById('pricesLoader').classList.remove('d-none');
-    document.getElementById('pricesTable').classList.add('d-none');
-    document.getElementById('pricesError').classList.add('d-none');
-    document.getElementById('pricesTableBody').innerHTML = '';
+        if (!airport) {
+            alert("Please enter an airport code to search!");
+            return;
+        }
 
-    fetch(`/api/fuel_prices?airport=${encodeURIComponent(airport)}`)
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('pricesLoader').classList.add('d-none');
+        const resultModal = new bootstrap.Modal(document.getElementById('pricesResultModal'));
+        resultModal.show();
 
-            if (data.error) {
+        document.getElementById('pricesLoader').classList.remove('d-none');
+        document.getElementById('pricesTable').classList.add('d-none');
+        document.getElementById('pricesError').classList.add('d-none');
+        document.getElementById('pricesTableBody').innerHTML = '';
+
+        fetch(`/api/fuel_prices?airport=${encodeURIComponent(airport)}&limit=${encodeURIComponent(limit)}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('pricesLoader').classList.add('d-none');
+
+                if (data.error) {
+                    const errDiv = document.getElementById('pricesError');
+                    errDiv.textContent = data.error;
+                    errDiv.classList.remove('d-none');
+                } else if (data.options && data.options.length > 0) {
+                    fuelOptionsCache = data.options;
+                    const limit = document.getElementById('priceLimitSelect').value;
+                    renderFuelPrices(limit);
+                }
+            })
+            .catch(err => {
+                document.getElementById('pricesLoader').classList.add('d-none');
                 const errDiv = document.getElementById('pricesError');
-                errDiv.textContent = data.error;
+                errDiv.textContent = "Failed to connect to the server.";
                 errDiv.classList.remove('d-none');
-            } else if (data.options && data.options.length > 0) {
-                const tbody = document.getElementById('pricesTableBody');
+                console.error(err);
+            });
+    }
 
-                data.options.forEach(opt => {
-                    const tr = document.createElement('tr');
-                    const distanceStr = opt.distance > 0 ? `${opt.distance} nm ${opt.direction}` : '0 nm';
+    document.getElementById('checkPricesBtn').addEventListener('click', function() {
+        loadFuelPrices();
+    });
 
-                    tr.innerHTML = `
-                        <td><strong>${opt.airport}</strong><br><small class="text-muted">${opt.name}</small></td>
-                        <td class="text-success fw-bold">$${opt.price.toFixed(2)}</td>
-                        <td>${distanceStr}</td>
-                        <td>$${opt.total_cost.toFixed(2)}<br><small class="text-muted">(${opt.used_to_return.toFixed(1)} gal round trip)</small></td>
-                        <td>${opt.date}</td>
+    document.getElementById('priceLimitSelect').addEventListener('change', function () {
+        const limit = this.value;
+        renderFuelPrices(limit);
+    });
+
+    // ====== ROUTE ADVISOR LOGIC ======
+    let routeMap = null;
+    let routeLine = null;
+    let routeMarkers = [];
+
+    const routeModal = document.getElementById("routeAdvisorModal");
+    routeModal.addEventListener("shown.bs.modal", function () {
+        if (!routeMap) {
+            routeMap = L.map("routeMap").setView([37.0, -95.0], 4);
+
+            L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                attribution: "&copy; OpenStreetMap contributors"
+            }).addTo(routeMap);
+        }
+        setTimeout(() => {
+            routeMap.invalidateSize();
+        }, 200);
+    });
+
+    document.getElementById("routeAdvisorForm").addEventListener("submit", function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+
+        const resultBox = document.getElementById("routeResult");
+        resultBox.classList.remove("d-none");
+        resultBox.classList.remove("alert-danger");
+        resultBox.classList.add("alert-info");
+        resultBox.innerHTML = "Calculating route...";
+
+        // Show map only after submission
+        const mapEl = document.getElementById("routeMap");
+        mapEl.classList.remove("d-none");
+
+        setTimeout(() => {
+            if (routeMap) {
+                routeMap.invalidateSize();
+            }
+        }, 200);
+
+        fetch("/route_advisor", {
+            method: "POST",
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.error) {
+                resultBox.classList.remove("alert-info");
+                resultBox.classList.add("alert-danger");
+                resultBox.innerHTML = data.error;
+                return;
+            }
+
+            let html = `<strong>Route:</strong><br>${data.route_string || ""}<br><hr>`;
+
+            if (data.route_data && data.route_data.length > 0) {
+                html += `
+                <div class="table-responsive">
+                    <table class="table table-sm table-striped">
+                        <thead>
+                            <tr>
+                                <th>Airport</th>
+                                <th>Name</th>
+                                <th>Location</th>
+                                <th>Distance to Next</th>
+                                <th>Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
+                data.route_data.forEach(stop => {
+                    html += `
+                        <tr>
+                            <td><strong>${stop.airport_code}</strong></td>
+                            <td>
+                                ${stop.airport_url
+                                    ? `<a href="${stop.airport_url}" target="_blank" rel="noopener noreferrer">${stop.airport_name || ""}</a>`
+                                    : (stop.airport_name || "")
+                                }
+                            </td>
+                            <td>${stop.location || ""}</td>
+                            <td>${stop.distance_to_next || "-"}</td>
+                            <td>
+                                ${stop.price
+                                    ? `$${parseFloat(String(stop.price).replace("$", "")).toFixed(2)}`
+                                    : "-"
+                                }
+                            </td>
+                        </tr>
                     `;
-                    tbody.appendChild(tr);
                 });
 
-                document.getElementById('pricesTable').classList.remove('d-none');
+                html += `
+                        </tbody>
+                    </table>
+                </div>
+                `;
+            }
+
+            resultBox.innerHTML = html;
+
+            // Build route coordinates if available
+            if (routeMap && data.route_data) {
+                const coords = [];
+                // Clear existing markers
+                routeMarkers.forEach(m => routeMap.removeLayer(m));
+                routeMarkers = [];
+                data.route_data.forEach(stop => {
+                    const lat = stop.lat || stop.latitude || stop.lat_deg;
+                    const lon = stop.lon || stop.lng || stop.longitude;
+                    if (lat !== undefined && lon !== undefined && lat !== null && lon !== null) {
+                        const latLng = [parseFloat(lat), parseFloat(lon)];
+                        coords.push(latLng);
+                        const marker = L.marker(latLng)
+                            .addTo(routeMap)
+                            .bindPopup(
+                                `<strong>${stop.airport_code}</strong><br>${stop.airport_name || ""}`
+                            );
+                        routeMarkers.push(marker);
+                    }
+                });
+                if (routeLine) {
+                    routeMap.removeLayer(routeLine);
+                }
+                if (coords.length > 1) {
+                    routeLine = L.polyline(coords, {
+                        color: "#0d6efd",
+                        weight: 3
+                    }).addTo(routeMap);
+                    routeMap.fitBounds(routeLine.getBounds(), {
+                        padding: [20, 20]
+                    });
+                }
             }
         })
         .catch(err => {
-            document.getElementById('pricesLoader').classList.add('d-none');
-            const errDiv = document.getElementById('pricesError');
-            errDiv.textContent = "Failed to connect to the server.";
-            errDiv.classList.remove('d-none');
+            resultBox.classList.remove("alert-info");
+            resultBox.classList.add("alert-danger");
+            resultBox.innerHTML = "Failed to load route.";
             console.error(err);
         });
+    });
 });
 </script>
+
 </body>
 </html>
