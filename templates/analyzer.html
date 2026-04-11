@@ -30,7 +30,7 @@
         <div class="col-md-5">
             <div class="card p-3 shadow-sm h-100">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="mb-0">1. Flight Data Source</h5>
+                    <h5 class="mb-0">Flight Data Source</h5>
 
                     <!-- Temp Unit Toggle -->
                     <div class="btn-group" role="group">
@@ -75,7 +75,91 @@
     </div>
 
     <!-- Plots Container -->
-    <h5 class="mb-3 text-secondary d-none" id="plotHeader">2. Flight Graphs</h5>
+    <!-- Toggle Buttons -->
+    <div class="text-end mb-3">
+        <button class="btn btn-outline-secondary btn-sm" onclick="toggleXYTab()">
+            Show XY Plot
+        </button>
+
+        <button class="btn btn-outline-primary btn-sm ms-2" onclick="window.location.href='/gami'">
+            GAMI Spread
+        </button>
+    </div>
+
+    <!-- XY Plot Tab (Hidden by default) -->
+    <div id="xyTab" class="card p-3 shadow-sm mb-4 d-none">
+        <h5 class="text-secondary mb-3">XY Plot (Signal vs Signal)</h5>
+        <div class="row mb-3">
+            <div class="col-md-5">
+                <label class="form-label small">X Axis Signal</label>
+                <select class="form-select" id="xyXSelect"></select>
+            </div>
+            <div class="col-md-5">
+                <label class="form-label small">Y Axis Signal</label>
+                <select class="form-select" id="xyYSelect"></select>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <div class="w-100 d-flex flex-column gap-2">
+                    <button class="btn btn-primary w-100" onclick="plotXY()">Plot</button>
+                    <button class="btn btn-outline-secondary w-100" onclick="swapXY()">Swap Axes</button>
+                    <button class="btn btn-outline-secondary w-100" id="xy-filter-btn" onclick="toggleXYFilters()">
+                        Show Filters
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- XY FILTER UI -->
+         <div class="form-check mb-2">
+            <input class="form-check-input" type="checkbox" id="xyOverlayToggle">
+            <label class="form-check-label small" for="xyOverlayToggle">
+                Show Raw vs Filtered Overlay
+            </label>
+        </div>
+        <div class="mb-3 p-2 border rounded bg-light d-none" id="xy-filter-section">
+
+            <div class="row g-2 align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label small">Filter Signal</label>
+                    <select class="form-select form-select-sm" id="xyFilterSignal"></select>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label small">Op</label>
+                    <select class="form-select form-select-sm" id="xyFilterOp">
+                        <option value=">">></option>
+                        <option value="<"><</option>
+                        <option value=">=">>=</option>
+                        <option value="<="><=</option>
+                        <option value="==">==</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label small">Value</label>
+                    <input type="number" class="form-control form-control-sm" id="xyFilterValue">
+                </div>
+
+                <div class="col-md-3">
+                    <button class="btn btn-primary btn-sm w-100" onclick="addXYFilter()">Add Filter</button>
+                </div>
+            </div>
+
+            <div class="mt-2">
+                <div class="small text-muted">Active XY Filters</div>
+                <ul class="list-group mt-1" id="xyFilterList"></ul>
+                <button class="btn btn-outline-danger btn-sm mt-2" onclick="clearXYFilters()">
+                    Clear Filters
+                </button>
+            </div>
+        </div>
+        <div class="graph-wrapper" style="height:400px;">
+            <div id="xyGraph" class="w-100 h-100"></div>
+        </div>
+    </div>
+
+
+
+    <h5 class="mb-3 text-secondary d-none" id="plotHeader">Flight Graphs</h5>
     <div id="plotsContainer">
         <!-- Dynamic Plot Cards go here -->
     </div>
@@ -94,6 +178,64 @@
 let currentSavedFilename = "";
 let masterSignalsList = [];
 let plotIdCounter = 0;
+let plotFilters = {}; // { plotId: [filters] }
+let xyFilters = [];
+let xyOverlay = false;
+
+function toggleXYTab() {
+    const tab = document.getElementById('xyTab');
+    tab.classList.toggle('d-none');
+    populateXYDropdowns();
+}
+
+function populateXYDropdowns() {
+    const xSelect = document.getElementById('xyXSelect');
+    const ySelect = document.getElementById('xyYSelect');
+
+    if (!xSelect || masterSignalsList.length === 0) return;
+
+    const unitF = document.getElementById('unitF').checked;
+    const hideString = unitF ? "(deg C)" : "(deg F)";
+
+    // Apply same filtering logic as main plots
+    const filteredSignals = masterSignalsList.filter(sig => {
+        if (sig === "CHT" || sig === "EGT") return true;
+        return !sig.includes(hideString);
+    });
+
+    let optionsHtml = '';
+    filteredSignals.forEach(sig => {
+        optionsHtml += `<option value="${sig}">${sig}</option>`;
+    });
+
+    const currentX = xSelect.value;
+    const currentY = ySelect.value;
+
+    xSelect.innerHTML = optionsHtml;
+    ySelect.innerHTML = optionsHtml;
+
+    // Restore previous selections if possible
+    if (filteredSignals.includes(currentX)) {
+        xSelect.value = currentX;
+    } else {
+        xSelect.value = filteredSignals[0];
+    }
+
+    if (filteredSignals.includes(currentY)) {
+        ySelect.value = currentY;
+    } else {
+        ySelect.value = filteredSignals.length > 1 ? filteredSignals[1] : filteredSignals[0];
+    }
+    // Populate XY filter dropdown
+    const xySelect = document.getElementById('xyFilterSignal');
+    if (xySelect) {
+        let html = '';
+        filteredSignals.forEach(sig => {
+            html += `<option value="${sig}">${sig}</option>`;
+        });
+        xySelect.innerHTML = html;
+    }
+}
 
 // 1. Initialize: Fetch saved flights on page load
 document.addEventListener('DOMContentLoaded', function() {
@@ -101,7 +243,13 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(res => res.json())
         .then(data => {
             const select = document.getElementById('savedFlights');
-            data.files.forEach(f => select.options.add(new Option(f, f)));
+
+            // Sort flight list in reverse alphabetical order for easier browsing
+            const sortedFiles = (data.files || []).slice().sort((a, b) => b.localeCompare(a));
+
+            sortedFiles.forEach(f => {
+                select.options.add(new Option(f, f));
+            });
         });
 });
 
@@ -162,7 +310,10 @@ document.getElementById('savedFlights').addEventListener('change', function(e) {
 
 // 5. Handle Unit Toggle Change
 document.querySelectorAll('input[name="tempUnit"]').forEach(radio => {
-    radio.addEventListener('change', updateAllPlots);
+    radio.addEventListener('change', () => {
+        updateAllPlots();
+        populateXYDropdowns();
+    });
 });
 
 // 6. Plot Management Functions
@@ -187,11 +338,58 @@ function addPlot() {
                     <select class="form-select border-danger right-signal-select" data-plot-id="${plotId}"></select>
                 </div>
                 <div class="col-md-2 text-end">
+                    <button class="btn btn-outline-secondary btn-sm me-1" id="filter-btn-${plotId}" onclick="togglePlotFilters(${plotId})">
+                        Show Filters
+                    </button>
                     ${plotId > 0 ? `<button class="btn btn-outline-secondary btn-sm" onclick="removePlot(${plotId})">✖ Remove</button>` : ''}
                 </div>
             </div>
         </div>
         <div class="card-body px-4 pb-4 pt-3">
+
+            <!-- PER-PLOT FILTER UI -->
+            <div class="mb-3 p-2 border rounded bg-light filter-section d-none" id="filter-section-${plotId}">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="small text-muted fw-bold" id="filter-label-${plotId}">
+                        Filters
+                    </div>
+                </div>
+                <div class="row g-2 align-items-end">
+                    <div class="col-md-4">
+                        <label class="form-label small">Filter Signal</label>
+                        <select class="form-select form-select-sm filter-signal"></select>
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label small">Op</label>
+                        <select class="form-select form-select-sm filter-op">
+                            <option value=">">></option>
+                            <option value="<"><</option>
+                            <option value=">=">>=</option>
+                            <option value="<="><=</option>
+                            <option value="==">==</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label small">Value</label>
+                        <input type="number" class="form-control form-control-sm filter-value">
+                    </div>
+
+                    <div class="col-md-3">
+                        <button class="btn btn-primary btn-sm w-100 add-filter-btn">Add Filter</button>
+                    </div>
+                </div>
+
+                <div class="mt-2">
+                    <div class="small text-muted">Active Filters</div>
+                    <ul class="list-group mt-1 filter-list"></ul>
+                    <button class="btn btn-outline-danger btn-sm mt-2 clear-filter-btn">
+                        Clear Filters
+                    </button>
+                </div>
+            </div>
+
             <div class="graph-wrapper position-relative w-100" style="height: 450px;">
                 <div id="loader-${plotId}" class="plot-loader position-absolute top-50 start-50 translate-middle d-none text-center p-3 shadow-sm border">
                     <div class="spinner-border text-primary" role="status"></div>
@@ -204,6 +402,41 @@ function addPlot() {
 
     container.appendChild(card);
 
+    const cardEl = document.getElementById(`plotCard-${plotId}`);
+
+    const signalSelect = cardEl.querySelector('.filter-signal');
+    const unitF = document.getElementById('unitF').checked;
+    const hideString = unitF ? "(deg C)" : "(deg F)";
+
+    const filteredSignals = masterSignalsList.filter(sig => {
+        if (sig === "CHT" || sig === "EGT") return true;
+        return !sig.includes(hideString);
+    });
+
+    signalSelect.innerHTML = filteredSignals.map(s => `<option value="${s}">${s}</option>`).join('');
+
+    // Add Filter
+    cardEl.querySelector('.add-filter-btn').onclick = () => {
+        const signal = cardEl.querySelector('.filter-signal').value;
+        const op = cardEl.querySelector('.filter-op').value;
+        const value = parseFloat(cardEl.querySelector('.filter-value').value);
+
+        if (isNaN(value)) return;
+
+        if (!plotFilters[plotId]) plotFilters[plotId] = [];
+        plotFilters[plotId].push({ signal, op, value });
+
+        renderPlotFilters(plotId);
+        triggerAnalysis(plotId);
+    };
+
+    // Clear Filters
+    cardEl.querySelector('.clear-filter-btn').onclick = () => {
+        plotFilters[plotId] = [];
+        renderPlotFilters(plotId);
+        triggerAnalysis(plotId);
+    };
+
     // Attach Event Listeners to the new dropdowns
     card.querySelector('.left-signal-select').addEventListener('change', () => triggerAnalysis(plotId));
     card.querySelector('.right-signal-select').addEventListener('change', () => triggerAnalysis(plotId));
@@ -211,6 +444,7 @@ function addPlot() {
     // Populate dropdowns and trigger the initial graph render
     populateDropdownsForPlot(plotId);
     if (currentSavedFilename) triggerAnalysis(plotId);
+    renderPlotFilters(plotId);
 }
 
 function removePlot(plotId) {
@@ -287,6 +521,8 @@ function triggerAnalysis(plotId) {
     formData.append('left_signal', leftSignal);
     formData.append('right_signal', rightSignal);
     formData.append('temp_unit', tempUnit);
+    const filters = plotFilters[plotId] || [];
+    formData.append('filters', JSON.stringify(filters));
 
     fetch('/api/analyze_flight', { method: 'POST', body: formData })
     .then(response => response.json())
@@ -320,7 +556,7 @@ function triggerAnalysis(plotId) {
             traces.push({
                 x: data.plot_data.x, y: traceData.y, name: traceData.name,
                 type: 'scatter', mode: 'lines',
-                line: { color: colorsRight[idx % colorsRight.length], dash: 'dash' },
+                line: { color: colorsRight[idx % colorsRight.length] },
                 yaxis: 'y2'
             });
         });
@@ -344,11 +580,6 @@ function triggerAnalysis(plotId) {
             legend: { orientation: "h", y: -0.15 }
         };
 
-        // Link axes if both signals are temperatures
-        const isTemp = (sig) => /CHT|EGT|Temp|OAT/i.test(sig);
-        if (isTemp(leftSignal) && isTemp(rightSignal)) {
-            layout.yaxis2.matches = 'y';
-        }
 
         Plotly.newPlot(graphDiv, traces, layout, {responsive: true});
 
@@ -359,8 +590,24 @@ function triggerAnalysis(plotId) {
             <div class="col-sm-4 mb-3"><strong>Total Fuel:</strong><br>${data.stats.total_fuel} gal</div>
             <div class="col-sm-4 mb-3"><strong>Avg Flow:</strong><br>${data.stats.avg_fuel_flow} gal/hr</div>
             <div class="col-sm-4 mb-3"><strong>Avg MPG:</strong><br><span class="text-success fw-bold">${data.stats.avg_mpg} nm/gal</span></div>
-            <div class="col-sm-4 mb-3"><strong>Max RPM:</strong><br>${data.stats.max_rpm}</div>
-            <div class="col-sm-4 mb-3"><strong>Max CHT:</strong><br>${data.stats.max_cht} °F</div>
+            <div class="col-sm-4 mb-3"><strong>Max RPM:</strong><br>
+                <span style="
+                    ${data.stats.max_rpm > 2750 ? 'color: red; font-weight: bold;' :
+                      data.stats.max_rpm >= 2700 ? 'color: orange;' :
+                      'color: green;'}
+                ">
+                    ${data.stats.max_rpm}
+                </span>
+            </div>
+            <div class="col-sm-4 mb-3"><strong>Max CHT:</strong><br>
+                <span style="
+                    ${data.stats.max_cht > 450 ? 'color: red; font-weight: bold;' :
+                      data.stats.max_cht > 420 ? 'color: orange;' :
+                      data.stats.max_cht < 400 ? 'color: green;' : ''}
+                ">
+                    ${data.stats.max_cht} °F
+                </span>
+            </div>
         `;
     })
     .catch(err => {
@@ -369,6 +616,208 @@ function triggerAnalysis(plotId) {
         loader.classList.add('d-none');
     });
 }
+function renderPlotFilters(plotId) {
+    const card = document.getElementById(`plotCard-${plotId}`);
+    if (!card) return;
+
+    const list = card.querySelector('.filter-list');
+    list.innerHTML = '';
+
+    const filters = plotFilters[plotId] || [];
+
+    filters.forEach((f, idx) => {
+        const li = document.createElement('li');
+        li.className = "list-group-item d-flex justify-content-between align-items-center p-1";
+        li.innerHTML = `
+            <span>${f.signal} ${f.op} ${f.value}</span>
+            <button class="btn btn-sm btn-outline-danger" onclick="removePlotFilter(${plotId}, ${idx})">✖</button>
+        `;
+        list.appendChild(li);
+    });
+}
+
+function removePlotFilter(plotId, index) {
+    plotFilters[plotId].splice(index, 1);
+    renderPlotFilters(plotId);
+    triggerAnalysis(plotId);
+}
+
+function plotXY() {
+    if (!currentSavedFilename) return;
+
+    const xSignal = document.getElementById('xyXSelect').value;
+    const ySignal = document.getElementById('xyYSelect').value;
+    const tempUnit = document.getElementById('unitF').checked ? 'F' : 'C';
+
+    const overlay = document.getElementById('xyOverlayToggle')?.checked;
+
+    const requestData = (filters) => {
+        const formData = new FormData();
+        formData.append('saved_filename', currentSavedFilename);
+        formData.append('left_signal', xSignal);
+        formData.append('right_signal', ySignal);
+        formData.append('temp_unit', tempUnit);
+        formData.append('filters', JSON.stringify(filters || []));
+
+        return fetch('/api/analyze_flight', { method: 'POST', body: formData })
+            .then(r => r.json());
+    };
+
+    const renderPlot = (rawData, filteredData) => {
+        const traces = [];
+
+        if (overlay) {
+            // RAW (gray)
+            const rx = rawData.plot_data.left_traces[0].y;
+            const ry = rawData.plot_data.right_traces[0].y;
+
+            traces.push({
+                x: rx,
+                y: ry,
+                mode: 'markers',
+                type: 'scatter',
+                name: 'Raw',
+                marker: { size: 3, color: 'rgba(150,150,150,0.5)' }
+            });
+
+            // FILTERED (blue)
+            const fx = filteredData.plot_data.left_traces[0].y;
+            const fy = filteredData.plot_data.right_traces[0].y;
+
+            traces.push({
+                x: fx,
+                y: fy,
+                mode: 'markers',
+                type: 'scatter',
+                name: 'Filtered',
+                marker: { size: 4, color: '#0d6efd' }
+            });
+
+        } else {
+            const data = filteredData;
+
+            traces.push({
+                x: data.plot_data.left_traces[0].y,
+                y: data.plot_data.right_traces[0].y,
+                mode: 'markers',
+                type: 'scatter',
+                marker: { size: 4 }
+            });
+        }
+
+        const layout = {
+            xaxis: { title: xSignal },
+            yaxis: { title: ySignal },
+            margin: { l: 60, r: 20, t: 20, b: 40 },
+            legend: { orientation: "h" }
+        };
+
+        Plotly.newPlot('xyGraph', traces, layout, { responsive: true });
+    };
+
+    if (!overlay) {
+        requestData(xyFilters)
+            .then(data => {
+                if (data.error) return alert(data.error);
+                renderPlot(null, data);
+            });
+    } else {
+        Promise.all([
+            requestData([]),
+            requestData(xyFilters)
+        ]).then(([rawData, filteredData]) => {
+            if (rawData.error || filteredData.error) {
+                alert("Error generating overlay plot.");
+                return;
+            }
+            renderPlot(rawData, filteredData);
+        });
+    }
+}
+
+function swapXY() {
+    const xSelect = document.getElementById('xyXSelect');
+    const ySelect = document.getElementById('xyYSelect');
+
+    const temp = xSelect.value;
+    xSelect.value = ySelect.value;
+    ySelect.value = temp;
+
+    // Re-plot immediately after swap
+    plotXY();
+}
+
+function addXYFilter() {
+    const signal = document.getElementById('xyFilterSignal').value;
+    const op = document.getElementById('xyFilterOp').value;
+    const value = parseFloat(document.getElementById('xyFilterValue').value);
+
+    if (isNaN(value)) return;
+
+    xyFilters.push({ signal, op, value });
+    renderXYFilters();
+    plotXY();
+}
+
+function removeXYFilter(index) {
+    xyFilters.splice(index, 1);
+    renderXYFilters();
+    plotXY();
+}
+
+function clearXYFilters() {
+    xyFilters = [];
+    renderXYFilters();
+    plotXY();
+}
+
+function renderXYFilters() {
+    const list = document.getElementById('xyFilterList');
+    if (!list) return;
+
+    list.innerHTML = '';
+
+    xyFilters.forEach((f, idx) => {
+        const li = document.createElement('li');
+        li.className = "list-group-item d-flex justify-content-between align-items-center p-1";
+        li.innerHTML = `
+            <span>${f.signal} ${f.op} ${f.value}</span>
+            <button class="btn btn-sm btn-outline-danger" onclick="removeXYFilter(${idx})">✖</button>
+        `;
+        list.appendChild(li);
+    });
+}
+</script>
+<script>
+// XY Filter show/hide toggle
+function toggleXYFilters() {
+    const section = document.getElementById('xy-filter-section');
+    if (!section) return;
+
+    const btn = document.getElementById('xy-filter-btn');
+
+    const isHidden = section.classList.toggle('d-none');
+
+    if (btn) {
+        btn.innerText = isHidden ? 'Show Filters' : 'Hide Filters';
+    }
+}
+</script>
+<script>
+// Per-plot filter show/hide toggle
+function togglePlotFilters(plotId) {
+    const section = document.getElementById(`filter-section-${plotId}`);
+    if (!section) return;
+
+    const btn = document.getElementById(`filter-btn-${plotId}`);
+
+    const isHidden = section.classList.toggle('d-none');
+
+    if (btn) {
+        btn.innerText = isHidden ? 'Show Filters' : 'Hide Filters';
+    }
+}
 </script>
 </body>
 </html>
+

@@ -1,4 +1,5 @@
 import calendar
+import json
 import os
 import re
 import sqlite3
@@ -596,9 +597,24 @@ def analyzer():
     return render_template("analyzer.html")
 
 
+# --- GAMI Spread Page Route ---
+@app.route("/gami")
+def gami():
+    return render_template("gami.html")
+
+
 @app.route("/api/saved_flights", methods=["GET"])
 def api_saved_flights():
     """Lists all previously uploaded and processed flight data files."""
+    files = [f for f in os.listdir(SAVE_DIR) if f.endswith(".csv")]
+    files.sort(key=lambda x: os.path.getmtime(os.path.join(SAVE_DIR, x)), reverse=True)
+    return jsonify({"files": files})
+
+
+# --- Compatibility endpoint for analyzer/gami UI for listing saved flights ---
+@app.route("/api/list_files", methods=["GET"])
+def api_list_files():
+    """Compatibility endpoint used by analyzer/gami UI for listing saved flights."""
     files = [f for f in os.listdir(SAVE_DIR) if f.endswith(".csv")]
     files.sort(key=lambda x: os.path.getmtime(os.path.join(SAVE_DIR, x)), reverse=True)
     return jsonify({"files": files})
@@ -638,7 +654,36 @@ def api_get_signals():
             df.to_csv(filepath, index=False)
 
         numeric_cols = df.select_dtypes(include=["number"]).columns.tolist()
-        excluded = ["Unnamed: 103", "Engine Run", "id"]
+        excluded = [
+            "Unnamed: 103",
+            "Engine Run",
+            "id",
+            "AP Yaw Force",
+            "AP Yaw Position",
+            "AP Yaw Slip (bool)",
+            "AP Pitch Slip (bool)",
+            "AP Roll Slip (bool)",
+            "AP Roll Mode",
+            "CANOPY CONTACT (V)",
+            "CDI Deflection (%)",
+            "CDI Scale NM",
+            "CDI Source Port",
+            "CDI Source Type",
+            "Thermocouple 1 (deg F)",
+            "Thermocouple 1 (deg C)",
+            "Thermocouple 2 (deg F)",
+            "Thermocouple 2 (deg C)",
+            "Thermocouple 3 (deg F)",
+            "Thermocouple 3 (deg C)",
+            "Thermocouple 4 (deg F)",
+            "Thermocouple 4 (deg C)",
+            "Thermocouple 12 (deg F)",
+            "Thermocouple 12 (deg C)",
+            "Thermocouple 13 (deg F)",
+            "Thermocouple 13 (deg C)",
+            "Thermocouple 14 (deg F)",
+            "Thermocouple 14 (deg C)",
+        ]
         signals = sorted([col for col in numeric_cols if col not in excluded])
 
         if "CHT" not in signals:
@@ -684,6 +729,35 @@ def api_analyze_flight():
 
         target_flight = flight_ids[0]
         flight_data = df[df["Flight ID"] == target_flight].copy()
+
+        # --- Apply Filters ---
+        filters_json = request.form.get("filters")
+        if filters_json:
+            try:
+                filters = json.loads(filters_json)
+                for f in filters:
+                    signal = f.get("signal")
+                    op = f.get("op")
+                    value = f.get("value")
+
+                    if signal not in flight_data.columns:
+                        continue
+
+                    col_data = pd.to_numeric(flight_data[signal], errors="coerce")
+
+                    if op == ">":
+                        flight_data = flight_data[col_data > value]
+                    elif op == "<":
+                        flight_data = flight_data[col_data < value]
+                    elif op == ">=":
+                        flight_data = flight_data[col_data >= value]
+                    elif op == "<=":
+                        flight_data = flight_data[col_data <= value]
+                    elif op == "==":
+                        flight_data = flight_data[col_data == value]
+
+            except Exception as e:
+                print("Filter parsing error:", e)
 
         # Sanitize data for JSON
         flight_data = flight_data.replace([np.inf, -np.inf], np.nan)
@@ -764,7 +838,9 @@ def api_analyze_flight():
             "avg_mpg": avg_mpg,
         }
 
-        return jsonify({"plot_data": plot_data, "stats": stats})
+        rawData = flight_data.to_dict(orient="records")
+
+        return jsonify({"plot_data": plot_data, "stats": stats, "rawData": rawData})
 
     except Exception as e:
         print(f"Analysis Error: {e}")
