@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flight Data Analyzer</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Import Plotly.js -->
     <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
     <style>
         body { background-color: #f8f9fa; padding-top: 56px; }
@@ -69,7 +68,6 @@
                         </select>
                     </div>
 
-                    <!-- Hidden but retained for fallback submission -->
                     <button type="submit" class="btn btn-primary w-100 d-none" id="analyzeBtn" disabled>Analyze Flight</button>
                 </form>
             </div>
@@ -94,7 +92,6 @@
 
                 <p id="placeholderText" class="text-muted mb-0">Select or upload a flight to view the interactive graph.</p>
 
-                <!-- Interactive Plotly Graph Container -->
                 <div id="flightGraph" class="w-100 h-100 d-none"></div>
             </div>
         </div>
@@ -118,7 +115,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 });
 
-// 2. Centralized function to request signals (called by both upload & dropdown)
+// 2. Centralized function to request signals
 function loadSignals(formData) {
     const leftSelect = document.getElementById('leftSignal');
     const rightSelect = document.getElementById('rightSignal');
@@ -142,16 +139,13 @@ function loadSignals(formData) {
         }
 
         currentSavedFilename = data.saved_filename;
-        masterSignalsList = data.signals; // Save master list
+        masterSignalsList = data.signals;
 
-        // Populate dropdowns based on the currently selected toggle
         populateDropdowns();
 
-        // Enable UI
         leftSelect.disabled = false;
         rightSelect.disabled = false;
 
-        // Auto-trigger the first analysis plot
         triggerAnalysis();
     })
     .catch(err => {
@@ -160,7 +154,6 @@ function loadSignals(formData) {
     });
 }
 
-// Helper to filter and populate dropdowns based on the temp toggle
 function populateDropdowns() {
     if (masterSignalsList.length === 0) return;
 
@@ -170,14 +163,16 @@ function populateDropdowns() {
     const leftSelect = document.getElementById('leftSignal');
     const rightSelect = document.getElementById('rightSignal');
 
-    // Save currently selected values to attempt to restore them after repopulating
     const currentLeft = leftSelect.value;
     const currentRight = rightSelect.value;
 
     let optionsHtml = '';
 
-    // Filter out the opposite temperature unit
-    const filteredSignals = masterSignalsList.filter(sig => !sig.includes(hideString));
+    // Filter out the opposite temperature unit (but always keep the virtual "CHT" and "EGT" items)
+    const filteredSignals = masterSignalsList.filter(sig => {
+        if (sig === "CHT" || sig === "EGT") return true;
+        return !sig.includes(hideString);
+    });
 
     filteredSignals.forEach(sig => {
         optionsHtml += `<option value="${sig}">${sig}</option>`;
@@ -186,7 +181,6 @@ function populateDropdowns() {
     leftSelect.innerHTML = optionsHtml;
     rightSelect.innerHTML = optionsHtml;
 
-    // Try to restore previous selections, otherwise apply intelligent defaults
     if (filteredSignals.includes(currentLeft)) {
         leftSelect.value = currentLeft;
     } else if (filteredSignals.includes("RPM")) {
@@ -203,9 +197,7 @@ function populateDropdowns() {
 // 3. Handle File Upload
 document.getElementById('csvFile').addEventListener('change', function(e) {
     if (e.target.files.length === 0) return;
-
     document.getElementById('savedFlights').value = "";
-
     const formData = new FormData();
     formData.append('file', e.target.files[0]);
     loadSignals(formData);
@@ -214,9 +206,7 @@ document.getElementById('csvFile').addEventListener('change', function(e) {
 // 4. Handle Saved Flight Selection
 document.getElementById('savedFlights').addEventListener('change', function(e) {
     if (!e.target.value) return;
-
     document.getElementById('csvFile').value = "";
-
     const formData = new FormData();
     formData.append('saved_filename', e.target.value);
     loadSignals(formData);
@@ -226,7 +216,7 @@ document.getElementById('savedFlights').addEventListener('change', function(e) {
 document.querySelectorAll('input[name="tempUnit"]').forEach(radio => {
     radio.addEventListener('change', function() {
         populateDropdowns();
-        triggerAnalysis(); // Update graph immediately if a temp var is currently selected
+        triggerAnalysis();
     });
 });
 
@@ -236,8 +226,8 @@ function triggerAnalysis() {
 
     const leftSignal = document.getElementById('leftSignal').value;
     const rightSignal = document.getElementById('rightSignal').value;
+    const tempUnit = document.getElementById('unitF').checked ? 'F' : 'C';
 
-    // UI Updates
     document.getElementById('placeholderText').classList.add('d-none');
     document.getElementById('flightGraph').classList.add('d-none');
     document.getElementById('loader').classList.remove('d-none');
@@ -247,6 +237,7 @@ function triggerAnalysis() {
     formData.append('saved_filename', currentSavedFilename);
     formData.append('left_signal', leftSignal);
     formData.append('right_signal', rightSignal);
+    formData.append('temp_unit', tempUnit);
 
     fetch('/api/analyze_flight', {
         method: 'POST',
@@ -266,24 +257,35 @@ function triggerAnalysis() {
         const graphDiv = document.getElementById('flightGraph');
         graphDiv.classList.remove('d-none');
 
-        const trace1 = {
-            x: data.plot_data.x,
-            y: data.plot_data.y_left,
-            name: data.plot_data.left_name,
-            type: 'scatter',
-            mode: 'lines',
-            line: { color: '#0d6efd' } // Bootstrap Primary Blue
-        };
+        const traces = [];
 
-        const trace2 = {
-            x: data.plot_data.x,
-            y: data.plot_data.y_right,
-            name: data.plot_data.right_name,
-            type: 'scatter',
-            mode: 'lines',
-            line: { color: '#dc3545', dash: 'dash' }, // Bootstrap Danger Red
-            yaxis: 'y2' // Assign to secondary axis
-        };
+        // Colors: Blues/Greens for the Left Axis, Reds/Oranges/Pinks for the Right Axis
+        const colorsLeft = ['#0d6efd', '#0dcaf0', '#198754', '#20c997'];
+        const colorsRight = ['#dc3545', '#fd7e14', '#ffc107', '#d63384'];
+
+        // Generate traces dynamically (handles 1 trace, or 4 traces if CHT/EGT is picked)
+        data.plot_data.left_traces.forEach((traceData, idx) => {
+            traces.push({
+                x: data.plot_data.x,
+                y: traceData.y,
+                name: traceData.name,
+                type: 'scatter',
+                mode: 'lines',
+                line: { color: colorsLeft[idx % colorsLeft.length] }
+            });
+        });
+
+        data.plot_data.right_traces.forEach((traceData, idx) => {
+            traces.push({
+                x: data.plot_data.x,
+                y: traceData.y,
+                name: traceData.name,
+                type: 'scatter',
+                mode: 'lines',
+                line: { color: colorsRight[idx % colorsRight.length] },
+                yaxis: 'y2'
+            });
+        });
 
         const layout = {
             title: `Flight Analysis: ${data.stats.flight_id}`,
@@ -305,9 +307,8 @@ function triggerAnalysis() {
             legend: { orientation: "h", y: -0.2 }
         };
 
-        Plotly.newPlot(graphDiv, [trace1, trace2], layout, {responsive: true});
+        Plotly.newPlot(graphDiv, traces, layout, {responsive: true});
 
-        // Display the Stats
         const statsList = document.getElementById('statsList');
         statsList.innerHTML = `
             <li><strong>Flight ID:</strong> ${data.stats.flight_id}</li>
@@ -327,14 +328,9 @@ function triggerAnalysis() {
     });
 }
 
-// Auto-trigger analysis when a dropdown is changed
 document.getElementById('leftSignal').addEventListener('change', triggerAnalysis);
 document.getElementById('rightSignal').addEventListener('change', triggerAnalysis);
-
-// Prevent default form submission
-document.getElementById('uploadForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-});
+document.getElementById('uploadForm').addEventListener('submit', function(e) { e.preventDefault(); });
 </script>
 </body>
 </html>

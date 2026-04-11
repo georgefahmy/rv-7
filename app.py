@@ -38,9 +38,9 @@ MAINTENANCE_RULES = {
     "Oil Change": {"type": "tach", "hours": OIL_CHANGE_INTERVAL_HOURS},
 }
 
-# In-Memory Cache for Nav Data (Prevents spamming the Dynon endpoint)
+# In-Memory Cache for Nav Data
 NAV_CACHE = {"data": None, "timestamp": 0}
-NAV_CACHE_TTL = 6 * 60 * 60  # 6 hours
+NAV_CACHE_TTL = 6 * 60 * 60
 NAV_CACHE_LOCK = threading.Lock()
 
 
@@ -62,7 +62,6 @@ def validate_float(value, default=0.0):
 
 
 def parse_date_safe(value):
-    """Force all incoming dates to ISO format (YYYY-MM-DD) for database integrity."""
     if not value:
         return datetime.today().strftime("%Y-%m-%d")
     for fmt in ("%Y-%m-%d", "%m/%d/%Y", "%m-%d-%Y"):
@@ -601,7 +600,6 @@ def analyzer():
 def api_saved_flights():
     """Lists all previously uploaded and processed flight data files."""
     files = [f for f in os.listdir(SAVE_DIR) if f.endswith(".csv")]
-    # Sort by newest first
     files.sort(key=lambda x: os.path.getmtime(os.path.join(SAVE_DIR, x)), reverse=True)
     return jsonify({"files": files})
 
@@ -633,7 +631,6 @@ def api_get_signals():
             if df is None or df.empty:
                 return jsonify({"error": "No valid flight data found in the CSV."}), 400
 
-            # Save the processed dataframe so we don't have to parse it again
             safe_name = secure_filename(file.filename)
             base_name, ext = os.path.splitext(safe_name)
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -647,6 +644,14 @@ def api_get_signals():
         excluded = ["Unnamed: 103", "Engine Run", "id"]
         signals = sorted([col for col in numeric_cols if col not in excluded])
 
+        # Manually append our "Multi-Plot" shortcut tags
+        if "CHT" not in signals:
+            signals.append("CHT")
+        if "EGT" not in signals:
+            signals.append("EGT")
+
+        signals = sorted(signals)
+
         return jsonify({"signals": signals, "saved_filename": saved_filename})
 
     except Exception as e:
@@ -656,7 +661,7 @@ def api_get_signals():
 
 @app.route("/api/analyze_flight", methods=["POST"])
 def api_analyze_flight():
-    """Loads the pre-saved dataframe and extracts plot data."""
+    """Loads the pre-saved dataframe and extracts plot data dynamically."""
     saved_filename = request.form.get("saved_filename")
     if not saved_filename:
         return jsonify({"error": "No data file specified."}), 400
@@ -670,6 +675,7 @@ def api_analyze_flight():
 
         left_signal = request.form.get("left_signal", "RPM")
         right_signal = request.form.get("right_signal", "AVG_CHT")
+        temp_unit = request.form.get("temp_unit", "F")
 
         flight_ids = [
             fid for fid in df["Flight ID"].unique() if pd.notna(fid) and fid != ""
@@ -683,26 +689,41 @@ def api_analyze_flight():
         target_flight = flight_ids[0]
         flight_data = df[df["Flight ID"] == target_flight].copy()
 
-        # --- Extract Raw Data for Plotly ---
+        # Sanitize data for JSON
         flight_data = flight_data.replace([np.inf, -np.inf], np.nan)
         flight_data = flight_data.fillna("")
-
         x_data = flight_data["Session Time"].tolist()
-        y_left_data = (
-            flight_data[left_signal].tolist()
-            if left_signal in flight_data.columns
-            else []
-        )
-        y_right_data = (
-            flight_data[right_signal].tolist()
-            if right_signal in flight_data.columns
-            else []
-        )
+
+        # --- Helper Function to Extract Multiple Traces ---
+        def extract_traces(sig):
+            traces = []
+            deg_str = f"(deg {temp_unit})"
+
+            # If the user selected the grouped 'CHT' or 'EGT' tag, find all matching cylinders for their temp unit
+            if sig == "CHT":
+                cols = [
+                    c
+                    for c in flight_data.columns
+                    if c.startswith("CHT ") and deg_str in c
+                ]
+            elif sig == "EGT":
+                cols = [
+                    c
+                    for c in flight_data.columns
+                    if c.startswith("EGT ") and deg_str in c
+                ]
+            else:
+                cols = [sig] if sig in flight_data.columns else []
+
+            # Create an individual trace dictionary for each extracted column
+            for col in sorted(cols):
+                traces.append({"name": col, "y": flight_data[col].tolist()})
+            return traces
 
         plot_data = {
             "x": x_data,
-            "y_left": y_left_data,
-            "y_right": y_right_data,
+            "left_traces": extract_traces(left_signal),
+            "right_traces": extract_traces(right_signal),
             "left_name": left_signal,
             "right_name": right_signal,
         }
