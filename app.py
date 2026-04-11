@@ -729,6 +729,45 @@ def route_advisor():
     return jsonify(result)
 
 
+# --- Proxy endpoint for posting a route string to ForeFlight performance API ---
+@app.route("/api/foreflight_route", methods=["POST"])
+def api_foreflight_route():
+    """
+    Posts a route string to ForeFlight performance API (server-side to avoid CORS issues).
+    """
+    try:
+        data = request.get_json(silent=True) or request.form
+        route_string = data.get("routeString", "")
+
+        if not route_string:
+            return jsonify({"error": "No routeString provided"}), 400
+
+        # Clean route for ForeFlight
+        clean_route = route_string.replace("➔", " ").replace("→", " ").strip()
+
+        payload = {"routeString": clean_route}
+
+        url = "https://plan.foreflight.com/map/api/performance/flight"
+
+        resp = requests.post(
+            url, json=payload, headers={"Content-Type": "application/json"}, timeout=10
+        )
+
+        # Try to parse response safely
+        try:
+            response_data = resp.json()
+        except Exception:
+            response_data = {"raw": resp.text}
+
+        return jsonify(
+            {"status_code": resp.status_code, "foreflight_response": response_data}
+        )
+
+    except Exception as e:
+        print("ForeFlight POST error:", e)
+        return jsonify({"error": str(e)}), 500
+
+
 @app.route("/api/analyze_flight", methods=["POST"])
 def api_analyze_flight():
     """Loads the pre-saved dataframe and extracts plot data dynamically."""
