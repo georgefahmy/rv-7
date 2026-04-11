@@ -45,6 +45,15 @@
         <input type="radio" class="btn-check" name="tempUnit" id="unitC" autocomplete="off" value="C">
         <label class="btn btn-outline-primary btn-sm" for="unitC">°C</label>
     </div>
+    <script>
+    // Temp unit toggle event handler
+    document.querySelectorAll('input[name="tempUnit"]').forEach(el => {
+        el.addEventListener('change', (e) => {
+            tempUnit = e.target.value;
+            if (currentData) renderGami(currentData);
+        });
+    });
+    </script>
     <!-- METRICS -->
     <div class="card p-3 mb-3">
         <div id="metrics" class="text-muted">No data loaded.</div>
@@ -164,10 +173,16 @@ function renderGami(data) {
 
     const egtKeys = keys.filter(k => {
         const ku = k.toUpperCase();
+
         if (!ku.includes("EGT")) return false;
 
-        if (tempUnit === 'F') return ku.includes("(DEG F)");
-        if (tempUnit === 'C') return ku.includes("(DEG C)");
+        if (tempUnit === 'F') {
+            return ku.includes("F");
+        }
+
+        if (tempUnit === 'C') {
+            return ku.includes("C");
+        }
 
         return true;
     });
@@ -269,15 +284,15 @@ function renderGami(data) {
     Plotly.newPlot('timeGraph', timeTraces, {
         title: "EGT + Fuel Flow vs Time",
         xaxis: { title: "Time" },
-        yaxis: { title: "EGT" },
+        yaxis: { title: `EGT (°${tempUnit})` },
         yaxis2: {
             title: "Fuel Flow",
             overlaying: 'y',
             side: 'right'
         },
-        hovermode: 'x',
-        shapes: [],
-        margin: { t: 40 }
+        hovermode: 'x unified',
+        margin: { l: 60, r: 60, t: 20, b: 40 },
+        legend: { orientation: "h", y: -0.15 }
     });
 
     // Click-based time window selection
@@ -508,35 +523,33 @@ function renderGami(data) {
             return t >= timeWindow.start && t <= timeWindow.end;
         });
 
-        const scatter = egtTraces.map((t,i)=>({
-            x: fuelTrace.y.filter((_, idx) => mask[idx]),
-            y: t.y.filter((_, idx) => mask[idx]),
-            mode: 'lines+markers',
-            type: 'scatter',
-            name: t.name,
-            line: {
-                shape: 'spline',
-                width: 2,
-                color: colors[i % colors.length]
-            },
-            marker: {
-                size: 3,
-                color: colors[i % colors.length]
-            }
-        }));
+        // Enhanced scatter traces: lines, plus dot at each peak
+        const scatter = [];
 
-        // =====================================================
-        // PEAK ANNOTATIONS (ONLY AFTER 2-CLICK WINDOW SELECTION)
-        // =====================================================
-        let annotations = [];
+        egtTraces.forEach((t, i) => {
+            const color = colors[i % colors.length];
 
-        if (timeWindow && timeWindow.start != null && timeWindow.end != null) {
+            // main line
+            scatter.push({
+                x: fuelTrace.y.filter((_, idx) => mask[idx]),
+                y: t.y.filter((_, idx) => mask[idx]),
+                mode: 'lines',
+                type: 'scatter',
+                name: t.name,
+                line: {
+                    shape: 'spline',
+                    width: 2,
+                    color: color
+                }
+            });
 
-            const mask2 = time.map(t =>
-                t >= timeWindow.start && t <= timeWindow.end
-            );
+            // peak dot (only if window selected)
+            if (timeWindow && timeWindow.start != null && timeWindow.end != null) {
 
-            egtTraces.forEach((t, i) => {
+                const mask2 = time.map(ti =>
+                    ti >= timeWindow.start && ti <= timeWindow.end
+                );
+
                 let maxY = null;
                 let maxIdx = null;
 
@@ -550,19 +563,66 @@ function renderGami(data) {
                 }
 
                 if (maxIdx !== null && fuelTrace) {
-                    const fuelVal = fuelTrace.y[maxIdx];
+                    scatter.push({
+                        x: [fuelTrace.y[maxIdx]],
+                        y: [maxY],
+                        mode: 'markers',
+                        marker: {
+                            size: 8,
+                            color: color,
+                            line: {
+                                width: 1,
+                                color: 'black'
+                            }
+                        },
+                        showlegend: false,
+                        hoverinfo: 'skip'
+                    });
+                }
+            }
+        });
 
+        // =====================================================
+        // PEAK ANNOTATIONS (ONLY AFTER 2-CLICK WINDOW SELECTION)
+        // =====================================================
+        let annotations = [];
+
+        if (timeWindow && timeWindow.start != null && timeWindow.end != null) {
+            const mask2 = time.map(t =>
+                t >= timeWindow.start && t <= timeWindow.end
+            );
+
+            egtTraces.forEach((t, i) => {
+                let maxY = null;
+                let maxIdx = null;
+
+                for (let j = 0; j < t.y.length; j++) {
+                    if (!mask2[j]) continue;
+                    if (maxY === null || t.y[j] > maxY) {
+                        maxY = t.y[j];
+                        maxIdx = j;
+                    }
+                }
+
+                if (maxIdx !== null && fuelTrace) {
+                    const fuelVal = fuelTrace.y[maxIdx];
+                    const color = colors[i % colors.length];
                     annotations.push({
                         x: fuelVal,
                         y: maxY,
                         text: (fuelVal ? `${t.name}: ${fuelVal.toFixed(1)}` : t.name),
                         showarrow: true,
                         arrowhead: 2,
-                        ax: 40,   // keep 45° offset via ax/ay
+                        arrowcolor: color,
+                        ax: 40,
                         ay: -40,
-                        textangle: 0,  // keep label horizontal
+                        textangle: 0,
+                        bgcolor: color,
+                        bordercolor: color,
+                        borderwidth: 1,
                         font: {
-                            size: 10
+                            size: 10,
+                            color: 'white'
                         }
                     });
                 }
@@ -575,9 +635,11 @@ function renderGami(data) {
         Plotly.newPlot('scatterGraph', scatter, {
             title: "EGT vs Fuel Flow",
             xaxis: { title: "Fuel Flow" },
-            yaxis: { title: "EGT" },
-            margin: { t: 40 },
-            annotations: annotations
+            yaxis: { title: `EGT (°${tempUnit})` },
+            annotations: annotations,
+            hovermode: 'x unified',
+            margin: { l: 60, r: 60, t: 20, b: 40 },
+            legend: { orientation: "h", y: -0.15 }
         });
 
         const scatterDiv = document.getElementById('scatterGraph');
