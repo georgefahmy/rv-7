@@ -610,14 +610,12 @@ def api_get_signals():
     saved_filename = request.form.get("saved_filename")
 
     try:
-        # 1. Load an existing file if selected from dropdown
         if saved_filename:
             filepath = os.path.join(SAVE_DIR, saved_filename)
             if not os.path.exists(filepath):
                 return jsonify({"error": "Saved file not found."}), 404
             df = pd.read_csv(filepath, low_memory=False)
 
-        # 2. Otherwise process a newly uploaded file
         else:
             if "file" not in request.files:
                 return jsonify({"error": "No file part"}), 400
@@ -639,12 +637,10 @@ def api_get_signals():
             filepath = os.path.join(SAVE_DIR, saved_filename)
             df.to_csv(filepath, index=False)
 
-        # Extract numeric columns for plotting
         numeric_cols = df.select_dtypes(include=["number"]).columns.tolist()
         excluded = ["Unnamed: 103", "Engine Run", "id"]
         signals = sorted([col for col in numeric_cols if col not in excluded])
 
-        # Manually append our "Multi-Plot" shortcut tags
         if "CHT" not in signals:
             signals.append("CHT")
         if "EGT" not in signals:
@@ -694,12 +690,10 @@ def api_analyze_flight():
         flight_data = flight_data.fillna("")
         x_data = flight_data["Session Time"].tolist()
 
-        # --- Helper Function to Extract Multiple Traces ---
         def extract_traces(sig):
             traces = []
             deg_str = f"(deg {temp_unit})"
 
-            # If the user selected the grouped 'CHT' or 'EGT' tag, find all matching cylinders for their temp unit
             if sig == "CHT":
                 cols = [
                     c
@@ -715,7 +709,6 @@ def api_analyze_flight():
             else:
                 cols = [sig] if sig in flight_data.columns else []
 
-            # Create an individual trace dictionary for each extracted column
             for col in sorted(cols):
                 traces.append({"name": col, "y": flight_data[col].tolist()})
             return traces
@@ -742,6 +735,17 @@ def api_analyze_flight():
         )
         avg_flow = (total_fuel * 3600) / duration if duration > 0 else 0
 
+        # Calculate Average MPG using the mean() of the MPG data column
+        avg_mpg = "N/A"
+
+        if "MPG" in flight_data.columns:
+            try:
+                valid_mpg = pd.to_numeric(flight_data["MPG"], errors="coerce").dropna()
+                if not valid_mpg.empty:
+                    avg_mpg = round(valid_mpg.mean(), 1)
+            except Exception:
+                pass
+
         def safe_max(col):
             if col in flight_data.columns:
                 series = pd.to_numeric(flight_data[col], errors="coerce").dropna()
@@ -757,6 +761,7 @@ def api_analyze_flight():
                 round(total_fuel, 2) if isinstance(total_fuel, (int, float)) else "N/A"
             ),
             "avg_fuel_flow": round(avg_flow, 2),
+            "avg_mpg": avg_mpg,
         }
 
         return jsonify({"plot_data": plot_data, "stats": stats})

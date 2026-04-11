@@ -9,7 +9,8 @@
     <style>
         body { background-color: #f8f9fa; padding-top: 56px; }
         .navbar { position: fixed; top: 0; width: 100%; z-index: 1050; }
-        .graph-container { background: white; padding: 10px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); min-height: 500px; }
+        .graph-wrapper { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #dee2e6;}
+        .plot-loader { z-index: 10; background: rgba(255,255,255,0.9); border-radius: 8px;}
     </style>
 </head>
 <body>
@@ -21,13 +22,15 @@
     </div>
 </nav>
 
-<div class="container-fluid mt-4 px-4">
-    <div class="row">
+<div class="container mt-4 mb-5">
+
+    <!-- Top Section: File Selection & Summary Stats -->
+    <div class="row mb-4">
         <!-- Control Panel -->
-        <div class="col-md-3">
-            <div class="card p-3 shadow-sm mb-4">
+        <div class="col-md-5">
+            <div class="card p-3 shadow-sm h-100">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="mb-0">Flight Data Source</h5>
+                    <h5 class="mb-0">1. Flight Data Source</h5>
 
                     <!-- Temp Unit Toggle -->
                     <div class="btn-group" role="group">
@@ -39,114 +42,99 @@
                     </div>
                 </div>
 
-                <form id="uploadForm">
-                    <div class="mb-3">
-                        <label class="form-label text-muted small mb-1">Previously Saved Flights</label>
-                        <select class="form-select" id="savedFlights">
-                            <option value="">-- Upload New File Below --</option>
-                        </select>
-                    </div>
+                <div class="mb-3">
+                    <label class="form-label text-muted small mb-1">Previously Saved Flights</label>
+                    <select class="form-select bg-light" id="savedFlights">
+                        <option value="">-- Upload New File Below --</option>
+                    </select>
+                </div>
 
-                    <hr>
+                <hr class="mt-1 mb-3">
 
-                    <div class="mb-3">
-                        <label class="form-label text-muted small mb-1">Upload New File</label>
-                        <input class="form-control" type="file" id="csvFile" accept=".csv">
-                    </div>
-
-                    <div class="mb-3 mt-4">
-                        <label class="form-label">Left Axis Signal</label>
-                        <select class="form-select" id="leftSignal" disabled>
-                            <option value="">Select a file first...</option>
-                        </select>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Right Axis Signal</label>
-                        <select class="form-select" id="rightSignal" disabled>
-                            <option value="">Select a file first...</option>
-                        </select>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary w-100 d-none" id="analyzeBtn" disabled>Analyze Flight</button>
-                </form>
-            </div>
-
-            <!-- Summary Stats Box -->
-            <div class="card p-3 shadow-sm d-none" id="statsCard">
-                <h5>Flight Summary</h5>
-                <hr class="mt-1 mb-2">
-                <ul class="list-unstyled mb-0" id="statsList">
-                    <!-- Populated by JS -->
-                </ul>
+                <div class="mb-1">
+                    <label class="form-label text-muted small mb-1">Upload New File</label>
+                    <input class="form-control" type="file" id="csvFile" accept=".csv">
+                </div>
             </div>
         </div>
 
-        <!-- Graph Display -->
-        <div class="col-md-9">
-            <div class="graph-container d-flex flex-column align-items-center justify-content-center h-100">
-                <div id="loader" class="d-none">
-                    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;"></div>
-                    <p class="mt-2 text-muted">Processing data...</p>
+        <!-- Summary Stats Box -->
+        <div class="col-md-7">
+            <div class="card p-3 shadow-sm h-100 d-none" id="statsCard">
+                <h5 class="text-primary mb-2" id="statFlightId">Flight Summary</h5>
+                <hr class="mt-0 mb-3">
+                <div class="row" id="statsList">
+                    <!-- Populated by JS -->
                 </div>
-
-                <p id="placeholderText" class="text-muted mb-0">Select or upload a flight to view the interactive graph.</p>
-
-                <div id="flightGraph" class="w-100 h-100 d-none"></div>
+            </div>
+            <!-- Placeholder before load -->
+            <div class="card p-3 shadow-sm h-100 d-flex align-items-center justify-content-center text-muted" id="statsPlaceholder">
+                Select or upload a flight to begin analysis.
             </div>
         </div>
     </div>
+
+    <!-- Plots Container -->
+    <h5 class="mb-3 text-secondary d-none" id="plotHeader">2. Flight Graphs</h5>
+    <div id="plotsContainer">
+        <!-- Dynamic Plot Cards go here -->
+    </div>
+
+    <!-- Add Plot Button -->
+    <div class="text-center mt-4">
+        <button class="btn btn-outline-primary shadow-sm px-4 py-2 d-none" id="addPlotBtn" onclick="addPlot()">
+            <strong>+ Add Additional Plot</strong>
+        </button>
+    </div>
+
 </div>
 
 <script>
-// Global state
+// Global State
 let currentSavedFilename = "";
 let masterSignalsList = [];
+let plotIdCounter = 0;
 
-// 1. Fetch saved flights on page load
+// 1. Initialize: Fetch saved flights on page load
 document.addEventListener('DOMContentLoaded', function() {
     fetch('/api/saved_flights')
         .then(res => res.json())
         .then(data => {
             const select = document.getElementById('savedFlights');
-            data.files.forEach(f => {
-                select.options.add(new Option(f, f));
-            });
+            data.files.forEach(f => select.options.add(new Option(f, f)));
         });
 });
 
 // 2. Centralized function to request signals
 function loadSignals(formData) {
-    const leftSelect = document.getElementById('leftSignal');
-    const rightSelect = document.getElementById('rightSignal');
+    // Show temporary loading state
+    document.getElementById('statsPlaceholder').innerHTML = '<div class="spinner-border text-primary spinner-border-sm"></div> Loading data...';
 
-    leftSelect.innerHTML = '<option>Loading signals...</option>';
-    rightSelect.innerHTML = '<option>Loading signals...</option>';
-    leftSelect.disabled = true;
-    rightSelect.disabled = true;
-
-    fetch('/api/get_signals', {
-        method: 'POST',
-        body: formData
-    })
+    fetch('/api/get_signals', { method: 'POST', body: formData })
     .then(response => response.json())
     .then(data => {
         if (data.error) {
             alert("Error: " + data.error);
-            leftSelect.innerHTML = '<option>Error loading data</option>';
-            rightSelect.innerHTML = '<option>Error loading data</option>';
+            document.getElementById('statsPlaceholder').innerHTML = 'Error loading data.';
             return;
         }
 
         currentSavedFilename = data.saved_filename;
         masterSignalsList = data.signals;
 
-        populateDropdowns();
+        // Hide placeholders, show relevant UI
+        document.getElementById('statsPlaceholder').classList.add('d-none');
+        document.getElementById('statsCard').classList.remove('d-none');
+        document.getElementById('plotHeader').classList.remove('d-none');
+        document.getElementById('addPlotBtn').classList.remove('d-none');
 
-        leftSelect.disabled = false;
-        rightSelect.disabled = false;
-
-        triggerAnalysis();
+        // If no plots exist, create the first one
+        if (plotIdCounter === 0) {
+            addPlot();
+        } else {
+            // If plots already exist, update their dropdowns and re-trigger analysis
+            updateAllPlots();
+        }
     })
     .catch(err => {
         console.error(err);
@@ -154,21 +142,105 @@ function loadSignals(formData) {
     });
 }
 
-function populateDropdowns() {
+// 3. Handle File Upload
+document.getElementById('csvFile').addEventListener('change', function(e) {
+    if (e.target.files.length === 0) return;
+    document.getElementById('savedFlights').value = ""; // Reset dropdown
+    const formData = new FormData();
+    formData.append('file', e.target.files[0]);
+    loadSignals(formData);
+});
+
+// 4. Handle Saved Flight Selection
+document.getElementById('savedFlights').addEventListener('change', function(e) {
+    if (!e.target.value) return;
+    document.getElementById('csvFile').value = ""; // Reset file input
+    const formData = new FormData();
+    formData.append('saved_filename', e.target.value);
+    loadSignals(formData);
+});
+
+// 5. Handle Unit Toggle Change
+document.querySelectorAll('input[name="tempUnit"]').forEach(radio => {
+    radio.addEventListener('change', updateAllPlots);
+});
+
+// 6. Plot Management Functions
+function addPlot() {
+    const plotId = plotIdCounter++;
+    const container = document.getElementById('plotsContainer');
+
+    const card = document.createElement('div');
+    card.className = "card p-0 shadow-sm mb-4 plot-card border-0";
+    card.id = `plotCard-${plotId}`;
+
+    // Construct the HTML for the dynamic plot card
+    card.innerHTML = `
+        <div class="card-header bg-white border-bottom-0 pt-3 pb-0 px-4">
+            <div class="row align-items-end">
+                <div class="col-md-5">
+                    <label class="form-label text-primary fw-bold mb-1 small">Left Axis Signal</label>
+                    <select class="form-select border-primary left-signal-select" data-plot-id="${plotId}"></select>
+                </div>
+                <div class="col-md-5">
+                    <label class="form-label text-danger fw-bold mb-1 small">Right Axis Signal</label>
+                    <select class="form-select border-danger right-signal-select" data-plot-id="${plotId}"></select>
+                </div>
+                <div class="col-md-2 text-end">
+                    ${plotId > 0 ? `<button class="btn btn-outline-secondary btn-sm" onclick="removePlot(${plotId})">✖ Remove</button>` : ''}
+                </div>
+            </div>
+        </div>
+        <div class="card-body px-4 pb-4 pt-3">
+            <div class="graph-wrapper position-relative w-100" style="height: 450px;">
+                <div id="loader-${plotId}" class="plot-loader position-absolute top-50 start-50 translate-middle d-none text-center p-3 shadow-sm border">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <div class="mt-2 text-muted small">Loading Plot...</div>
+                </div>
+                <div id="flightGraph-${plotId}" class="w-100 h-100"></div>
+            </div>
+        </div>
+    `;
+
+    container.appendChild(card);
+
+    // Attach Event Listeners to the new dropdowns
+    card.querySelector('.left-signal-select').addEventListener('change', () => triggerAnalysis(plotId));
+    card.querySelector('.right-signal-select').addEventListener('change', () => triggerAnalysis(plotId));
+
+    // Populate dropdowns and trigger the initial graph render
+    populateDropdownsForPlot(plotId);
+    if (currentSavedFilename) triggerAnalysis(plotId);
+}
+
+function removePlot(plotId) {
+    const card = document.getElementById(`plotCard-${plotId}`);
+    if (card) card.remove();
+}
+
+function updateAllPlots() {
+    document.querySelectorAll('.plot-card').forEach(card => {
+        const id = parseInt(card.id.split('-')[1]);
+        populateDropdownsForPlot(id);
+        triggerAnalysis(id);
+    });
+}
+
+function populateDropdownsForPlot(plotId) {
     if (masterSignalsList.length === 0) return;
 
     const unitF = document.getElementById('unitF').checked;
     const hideString = unitF ? "(deg C)" : "(deg F)";
 
-    const leftSelect = document.getElementById('leftSignal');
-    const rightSelect = document.getElementById('rightSignal');
+    const leftSelect = document.querySelector(`.left-signal-select[data-plot-id="${plotId}"]`);
+    const rightSelect = document.querySelector(`.right-signal-select[data-plot-id="${plotId}"]`);
 
     const currentLeft = leftSelect.value;
     const currentRight = rightSelect.value;
 
     let optionsHtml = '';
 
-    // Filter out the opposite temperature unit (but always keep the virtual "CHT" and "EGT" items)
+    // Filter out the wrong temperature unit
     const filteredSignals = masterSignalsList.filter(sig => {
         if (sig === "CHT" || sig === "EGT") return true;
         return !sig.includes(hideString);
@@ -181,57 +253,34 @@ function populateDropdowns() {
     leftSelect.innerHTML = optionsHtml;
     rightSelect.innerHTML = optionsHtml;
 
+    // Restore previous selections, or apply intelligent defaults based on the plot number
     if (filteredSignals.includes(currentLeft)) {
         leftSelect.value = currentLeft;
-    } else if (filteredSignals.includes("RPM")) {
-        leftSelect.value = "RPM";
+    } else if (plotId === 0 && filteredSignals.includes("CHT")) {
+        leftSelect.value = "CHT";
+    } else {
+        leftSelect.value = filteredSignals[0];
     }
 
     if (filteredSignals.includes(currentRight)) {
         rightSelect.value = currentRight;
-    } else if (filteredSignals.includes("AVG_CHT")) {
-        rightSelect.value = "AVG_CHT";
+    } else if (plotId === 0 && filteredSignals.includes("EGT")) {
+        rightSelect.value = "EGT";
+    } else {
+        rightSelect.value = filteredSignals.length > 1 ? filteredSignals[1] : filteredSignals[0];
     }
 }
 
-// 3. Handle File Upload
-document.getElementById('csvFile').addEventListener('change', function(e) {
-    if (e.target.files.length === 0) return;
-    document.getElementById('savedFlights').value = "";
-    const formData = new FormData();
-    formData.append('file', e.target.files[0]);
-    loadSignals(formData);
-});
-
-// 4. Handle Saved Flight Selection
-document.getElementById('savedFlights').addEventListener('change', function(e) {
-    if (!e.target.value) return;
-    document.getElementById('csvFile').value = "";
-    const formData = new FormData();
-    formData.append('saved_filename', e.target.value);
-    loadSignals(formData);
-});
-
-// Handle Unit Toggle Change
-document.querySelectorAll('input[name="tempUnit"]').forEach(radio => {
-    radio.addEventListener('change', function() {
-        populateDropdowns();
-        triggerAnalysis();
-    });
-});
-
-// 5. The core analysis function that handles fetching and plotting
-function triggerAnalysis() {
+// 7. Core Analysis & Plotting Function
+function triggerAnalysis(plotId) {
     if (!currentSavedFilename) return;
 
-    const leftSignal = document.getElementById('leftSignal').value;
-    const rightSignal = document.getElementById('rightSignal').value;
+    const leftSignal = document.querySelector(`.left-signal-select[data-plot-id="${plotId}"]`).value;
+    const rightSignal = document.querySelector(`.right-signal-select[data-plot-id="${plotId}"]`).value;
     const tempUnit = document.getElementById('unitF').checked ? 'F' : 'C';
 
-    document.getElementById('placeholderText').classList.add('d-none');
-    document.getElementById('flightGraph').classList.add('d-none');
-    document.getElementById('loader').classList.remove('d-none');
-    document.getElementById('statsCard').classList.add('d-none');
+    const loader = document.getElementById(`loader-${plotId}`);
+    loader.classList.remove('d-none');
 
     const formData = new FormData();
     formData.append('saved_filename', currentSavedFilename);
@@ -239,98 +288,87 @@ function triggerAnalysis() {
     formData.append('right_signal', rightSignal);
     formData.append('temp_unit', tempUnit);
 
-    fetch('/api/analyze_flight', {
-        method: 'POST',
-        body: formData
-    })
+    fetch('/api/analyze_flight', { method: 'POST', body: formData })
     .then(response => response.json())
     .then(data => {
-        document.getElementById('loader').classList.add('d-none');
+        loader.classList.add('d-none');
 
         if (data.error) {
             alert("Error: " + data.error);
-            document.getElementById('placeholderText').classList.remove('d-none');
             return;
         }
 
-        // --- Build Plotly Chart ---
-        const graphDiv = document.getElementById('flightGraph');
-        graphDiv.classList.remove('d-none');
-
+        // --- Render Plotly Chart ---
+        const graphDiv = document.getElementById(`flightGraph-${plotId}`);
         const traces = [];
 
         // Colors: Blues/Greens for the Left Axis, Reds/Oranges/Pinks for the Right Axis
         const colorsLeft = ['#0d6efd', '#0dcaf0', '#198754', '#20c997'];
         const colorsRight = ['#dc3545', '#fd7e14', '#ffc107', '#d63384'];
 
-        // Generate traces dynamically (handles 1 trace, or 4 traces if CHT/EGT is picked)
+        // Map Left Traces
         data.plot_data.left_traces.forEach((traceData, idx) => {
             traces.push({
-                x: data.plot_data.x,
-                y: traceData.y,
-                name: traceData.name,
-                type: 'scatter',
-                mode: 'lines',
+                x: data.plot_data.x, y: traceData.y, name: traceData.name,
+                type: 'scatter', mode: 'lines',
                 line: { color: colorsLeft[idx % colorsLeft.length] }
             });
         });
 
+        // Map Right Traces
         data.plot_data.right_traces.forEach((traceData, idx) => {
             traces.push({
-                x: data.plot_data.x,
-                y: traceData.y,
-                name: traceData.name,
-                type: 'scatter',
-                mode: 'lines',
-                line: { color: colorsRight[idx % colorsRight.length] },
+                x: data.plot_data.x, y: traceData.y, name: traceData.name,
+                type: 'scatter', mode: 'lines',
+                line: { color: colorsRight[idx % colorsRight.length], dash: 'dash' },
                 yaxis: 'y2'
             });
         });
 
         const layout = {
-            title: `Flight Analysis: ${data.stats.flight_id}`,
-            xaxis: { title: 'Session Time (seconds)' },
+            title: false, // Hide title to save space, header handles it
+            xaxis: { title: 'Session Time (seconds)', gridcolor: '#f0f0f0' },
             yaxis: {
                 title: data.plot_data.left_name,
-                titlefont: { color: '#0d6efd' },
-                tickfont: { color: '#0d6efd' }
+                titlefont: { color: '#0d6efd' }, tickfont: { color: '#0d6efd' },
+                gridcolor: '#f0f0f0'
             },
             yaxis2: {
                 title: data.plot_data.right_name,
-                titlefont: { color: '#dc3545' },
-                tickfont: { color: '#dc3545' },
-                overlaying: 'y',
-                side: 'right'
+                titlefont: { color: '#dc3545' }, tickfont: { color: '#dc3545' },
+                overlaying: 'y', side: 'right',
+                gridcolor: 'transparent'
             },
             hovermode: 'x unified',
-            margin: { l: 60, r: 60, t: 60, b: 40 },
-            legend: { orientation: "h", y: -0.2 }
+            margin: { l: 60, r: 60, t: 20, b: 40 },
+            legend: { orientation: "h", y: -0.15 }
         };
+
+        // Link axes if both signals are temperatures
+        const isTemp = (sig) => /CHT|EGT|Temp|OAT/i.test(sig);
+        if (isTemp(leftSignal) && isTemp(rightSignal)) {
+            layout.yaxis2.matches = 'y';
+        }
 
         Plotly.newPlot(graphDiv, traces, layout, {responsive: true});
 
-        const statsList = document.getElementById('statsList');
-        statsList.innerHTML = `
-            <li><strong>Flight ID:</strong> ${data.stats.flight_id}</li>
-            <li><strong>Duration:</strong> ${data.stats.duration_min} min</li>
-            <li><strong>Max RPM:</strong> ${data.stats.max_rpm}</li>
-            <li><strong>Max CHT:</strong> ${data.stats.max_cht} °F</li>
-            <li><strong>Total Fuel:</strong> ${data.stats.total_fuel} gal</li>
-            <li><strong>Avg Flow:</strong> ${data.stats.avg_fuel_flow} gal/hr</li>
+        // --- Update Summary Stats (Only needs to happen once per fetch, but fine to overwrite) ---
+        document.getElementById('statFlightId').innerText = `Flight: ${data.stats.flight_id}`;
+        document.getElementById('statsList').innerHTML = `
+            <div class="col-sm-4 mb-3"><strong>Duration:</strong><br>${data.stats.duration_min} min</div>
+            <div class="col-sm-4 mb-3"><strong>Total Fuel:</strong><br>${data.stats.total_fuel} gal</div>
+            <div class="col-sm-4 mb-3"><strong>Avg Flow:</strong><br>${data.stats.avg_fuel_flow} gal/hr</div>
+            <div class="col-sm-4 mb-3"><strong>Avg MPG:</strong><br><span class="text-success fw-bold">${data.stats.avg_mpg} nm/gal</span></div>
+            <div class="col-sm-4 mb-3"><strong>Max RPM:</strong><br>${data.stats.max_rpm}</div>
+            <div class="col-sm-4 mb-3"><strong>Max CHT:</strong><br>${data.stats.max_cht} °F</div>
         `;
-        document.getElementById('statsCard').classList.remove('d-none');
     })
     .catch(err => {
         alert("A network error occurred.");
         console.error(err);
-        document.getElementById('loader').classList.add('d-none');
-        document.getElementById('placeholderText').classList.remove('d-none');
+        loader.classList.add('d-none');
     });
 }
-
-document.getElementById('leftSignal').addEventListener('change', triggerAnalysis);
-document.getElementById('rightSignal').addEventListener('change', triggerAnalysis);
-document.getElementById('uploadForm').addEventListener('submit', function(e) { e.preventDefault(); });
 </script>
 </body>
 </html>
