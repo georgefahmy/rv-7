@@ -160,15 +160,31 @@
 
 
     <h5 class="mb-3 text-secondary d-none" id="plotHeader">Flight Graphs</h5>
-    <div id="plotsContainer">
-        <!-- Dynamic Plot Cards go here -->
-    </div>
 
-    <!-- Add Plot Button -->
-    <div class="text-center mt-4">
-        <button class="btn btn-outline-primary shadow-sm px-4 py-2 d-none" id="addPlotBtn" onclick="addPlot()">
-            <strong>+ Add Additional Plot</strong>
-        </button>
+    <div class="row">
+        <!-- LEFT: PLOTS -->
+        <div class="col-md-8">
+            <div id="plotsContainer">
+                <!-- Dynamic Plot Cards go here -->
+            </div>
+            <!-- Add Plot Button -->
+            <div class="text-center mt-4">
+                <button class="btn btn-outline-primary shadow-sm px-4 py-2 d-none" id="addPlotBtn" onclick="addPlot()">
+                    <strong>+ Add Additional Plot</strong>
+                </button>
+            </div>
+        </div>
+
+        <!-- RIGHT: MAP -->
+        <div class="col-md-4">
+            <div class="card p-2 shadow-sm mb-4">
+                <h6 class="text-secondary text-center">Flight Map</h6>
+
+                <div id="mapGraph" style="height:420px;"></div>
+                <div id="mapMetrics" class="small text-muted px-2 pb-1"></div>
+
+            </div>
+        </div>
     </div>
 
 </div>
@@ -582,6 +598,15 @@ function triggerAnalysis(plotId) {
 
 
         Plotly.newPlot(graphDiv, traces, layout, {responsive: true});
+        if (plotId === 0) {
+        graphDiv.on('plotly_hover', function(eventdata) {
+            if (!eventdata.points || eventdata.points.length === 0) return;
+            syncAircraftToTime(eventdata.points[0].x);
+        });
+    }
+
+        // --- Render Map (Flight Path) ---
+        renderMap(data);
 
         // --- Update Summary Stats (Only needs to happen once per fetch, but fine to overwrite) ---
         document.getElementById('statFlightId').innerText = `Flight: ${data.stats.flight_id}`;
@@ -787,6 +812,162 @@ function renderXYFilters() {
         list.appendChild(li);
     });
 }
+</script>
+<script>
+// Helper to compute heading (bearing) between two lat/lon points
+function computeHeading(lat1, lon1, lat2, lon2) {
+    const toRad = Math.PI / 180;
+    const toDeg = 180 / Math.PI;
+
+    const dLon = (lon2 - lon1) * toRad;
+    const y = Math.sin(dLon) * Math.cos(lat2 * toRad);
+    const x = Math.cos(lat1 * toRad) * Math.sin(lat2 * toRad) -
+              Math.sin(lat1 * toRad) * Math.cos(lat2 * toRad) * Math.cos(dLon);
+
+    let brng = Math.atan2(y, x) * toDeg;
+    return (brng + 360) % 360;
+}
+function computeDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371000; // meters
+    const toRad = Math.PI / 180;
+
+    const dLat = (lat2 - lat1) * toRad;
+    const dLon = (lon2 - lon1) * toRad;
+
+    const a =
+        Math.sin(dLat / 2) ** 2 +
+        Math.cos(lat1 * toRad) *
+        Math.cos(lat2 * toRad) *
+        Math.sin(dLon / 2) ** 2;
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+}
+
+// Render Map (Flight Path) on right column
+function renderMap(data) {
+    if (!data) return;
+
+    let lat = null;
+    let lon = null;
+
+    if (data.plot_data) {
+        const keys = Object.keys(data.plot_data);
+
+        const latKey = keys.find(k => k.toLowerCase().includes("latitude"));
+        const lonKey = keys.find(k => k.toLowerCase().includes("longitude"));
+
+        if (latKey && lonKey) {
+            lat = data.plot_data[latKey];
+            lon = data.plot_data[lonKey];
+        }
+    }
+
+    if ((!lat || !lon) && data.lat && data.lon) {
+        lat = data.lat;
+        lon = data.lon;
+    }
+
+    if (!lat || !lon) return;
+
+    lat = lat.map(v => parseFloat(v)).filter(v => !isNaN(v));
+    lon = lon.map(v => parseFloat(v)).filter(v => !isNaN(v));
+
+    if (lat.length === 0 || lon.length === 0) return;
+
+    // 🔥 STORE FOR SYNC
+    window._mapLat = lat;
+    window._mapLon = lon;
+    window._mapTime = data.plot_data?.x || null;
+
+    let alt = null;
+
+    if (data.plot_data) {
+        const keys = Object.keys(data.plot_data);
+        const altKey = keys.find(k => k.toLowerCase().includes("alt"));
+
+        if (altKey) {
+            alt = data.plot_data[altKey];
+        }
+    }
+
+    if (!alt && data.alt) {
+        alt = data.alt;
+    }
+
+    if (alt) {
+        alt = alt.map(v => parseFloat(v)).filter(v => !isNaN(v));
+        window._mapAlt = alt;
+    } else {
+        window._mapAlt = null;
+    }
+
+    // Map metrics: clear (no replay)
+    const metricsDiv = document.getElementById('mapMetrics');
+    if (metricsDiv) {
+        metricsDiv.innerHTML = '';
+    }
+
+    const pathTrace = {
+        type: 'scattermapbox',
+        mode: 'lines',
+        lat: lat,
+        lon: lon,
+        line: { width: 3 },
+        name: 'Flight Path',
+        showlegend: false
+    };
+
+    const markerTrace = {
+        type: 'scattermapbox',
+        mode: 'markers',
+        lat: [lat[0]],
+        lon: [lon[0]],
+        marker: {
+            size: 10,
+            color: 'red'
+        },
+        name: 'Aircraft',
+        showlegend: false
+    };
+
+    const layout = {
+        mapbox: {
+            style: "open-street-map",
+            center: {
+                lat: lat[Math.floor(lat.length / 2)],
+                lon: lon[Math.floor(lon.length / 2)]
+            },
+            zoom: 8
+        },
+        margin: { t: 0, b: 0, l: 0, r: 0 },
+        showlegend: false
+    };
+
+    Plotly.newPlot('mapGraph', [pathTrace, markerTrace], layout, { responsive: true });
+}
+function syncAircraftToTime(t) {
+    if (!window._mapTime || !window._mapLat || !window._mapLon) return;
+
+    let bestIndex = 0;
+    let bestDiff = Infinity;
+
+    for (let i = 0; i < window._mapTime.length; i++) {
+        const diff = Math.abs(window._mapTime[i] - t);
+        if (diff < bestDiff) {
+            bestDiff = diff;
+            bestIndex = i;
+        }
+    }
+
+    // Move aircraft marker (trace index 1)
+    Plotly.restyle('mapGraph', {
+        lat: [[window._mapLat[bestIndex]]],
+        lon: [[window._mapLon[bestIndex]]]
+    }, [1]);
+}
+</script>
+<script>
 </script>
 <script>
 // XY Filter show/hide toggle

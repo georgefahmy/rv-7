@@ -795,12 +795,39 @@ def api_analyze_flight():
                 traces.append({"name": col, "y": flight_data[col].tolist()})
             return traces
 
+        # --- Extract Latitude / Longitude (supports Dynon naming) ---
+        lat_col = next(
+            (c for c in flight_data.columns if "latitude" in c.lower()), None
+        )
+        lon_col = next(
+            (c for c in flight_data.columns if "longitude" in c.lower()), None
+        )
+
+        lat_data = []
+        lon_data = []
+
+        if lat_col and lon_col:
+            lat_data = (
+                pd.to_numeric(flight_data[lat_col], errors="coerce")
+                .replace([np.inf, -np.inf], np.nan)
+                .dropna()
+                .tolist()
+            )
+            lon_data = (
+                pd.to_numeric(flight_data[lon_col], errors="coerce")
+                .replace([np.inf, -np.inf], np.nan)
+                .dropna()
+                .tolist()
+            )
+
         plot_data = {
             "x": x_data,
             "left_traces": extract_traces(left_signal),
             "right_traces": extract_traces(right_signal),
             "left_name": left_signal,
             "right_name": right_signal,
+            "latitude": lat_data,
+            "longitude": lon_data,
         }
 
         # --- Generate Summary Stats ---
