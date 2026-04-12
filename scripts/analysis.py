@@ -93,14 +93,14 @@ def process_flights(df):
 
     # --- Compute Fuel Flow Integral (gallons) per flight ---
     # Ensure Fuel Flow 1 is numeric
-    if "Fuel Flow 1 (gal/hr)" in df.columns:
-        df["Fuel Flow 1 (gal/hr)"] = pd.to_numeric(
+    if "Total Fuel Flow (gal/hr)" in df.columns:
+        df["Total Fuel Flow (gal/hr)"] = pd.to_numeric(
             df["Fuel Flow 1 (gal/hr)"], errors="coerce"
         ).fillna(0)
         # Vectorized trapezoidal integration per flight
         df = df.sort_values(["_orig_flight_num", "Session Time"])
         dt = df.groupby("_orig_flight_num")["Session Time"].diff().fillna(0)
-        flow_gps = df["Fuel Flow 1 (gal/hr)"] / 3600.0
+        flow_gps = df["Total Fuel Flow (gal/hr)"] / 3600.0
         flow_prev = flow_gps.groupby(df["_orig_flight_num"]).shift(1).fillna(flow_gps)
         avg_flow = 0.5 * (flow_gps + flow_prev)
         increment = avg_flow * dt
@@ -119,7 +119,28 @@ def process_flights(df):
         avg_speed = 0.5 * (speed_fps + speed_prev)
         increment = avg_speed * dt
         df["Distance Traveled"] = increment.groupby(df["_orig_flight_num"]).cumsum()
-
+    if "Ground Speed (knots)" in df.columns:
+        df["Ground Speed (knots)"] = pd.to_numeric(
+            df["Ground Speed (knots)"], errors="coerce"
+        ).fillna(0)
+    # Try both "Fuel Flow" and "Fuel Flow 1 (gal/hr)" as possible columns
+    if "Total Fuel Flow (gal/hr)" in df.columns:
+        df["Total Fuel Flow (gal/hr)"] = pd.to_numeric(
+            df["Total Fuel Flow (gal/hr)"], errors="coerce"
+        ).fillna(0)
+    elif "Fuel Flow 1 (gal/hr)" in df.columns:
+        df["Total Fuel Flow (gal/hr)"] = pd.to_numeric(
+            df["Fuel Flow 1 (gal/hr)"], errors="coerce"
+        ).fillna(0)
+    # Calculate MPG (nautical miles per gallon)
+    if (
+        "Ground Speed (knots)" in df.columns
+        and "Total Fuel Flow (gal/hr)" in df.columns
+    ):
+        df["MPG"] = df["Ground Speed (knots)"] / df["Total Fuel Flow (gal/hr)"]
+        df["MPG"] = df["MPG"].replace([float("inf"), -float("inf")], 0).fillna(0)
+    else:
+        df["MPG"] = 0
     # 2. Determine if Engine was Run for each flight
     # Calculate max RPM for each flight
     flight_max_rpm = df.groupby("_orig_flight_num")[["RPM L", "RPM R"]].max()
@@ -1173,17 +1194,20 @@ def main():
                     df["Ground Speed (knots)"], errors="coerce"
                 ).fillna(0)
             # Try both "Fuel Flow" and "Fuel Flow 1 (gal/hr)" as possible columns
-            if "Fuel Flow" in df.columns:
-                df["Fuel Flow"] = pd.to_numeric(
-                    df["Fuel Flow"], errors="coerce"
+            if "Total Fuel Flow (gal/hr)" in df.columns:
+                df["Total Fuel Flow (gal/hr)"] = pd.to_numeric(
+                    df["Total Fuel Flow (gal/hr)"], errors="coerce"
                 ).fillna(0)
             elif "Fuel Flow 1 (gal/hr)" in df.columns:
-                df["Fuel Flow"] = pd.to_numeric(
+                df["Total Fuel Flow (gal/hr)"] = pd.to_numeric(
                     df["Fuel Flow 1 (gal/hr)"], errors="coerce"
                 ).fillna(0)
             # Calculate MPG (nautical miles per gallon)
-            if "Ground Speed (knots)" in df.columns and "Fuel Flow" in df.columns:
-                df["MPG"] = df["Ground Speed (knots)"] / df["Fuel Flow"]
+            if (
+                "Ground Speed (knots)" in df.columns
+                and "Total Fuel Flow (gal/hr)" in df.columns
+            ):
+                df["MPG"] = df["Ground Speed (knots)"] / df["Total Fuel Flow (gal/hr)"]
                 df["MPG"] = (
                     df["MPG"].replace([float("inf"), -float("inf")], 0).fillna(0)
                 )

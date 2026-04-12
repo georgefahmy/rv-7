@@ -13,10 +13,9 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 from flask import Flask, jsonify, redirect, render_template, request, url_for
-from werkzeug.utils import secure_filename
 
 from scripts.airnav_route import fetch_route
-from scripts.analysis import analyze_flight_data, process_flights
+from scripts.analysis import analyze_flight_data
 from scripts.fuel_prices import scrape_airnav_to_json
 
 # Force matplotlib to not use any Xwindows backend
@@ -317,6 +316,133 @@ def get_upcoming_maintenance(conn):
         "oil_due": oil_due_str,
         "oil_status_class": oil_class,
     }
+
+
+def process_flights(df):
+    """
+    Groups data into flights and marks if the engine was run.
+    """
+    # Remove rows where System Time is NaN or blank
+    df = df[df["System Time"].notna() & (df["System Time"] != "")]
+    # Remove rows where GPS Date & Time is NaN or blank
+    df = df[df["GPS Date & Time"].notna() & (df["GPS Date & Time"] != "")]
+    # Convert all temperature columns from deg C to deg F
+    temp_cols = [col for col in df.columns if "(deg C)" in col]
+    for col in temp_cols:
+        try:
+            new_name = col.replace("(deg C)", "(deg F)")
+            # Force numeric conversion to prevent string math errors
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+            # Convert C to F
+            df[new_name] = df[col] * 9.0 / 5.0 + 32.0
+
+        except Exception as e:
+            print(f"Warning: Temperature conversion failed for column '{col}': {e}")
+    # 1. Identify Flights based on Session Time resets
+    df["_orig_flight_num"] = (df["Session Time"].diff() < 0).cumsum()
+    # Ensure System Time is numeric and fill NaNs with 0 to prevent aggregation errors
+    df["System Time"] = pd.to_numeric(df["System Time"], errors="coerce").fillna(0)
+    # Ensure RPM L and RPM R are numeric and fill NaNs with 0
+    for col in ["RPM L", "RPM R"]:
+        df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
+    # Create combined RPM signal as average of left and right
+    df["RPM"] = (df["RPM L"] + df["RPM R"]) / 2
+    df["AVG_CHT"] = (
+        df["CHT 1 (deg F)"]
+        + df["CHT 2 (deg F)"]
+        + df["CHT 3 (deg F)"]
+        + df["CHT 4 (deg F)"]
+    ) / 4
+    df["CHT_Delta_T"] = df["AVG_CHT"] - df["OAT (deg F)"]
+    df["OIL_Delta_T"] = df["Oil Temp (deg F)"] - df["OAT (deg F)"]
+
+    # --- Compute Fuel Flow Integral (gallons) per flight ---
+    # Ensure Fuel Flow 1 is numeric
+    if "Total Fuel Flow (gal/hr)" in df.columns:
+        df["Total Fuel Flow (gal/hr)"] = pd.to_numeric(
+            df["Fuel Flow 1 (gal/hr)"], errors="coerce"
+        ).fillna(0)
+        # Vectorized trapezoidal integration per flight
+        df = df.sort_values(["_orig_flight_num", "Session Time"])
+        dt = df.groupby("_orig_flight_num")["Session Time"].diff().fillna(0)
+        flow_gps = df["Total Fuel Flow (gal/hr)"] / 3600.0
+        flow_prev = flow_gps.groupby(df["_orig_flight_num"]).shift(1).fillna(flow_gps)
+        avg_flow = 0.5 * (flow_gps + flow_prev)
+        increment = avg_flow * dt
+        df["Fuel Flow Integral"] = increment.groupby(df["_orig_flight_num"]).cumsum()
+
+    if "Ground Speed (knots)" in df.columns:
+        df["Ground Speed (knots)"] = pd.to_numeric(
+            df["Ground Speed (knots)"], errors="coerce"
+        ).fillna(0)
+        # Vectorized trapezoidal integration for distance per flight
+        dt = df.groupby("_orig_flight_num")["Session Time"].diff().fillna(0)
+        speed_fps = df["Ground Speed (knots)"] * 1.15 * 5280 / 3600
+        speed_prev = (
+            speed_fps.groupby(df["_orig_flight_num"]).shift(1).fillna(speed_fps)
+        )
+        avg_speed = 0.5 * (speed_fps + speed_prev)
+        increment = avg_speed * dt
+        df["Distance Traveled"] = increment.groupby(df["_orig_flight_num"]).cumsum()
+
+    # Try both "Fuel Flow" and "Fuel Flow 1 (gal/hr)" as possible columns
+    if "Total Fuel Flow (gal/hr)" in df.columns:
+        df["Total Fuel Flow (gal/hr)"] = pd.to_numeric(
+            df["Total Fuel Flow (gal/hr)"], errors="coerce"
+        ).fillna(0)
+
+    elif "Fuel Flow 1 (gal/hr)" in df.columns:
+        df["Total Fuel Flow (gal/hr)"] = pd.to_numeric(
+            df["Fuel Flow 1 (gal/hr)"], errors="coerce"
+        ).fillna(0)
+
+    # Calculate MPG (nautical miles per gallon)
+    if (
+        "Ground Speed (knots)" in df.columns
+        and "Total Fuel Flow (gal/hr)" in df.columns
+    ):
+        df["MPG"] = df["Ground Speed (knots)"] / df["Total Fuel Flow (gal/hr)"]
+        df["MPG"] = df["MPG"].replace([float("inf"), -float("inf")], 0).fillna(0)
+    else:
+        df["MPG"] = 0
+    # 2. Determine if Engine was Run for each flight
+    # Calculate max RPM for each flight
+    flight_max_rpm = df.groupby("_orig_flight_num")[["RPM"]].max()
+    flight_max_cht = df.groupby("_orig_flight_num")[
+        [
+            "CHT 1 (deg F)",
+            "CHT 2 (deg F)",
+            "CHT 3 (deg F)",
+            "CHT 4 (deg F)",
+        ]
+    ].max()
+    df["Max CHT"] = df["_orig_flight_num"].map(flight_max_cht.max(axis=1))
+    # Create a boolean Series: True if any RPM > 0 and CHT > 125
+    flights_with_engine = (flight_max_rpm["RPM"] > 0) & (
+        flight_max_cht.max(axis=1) > 125
+    )
+    # Compute first GPS Date & Time for each flight
+    flight_start_gps = df.groupby("_orig_flight_num")["GPS Date & Time"].first()
+    # Map this status back to the original DataFrame
+    df["Engine Run"] = df["_orig_flight_num"].map(flights_with_engine)
+    # Assign sequential Flight IDs as "<seq> - <GPS Date & Time>" for engine-run flights, else NaN
+    engine_flight_ids = [
+        fid
+        for fid in df["_orig_flight_num"].unique()
+        if flights_with_engine.get(fid, False)
+    ]
+    # Map: _orig_flight_num -> "<seq> - <GPS Date & Time>"
+    flightid_map = {
+        fid: f"{flight_start_gps.get(fid, '')}"
+        for idx, fid in enumerate(engine_flight_ids)
+    }
+    df["Flight ID"] = df["_orig_flight_num"].map(lambda x: flightid_map.get(x, None))
+    df.drop(columns=["_orig_flight_num"], inplace=True)
+    # Fill any null or NaN values in the DataFrame with 0 to ensure consistent datatypes
+    # df.fillna("0", inplace=True)
+    # Defragment DataFrame to improve performance after many column insertions
+    df = df.copy()
+    return df
 
 
 @app.before_request
@@ -658,11 +784,13 @@ def api_get_signals():
 
             if df is None or df.empty:
                 return jsonify({"error": "No valid flight data found in the CSV."}), 400
+
             flight_ids = [
                 fid
                 for fid in df["Flight ID"].unique()
                 if fid not in (None, 0, "", "nan")
             ]
+
             for fid in flight_ids:
                 flight_data = df[df["Flight ID"] == fid]
                 if flight_data.empty:
