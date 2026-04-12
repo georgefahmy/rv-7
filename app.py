@@ -658,15 +658,25 @@ def api_get_signals():
 
             if df is None or df.empty:
                 return jsonify({"error": "No valid flight data found in the CSV."}), 400
+            flight_ids = [
+                fid
+                for fid in df["Flight ID"].unique()
+                if fid not in (None, 0, "", "nan")
+            ]
+            for fid in flight_ids:
+                flight_data = df[df["Flight ID"] == fid]
+                if flight_data.empty:
+                    continue
 
-            safe_name = secure_filename(file.filename)
-            base_name, ext = os.path.splitext(safe_name)
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            saved_filename = f"{base_name}_{timestamp}{ext}"
+                # Extract date from Flight ID (assumes format: "YYYY-MM-DD ... - Flight X")
+                fid_str = str(fid)
 
-            filepath = os.path.join(SAVE_DIR, saved_filename)
-            df.to_csv(filepath, index=False)
-
+                # Clean filename
+                safe_name = fid_str.replace("/", "-").replace(":", "-")
+                base_name, ext = os.path.splitext(safe_name)
+                filepath = os.path.join(SAVE_DIR, f"{safe_name}.csv")
+                flight_data.to_csv(filepath, index=False)
+            df = flight_data
         numeric_cols = df.select_dtypes(include=["number"]).columns.tolist()
         excluded = [
             "Unnamed: 103",
