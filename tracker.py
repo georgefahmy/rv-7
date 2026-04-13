@@ -475,74 +475,82 @@ def update_total_airframe_hours(window):
     window["total_landings_text"].update(f"Total Landings: {total_landings}")
 
 
-conn = sqlite3.connect("scripts/maintenance.db")
-cursor = conn.cursor()
+def initialize_database():
+    conn = sqlite3.connect("scripts/maintenance.db")
+    cursor = conn.cursor()
 
-# --- Create Mx Entries table ---
-cursor.execute(
-    """
-    CREATE TABLE IF NOT EXISTS maintenance_entries (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        date DATE NOT NULL,
-        tach_time REAL,
-        airframe_time REAL,
-        notes TEXT,
-        recurrent_item TEXT,
-        category TEXT
-    )
-    """
-)
-conn.commit()
-cursor.execute(
-    """
-    CREATE TABLE IF NOT EXISTS aircraft_totals (
-        id INTEGER PRIMARY KEY CHECK (id = 1),
-        total_airframe_hours REAL
-    )
-    """
-)
-conn.commit()
-cursor.execute("SELECT total_airframe_hours FROM aircraft_totals WHERE id=1")
-if cursor.fetchone() is None:
+    # --- Create Mx Entries table ---
     cursor.execute(
-        "INSERT INTO aircraft_totals (id, total_airframe_hours) VALUES (1, 0.0)"
+        """
+        CREATE TABLE IF NOT EXISTS maintenance_entries (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            date DATE NOT NULL,
+            tach_time REAL,
+            airframe_time REAL,
+            notes TEXT,
+            recurrent_item TEXT,
+            category TEXT
+        )
+        """
     )
     conn.commit()
 
-# --- Create flight_log table ---
-cursor.execute(
-    """
-    CREATE TABLE IF NOT EXISTS flight_log (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        date DATE NOT NULL,
-        takeoff_airport TEXT,
-        landing_airport TEXT,
-        hobbs REAL,
-        tach REAL,
-        hobbs_delta REAL,
-        tach_delta REAL,
-        landings INTEGER,
-        notes TEXT
+    cursor.execute(
+        """
+        CREATE TABLE IF NOT EXISTS aircraft_totals (
+            id INTEGER PRIMARY KEY CHECK (id = 1),
+            total_airframe_hours REAL
+        )
+        """
     )
-    """
-)
-conn.commit()
+    conn.commit()
 
-# --- Create fuel_tracker table ---
-cursor.execute(
-    """
-    CREATE TABLE IF NOT EXISTS fuel_tracker (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        date TEXT,
-        hours REAL,
-        gallons REAL,
-        price_per_gallon REAL,
-        total_cost REAL,
-        gal_per_hour REAL
+    cursor.execute("SELECT total_airframe_hours FROM aircraft_totals WHERE id=1")
+    if cursor.fetchone() is None:
+        cursor.execute(
+            "INSERT INTO aircraft_totals (id, total_airframe_hours) VALUES (1, 0.0)"
+        )
+        conn.commit()
+
+    # --- Create flight_log table ---
+    cursor.execute(
+        """
+        CREATE TABLE IF NOT EXISTS flight_log (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            date DATE NOT NULL,
+            takeoff_airport TEXT,
+            landing_airport TEXT,
+            hobbs REAL,
+            tach REAL,
+            hobbs_delta REAL,
+            tach_delta REAL,
+            landings INTEGER,
+            notes TEXT
+        )
+        """
     )
-    """
-)
-conn.commit()
+    conn.commit()
+
+    # --- Create fuel_tracker table ---
+    cursor.execute(
+        """
+        CREATE TABLE IF NOT EXISTS fuel_tracker (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            date TEXT,
+            hours REAL,
+            gallons REAL,
+            price_per_gallon REAL,
+            total_cost REAL,
+            gal_per_hour REAL
+        )
+        """
+    )
+    conn.commit()
+
+    return conn, cursor
+
+
+conn, cursor = initialize_database()
 
 
 window = sg.Window(title="N890GF", layout=main_layout, finalize=True)
