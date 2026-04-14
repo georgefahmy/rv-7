@@ -145,8 +145,8 @@ def break_in_trend(df):
                 "CHT_Per_Power": "mean",  # Lower trend == break in complete
                 "Fuel_Efficiency_Index": "mean",  # Lower trend == break in complete
                 "Oil_Friction_Index": "mean",  # Higher == break in complete
-                "Percent Power": "mean",
                 "AVG_CHT_Final_Normalized": "mean",  # Lower == break in complete
+                "Percent Power": "mean",
             }
         )
         .reset_index()

@@ -1,15 +1,14 @@
 
 backlog:
     ☐ run one tank dry so i can calibrate it with fuel
-    ☐ combine flight tests 6, 7, 8, 9 into next flight
 
 flight tests:
     ☐ 8. Vx and Vy calcs
     ☐ 9. best glide speed
-    ☐ 15. dynamic longitudinal stability
-    ☐ 19. range and endurance
 
 Archive:
+    ✔ 15. dynamic longitudinal stability @done(26-04-14) @project(flight tests)
+    ✔ 19. range and endurance @done(26-04-14) @project(flight tests)
     ✔ 12. static longitudinal stability @done(26-04-10) @project(flight tests)
     ✔ 13. static directional stability @done(26-04-10) @project(flight tests)
     ✔ 14. static lateral and spiral stability @done(26-04-10) @project(flight tests)

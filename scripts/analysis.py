@@ -9,15 +9,14 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from airspeed_calibration import analyze_flight_data
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 from matplotlib.widgets import RectangleSelector
-
-from scripts.airspeed_calibration import analyze_flight_data
 
 warnings.filterwarnings("ignore")
 sg.theme("Reddit")
 sg.set_options(font=("Arial", 14))
-sg.set_options(icon=base64.b64encode(open(str("paint_logo.png"), "rb").read()))
+# sg.set_options(icon=base64.b64encode(open(str("paint_logo.png"), "rb").read()))
 matplotlib.use("TkAgg")
 ground_track = {
     "lat": None,
