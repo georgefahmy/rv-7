@@ -102,11 +102,11 @@ def analyze(df):
 
 
 def break_in_trend(df):
-    CRUISE_RPM_MIN = 2300
-    CRUISE_RPM_MAX = 2600
+    CRUISE_RPM_MIN = 2200
+    CRUISE_RPM_MAX = 2550
     CRUISE_MAP_MIN = 21.0  # Manifold Pressure in inches Hg
-    CRUISE_MAP_MAX = 28.0
-    CRUISE_IAS_MIN = 130  # Minimum Indicated Airspeed (knots)
+    CRUISE_MAP_MAX = 26.0
+    CRUISE_IAS_MIN = 110  # Minimum Indicated Airspeed (knots)
     CRUISE_GPS_ALT_MIN = 3000
     MIN_CRUISE_POWER = 65
     MAX_CRUISE_POWER = 85

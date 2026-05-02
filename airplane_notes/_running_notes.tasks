@@ -122,14 +122,15 @@ Future Project Order:
 
 On Deck:
     investigate flaps position sensor flickering
-    washers in front of static port increase TAS reading
-    washers in back of static port decrease TAS reading - need to add washers to the rear of the static ports
 
 
 ################################################
 Daily Updates are collected below this line
 Updates are moved to the archive section after
 they have been added to the build log
+4/24/2026:
+    ✔ First oil change - needed some new tools @done(26-05-01)
+    ✔ swapped out MAP sensor for new one that is engine frame mounted with cleaner tubing @done(26-05-01)
 4/13/2026:
     ✔ fuel trip @done(26-04-14)
     ✔ filled up 29.65 @done(26-04-14)

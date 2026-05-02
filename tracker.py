@@ -537,7 +537,7 @@ def initialize_database():
         CREATE TABLE IF NOT EXISTS fuel_tracker (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             date TEXT,
-            hours REAL,
+            hobbs REAL,
             gallons REAL,
             price_per_gallon REAL,
             total_cost REAL,
@@ -603,7 +603,7 @@ while True:
     if event == "fuel_tracker_button":
         # Load existing fuel entries
         cursor.execute(
-            "SELECT date, hours, gallons, price_per_gallon, total_cost, gal_per_hour FROM fuel_tracker ORDER BY id DESC"
+            "SELECT date, hobbs, gallons, price_per_gallon, total_cost, gal_per_hour FROM fuel_tracker ORDER BY id DESC"
         )
         fuel_rows = cursor.fetchall()
 
