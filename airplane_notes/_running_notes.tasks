@@ -16,8 +16,8 @@ Backlog:
         ☐ Change avionics dimmer power wire from accessory bus to PFD power splice
         ☐ Ram mount to roll bar
         ☐ Clean up paint on panel and other spots inside cabin
-        ☐ Wing mount for insta360
-        ☐ Oil cooler temperature optimization (tape/flap/something)
+        ✔ Wing mount for insta360 @done(26-05-04)
+        ✔ Oil cooler temperature optimization (tape/flap/something) @done(26-05-04)
         ☐ Install autopilot safety brackets
         ☐ Oil pressure switch instsall on firewall for hobbs meter on panel - accessory bus to the switch to the hobbs to ground
         ☐ Remove starter enable and add a secret kill switch to the VPX Batt/Alt distribution ground under panel/cowl?
@@ -29,7 +29,6 @@ Backlog:
         ☐ add smoothing to exit above exhausts
         ☐ optimize routing of things in lower cowl to minimize obstruction
         ☐ add additional lower cowl baffling to cylinders?
-        ☐ utilize exhaust flow to reduce lower cowl pressure
         ☐ seal behind starter gear to reduce lower cowl pressure
         ☐ Cowl Inlet conical gussets for cooling optimization
 
@@ -91,9 +90,9 @@ Backlog:
             ☐ fabricate remaining support tubes
             ☐ cut to length pipe clamp
         Gear Leg Fairings:
-            ☐ Cut left gear leg fairing to size using template
-            ☐ Fit fairings to landing gear
-            ☐ Add piano hinge to trailing edge - 1/16" hinge pin size 1.5" spacing for rivets
+            ✔ Cut left gear leg fairing to size using template @done(26-05-07)
+            ✔ Fit fairings to landing gear @done(26-05-07)
+            ✔ Add piano hinge to trailing edge - 1/16" hinge pin size 1.5" spacing for rivets @done(26-05-07)
             ☐ Align with offset centerline
             ☐ Secure with wormgear hose clamp
             ☐ Cut out notch for brake line
@@ -128,6 +127,17 @@ On Deck:
 Daily Updates are collected below this line
 Updates are moved to the archive section after
 they have been added to the build log
+5/1/2026:
+    ✔ first passenger flight! @done(26-05-04)
+    ✔ filled up 30 gallons @done(26-05-04)
+        ✔ computer said 30.9 gallons used - need to adjust K factor @done(26-05-04)
+        ✔ Started at 42 Gal @done(26-05-04)
+        ✔ Remaining 11.1 Gal @done(26-05-04)
+        ✔ Filled up 30 Gal to 42 Gal @done(26-05-04)
+        ✔ 42 - 11.1 = 30.9 @done(26-05-04)
+        ✔ 30.9/30 = 1.03 @done(26-05-04)
+        ✔ 1.03 * 63000 pulses = 64890 @done(26-05-04)
+        ✔ will switch to 64000 @done(26-05-04)
 4/24/2026:
     ✔ First oil change - needed some new tools @done(26-05-01)
     ✔ swapped out MAP sensor for new one that is engine frame mounted with cleaner tubing @done(26-05-01)
