@@ -59,7 +59,7 @@ Backlog:
         ☐ switch on the panel (or digital only switch from vpx?)
         ☐ indicator on panel (or digital only on hdx screen)
 
-        @future PMAG controller (~$500):
+    @future PMAG controller (~$500):
         PMAG EI Controller - see advance angle on skyview
         ✔ Order PMAG EI Controller @done(26-02-25)
         ✔ Fabricate Tx/Rx harness for Left/Right PMAG to D15 connector @done(26-04-01)
@@ -121,12 +121,18 @@ Future Project Order:
 
 On Deck:
     investigate flaps position sensor flickering
+    radio static popping/clicking interference
+        check transponder - turn to standby in flight to see if it goes away
+        check alternator in flight and see if it goes away
 
 
 ################################################
 Daily Updates are collected below this line
 Updates are moved to the archive section after
 they have been added to the build log
+5/9/2026:
+    started on fiberglass fairings
+
 5/1/2026:
     ✔ first passenger flight! @done(26-05-04)
     ✔ filled up 30 gallons @done(26-05-04)
