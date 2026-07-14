@@ -68,25 +68,29 @@ def get_existing_versions(dynon_folder=None, garmin_folder=None):
         dynon_folder = os.path.expanduser("~/Desktop/RV-7_Plans/SkyView/sotware_updates/")
     if not garmin_folder:
         garmin_folder = os.path.expanduser("~/Desktop/RV-7_Plans/garmin/")
+    
+    dynon_files = os.listdir(dynon_folder) if os.path.isdir(dynon_folder) else []
+    garmin_files = os.listdir(garmin_folder) if os.path.isdir(garmin_folder) else []
+
     return DotMap(
         dynon=DotMap(
             software=DotMap(
                 files=[
                     file
-                    for file in os.listdir(dynon_folder)
+                    for file in dynon_files
                     if file.startswith("SkyView")
                 ],
                 current=False,
             ),
             database=DotMap(
                 files=[
-                    file for file in os.listdir(dynon_folder) if file.startswith("FAA")
+                    file for file in dynon_files if file.startswith("FAA")
                 ],
                 current=False,
             ),
         ),
         garmin_g5=DotMap(
-            files=[file for file in os.listdir(garmin_folder) if file.startswith("G5")],
+            files=[file for file in garmin_files if file.startswith("G5")],
             current=False,
         ),
     )
@@ -225,14 +229,19 @@ def download_garmin(garmin_url, drive):
     return drive
 
 
+def get_file_creation_time(path):
+    stat = os.stat(path)
+    return getattr(stat, "st_birthtime", stat.st_mtime)
+
+
 def compare_file_dates(f1: DotMap, f2: DotMap):
     return f1.name if f1.ctime < f2.ctime else f2.name
 
 
 def files_to_remove(files):
     for x, y in itertools.pairwise(files):
-        f1 = DotMap(name=x, ctime=os.stat(x).st_birthtime)
-        f2 = DotMap(name=y, ctime=os.stat(y).st_birthtime)
+        f1 = DotMap(name=x, ctime=get_file_creation_time(x))
+        f2 = DotMap(name=y, ctime=get_file_creation_time(y))
         remove_file = compare_file_dates(f1, f2)
         os.remove(remove_file)
 
@@ -266,8 +275,8 @@ def clean_up_files(folder):
         if x[:10] == y[:10]:
             x = folder + x
             y = folder + y
-            f1 = DotMap(name=x, ctime=os.stat(x).st_birthtime)
-            f2 = DotMap(name=y, ctime=os.stat(y).st_birthtime)
+            f1 = DotMap(name=x, ctime=get_file_creation_time(x))
+            f2 = DotMap(name=y, ctime=get_file_creation_time(y))
             remove_file = compare_file_dates(f1, f2)
             print(f"Removed {remove_file}")
             os.remove(remove_file)
@@ -276,16 +285,27 @@ def clean_up_files(folder):
 
 
 if __name__ == "__main__":
-    dynon_volumes = [
-        f"/Volumes/{drive}/" for drive in os.listdir("/Volumes/") if "DYNON" in drive
-    ]
-    garmin_volumes = [
-        f"/Volumes/{drive}/"
-        for drive in os.listdir("/Volumes/")
-        if "GARMIN_G5" in drive
-    ]
+    dynon_volumes = []
+    garmin_volumes = []
+    if os.path.exists("/Volumes/"):
+        dynon_volumes = [
+            f"/Volumes/{drive}/" for drive in os.listdir("/Volumes/") if "DYNON" in drive
+        ]
+        garmin_volumes = [
+            f"/Volumes/{drive}/"
+            for drive in os.listdir("/Volumes/")
+            if "GARMIN_G5" in drive
+        ]
 
-    config_file = json.load(open("scripts/sw_folder_config.json", "r"))
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    config_path = os.path.join(base_dir, "sw_folder_config.json")
+
+    if os.path.isfile(config_path):
+        with open(config_path, "r") as config_fp:
+            config_file = json.load(config_fp)
+    else:
+        config_file = {}
+
     config = (
         config_file.get("default")
         if "default" in config_file.keys()
@@ -306,11 +326,9 @@ if __name__ == "__main__":
     garmin_folder = f"{main_folder}garmin_software/"
     dynon_documentation_folder = f"{main_folder}documentation/"
 
-    [
-        os.mkdir(folder)
-        for folder in [dynon_folder, garmin_folder, dynon_documentation_folder]
-        if not os.path.isdir(folder)
-    ]
+    for folder in [dynon_folder, garmin_folder, dynon_documentation_folder]:
+        if not os.path.isdir(folder):
+            os.mkdir(folder)
 
     current_versions = get_available_versions()
     existing_versions = get_existing_versions(
@@ -360,5 +378,5 @@ if __name__ == "__main__":
     config_file["default"] = {
         "main_path": main_folder,
     }
-    with open("sw_folder_config.json", "w+") as fp:
+    with open(config_path, "w+") as fp:
         json.dump(config_file, fp, indent=4)
