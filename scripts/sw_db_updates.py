@@ -65,27 +65,23 @@ def get_available_versions():
 
 def get_existing_versions(dynon_folder=None, garmin_folder=None):
     if not dynon_folder:
-        dynon_folder = os.path.expanduser("~/Desktop/RV-7_Plans/SkyView/sotware_updates/")
+        dynon_folder = os.path.expanduser(
+            "~/Desktop/RV-7_Plans/SkyView/sotware_updates/"
+        )
     if not garmin_folder:
         garmin_folder = os.path.expanduser("~/Desktop/RV-7_Plans/garmin/")
-    
+
     dynon_files = os.listdir(dynon_folder) if os.path.isdir(dynon_folder) else []
     garmin_files = os.listdir(garmin_folder) if os.path.isdir(garmin_folder) else []
 
     return DotMap(
         dynon=DotMap(
             software=DotMap(
-                files=[
-                    file
-                    for file in dynon_files
-                    if file.startswith("SkyView")
-                ],
+                files=[file for file in dynon_files if file.startswith("SkyView")],
                 current=False,
             ),
             database=DotMap(
-                files=[
-                    file for file in dynon_files if file.startswith("FAA")
-                ],
+                files=[file for file in dynon_files if file.startswith("FAA")],
                 current=False,
             ),
         ),
@@ -289,7 +285,9 @@ if __name__ == "__main__":
     garmin_volumes = []
     if os.path.exists("/Volumes/"):
         dynon_volumes = [
-            f"/Volumes/{drive}/" for drive in os.listdir("/Volumes/") if "DYNON" in drive
+            f"/Volumes/{drive}/"
+            for drive in os.listdir("/Volumes/")
+            if "DYNON" in drive
         ]
         garmin_volumes = [
             f"/Volumes/{drive}/"
