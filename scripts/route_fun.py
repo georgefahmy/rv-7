@@ -122,7 +122,6 @@ def find_optimal_route(
         elif f"K{start_code}" in valid_airports:
             resolved_start = f"K{start_code}"
         else:
-            valid_airports.append(start_code)
             print(f"Error: The starting airport '{start_airport}' was not found.")
             return
 

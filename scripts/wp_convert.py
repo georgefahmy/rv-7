@@ -68,7 +68,7 @@ images = DotMap()
 for i, item in enumerate(d.content):
     if item["wp:post_type"] == "post":
         print(item.title)
-        content = bs(item["content:encoded"])
+        content = bs(item["content:encoded"], "html.parser")
         clean[item.title] = DotMap(
             index=i,
             title=item.title,

@@ -33,7 +33,10 @@ def _round(x):
 
 
 def load_params():
-    with open("weight_and_balance/params.json", "r") as fp:
+    import os
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    params_path = os.path.join(base_dir, "params.json")
+    with open(params_path, "r") as fp:
         params = DotMap(json.load(fp))
         for config in params:
             for key in params[config].keys():

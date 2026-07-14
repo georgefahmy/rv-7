@@ -65,9 +65,9 @@ def get_available_versions():
 
 def get_existing_versions(dynon_folder=None, garmin_folder=None):
     if not dynon_folder:
-        dynon_folder = "/Users/GFahmy/Desktop/RV-7_Plans/SkyView/sotware_updates/"
+        dynon_folder = os.path.expanduser("~/Desktop/RV-7_Plans/SkyView/sotware_updates/")
     if not garmin_folder:
-        garmin_folder = "/Users/GFahmy/Desktop/RV-7_Plans/garmin/"
+        garmin_folder = os.path.expanduser("~/Desktop/RV-7_Plans/garmin/")
     return DotMap(
         dynon=DotMap(
             software=DotMap(

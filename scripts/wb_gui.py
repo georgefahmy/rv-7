@@ -15,15 +15,16 @@ from weight_and_balance.gui_layout import layout
 # sg.theme("Reddit")
 # sg.set_options(font=("Arial", 16))
 
-WD = os.getcwd()
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+params_path = os.path.join(BASE_DIR, "weight_and_balance", "params.json")
 
 params = load_params()
 results = calc_cg(params.Default)
-icon_file = f"{WD}/weight_and_balance/wb_logo.png"
+icon_file = os.path.join(BASE_DIR, "weight_and_balance", "wb_logo.png")
 sg.set_options(icon=base64.b64encode(open(str(icon_file), "rb").read()))
 
 window = sg.Window("Weight & Balance", layout=layout, finalize=True)
-with open("weight_and_balance/params.json", "r") as fp:
+with open(params_path, "r") as fp:
     params = DotMap(json.load(fp))
     for config in params:
         for key in params[config].keys():
@@ -44,7 +45,7 @@ while True:
         break
 
     if event == "load_config_name":
-        with open("weight_and_balance/params.json", "r") as fp:
+        with open(params_path, "r") as fp:
             params = DotMap(json.load(fp))
             for config in params:
                 for key in params[config].keys():
@@ -69,7 +70,7 @@ while True:
         del save_params["load_config_name"]
         del save_params["save_config_name"]
         params[values["save_config_name"]] = save_params.toDict()
-        with open("resources/params.json", "w") as fp:
+        with open(params_path, "w") as fp:
             json.dump(
                 params,
                 fp,
