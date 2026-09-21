@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+</head>
+<body class="bg-transparent text-[var(--foreground)] antialiased p-2">
+  <div class="bg-[var(--card)] text-[var(--foreground)] border border-[var(--border)] rounded-xl p-3.5 shadow-sm">
+    <!-- Header & View Tabs -->
+    <div class="flex flex-wrap items-center justify-between gap-2 pb-2.5 mb-2.5 border-b border-[var(--border)]">
+      <div>
+        <h2 class="text-[var(--foreground)] font-semibold text-sm md:text-base leading-tight">
+          Bottle Jack X-Base Support — 2D &amp; 3D CAD Engineering Blueprints
+        </h2>
+        <p class="text-[var(--muted-foreground)] text-[11px] mt-0.5">
+          Base: 1× 31&quot; + 2× 14&quot; C-Channel (3&quot;×1.375&quot;×0.145&quot;) | Jack: Ø4&quot; × 25&quot;H (Base 4&quot;×4.25&quot;) | Struts: 4× 1&quot;×1&quot; × 25.30&quot; (25-5/16&quot;)
+        </p>
+      </div>
+      <div class="flex flex-wrap items-center gap-1 text-[11px]">
+        <button id="tab-all" onclick="switchTab('all')"
+          class="px-2.5 py-1 rounded font-semibold border border-[var(--border)] bg-[var(--primary)] text-[var(--primary-foreground)] transition">
+          All 3 Views (Sheet)
+        </button>
+        <button id="tab-side" onclick="switchTab('side')"
+          class="px-2.5 py-1 rounded font-medium border border-[var(--border)] bg-[var(--content)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition">
+          Side View (2D)
+        </button>
+        <button id="tab-top" onclick="switchTab('top')"
+          class="px-2.5 py-1 rounded font-medium border border-[var(--border)] bg-[var(--content)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition">
+          Top View (2D)
+        </button>
+        <button id="tab-iso" onclick="switchTab('iso')"
+          class="px-2.5 py-1 rounded font-medium border border-[var(--border)] bg-[var(--content)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition">
+          3D Isometric (Interactive)
+        </button>
+      </div>
+    </div>
+
+    <!-- Multi-Panel Blueprint Container -->
+    <div id="grid-container" class="grid grid-cols-1 md:grid-cols-3 gap-2.5 items-stretch">
+      <!-- Panel 1: SIDE VIEW -->
+      <div id="panel-side" class="bg-[#0b1220] border border-slate-700/80 rounded-lg p-2 flex flex-col">
+        <div class="flex justify-between items-center px-1 mb-1">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-sky-400">1. Side Elevation View (Along Diagonal)</span>
+          <span class="text-[10px] font-mono text-amber-400">Strut: 25.30&quot; (25-5/16&quot;)</span>
+        </div>
+        <svg id="svg-side" viewBox="0 0 380 340" class="w-full h-auto max-h-[330px] select-none"></svg>
+      </div>
+
+      <!-- Panel 2: TOP VIEW -->
+      <div id="panel-top" class="bg-[#0b1220] border border-slate-700/80 rounded-lg p-2 flex flex-col">
+        <div class="flex justify-between items-center px-1 mb-1">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-400">2. Top Plan View (45° Rotated X)</span>
+          <span class="text-[10px] font-mono text-slate-300">Diagonals: 31.0&quot; × 31.0&quot;</span>
+        </div>
+        <svg id="svg-top" viewBox="0 0 380 340" class="w-full h-auto max-h-[330px] select-none"></svg>
+      </div>
+
+      <!-- Panel 3: 3D ISOMETRIC VIEW -->
+      <div id="panel-iso" class="bg-[#0b1220] border border-slate-700/80 rounded-lg p-2 flex flex-col">
+        <div class="flex justify-between items-center px-1 mb-1">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-purple-400">3. 3D Isometric View (Drag to Rotate)</span>
+          <button onclick="resetIso()" class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 hover:text-white border border-slate-600">Reset Angle</button>
+        </div>
+        <svg id="svg-iso" viewBox="0 0 380 340" class="w-full h-auto max-h-[330px] cursor-grab active:cursor-grabbing select-none"></svg>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function switchTab(mode) {
+      const tabs = ['all', 'side', 'top', 'iso'];
+      const activeCls = 'px-2.5 py-1 rounded font-semibold border border-[var(--border)] bg-[var(--primary)] text-[var(--primary-foreground)] transition';
+      const inactiveCls = 'px-2.5 py-1 rounded font-medium border border-[var(--border)] bg-[var(--content)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition';
+      tabs.forEach(t => {
+        document.getElementById('tab-' + t).className = (t === mode) ? activeCls : inactiveCls;
+      });
+
+      const grid = document.getElementById('grid-container');
+      const pSide = document.getElementById('panel-side');
+      const pTop  = document.getElementById('panel-top');
+      const pIso  = document.getElementById('panel-iso');
+
+      const svgs = [document.getElementById('svg-side'), document.getElementById('svg-top'), document.getElementById('svg-iso')];
+
+      if (mode === 'all') {
+        grid.className = 'grid grid-cols-1 md:grid-cols-3 gap-2.5 items-stretch';
+        pSide.classList.remove('hidden');
+        pTop.classList.remove('hidden');
+        pIso.classList.remove('hidden');
+        svgs.forEach(s => s.setAttribute(' class', 'w-full h-auto max-h-[330px] select-none'));
+      } else {
+        grid.className = 'grid grid-cols-1 gap-2.5 items-stretch';
+        pSide.classList.toggle('hidden', mode !== 'side');
+        pTop.classList.toggle('hidden', mode !== 'top');
+        pIso.classList.toggle('hidden', mode !== 'iso');
+        svgs.forEach(s => s.setAttribute('class', 'w-full h-auto max-h-[375px] select-none'));
+      }
+    }
+
+    // =========================================================================
+    // 1. SIDE ELEVATION VIEW (Section along 31" Diagonal Arm)
+    // =========================================================================
+    function drawSideView() {
+      const svg = document.getElementById('svg-side');
+      // Coordinate mapping:
+      // Center of X is at x = 190. Ground floor is at y = 285.
+      // Scale = 8.4 px per inch
+      const cx = 190;
+      const yFloor = 285;
+      const sc = 8.4;
+
+      const cHeight = 1.375 * sc; // 11.55 px
+      const yBaseTop = yFloor - cHeight; // Top surface of C-channel = 273.45
+      const halfSpan = 15.5 * sc; // 130.2 px (total 31" = 260.4 px)
+      const xLeftEnd = cx - halfSpan;  // 59.8
+      const xRightEnd = cx + halfSpan; // 320.2
+
+      // Bottle jack:
+      // Base is 4.0" x 4.25" rotated 45° relative to the C-channel arms:
+      // Along the 45° C-channel arm axis, its corners extend to ±(4.0 + 4.25)/(2*sqrt(2)) = ±2.917" along the arm!
+      // Cylinder is 4.00" diameter (radius 2.00" = 16.8 px) up to height 21.5"
+      // Top collar/ram extends to 25.0" above C-channel top
+      const rJack = 2.0 * sc; // 16.8 px
+      const rBaseDiag = 2.917 * sc; // 24.5 px (4"x4.25" base rotated 45° to channel arms)
+      const yJackTop = yBaseTop - 25.0 * sc; // 273.45 - 210 = 63.45
+      const yBodyTop = yBaseTop - 21.0 * sc; // Cylinder shoulder
+      const yAttach  = yBaseTop - 22.0 * sc; // 22" attachment height = 88.65
+
+      // 1"x1" Struts:
+      // Attach 1" from end of arm: r_outer = 14.5" (121.8 px from center), r_inner = 13.35" (112.1 px from center)
+      // At jack (r = 2.0"): z_top = 22.0", z_bot = 19.98"
+      const xStrutROuter = cx + 14.5 * sc;
+      const xStrutRInner = cx + 13.35 * sc;
+      const xStrutLOuter = cx - 14.5 * sc;
+      const xStrutLInner = cx - 13.35 * sc;
+      const yAttachBot   = yBaseTop - 19.98 * sc;
+
+      svg.innerHTML = `
+        <defs>
+          <marker id="arr-sky" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+            <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#38bdf8"/>
+          </marker>
+          <marker id="arr-amb" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+            <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#f59e0b"/>
+          </marker>
+          <marker id="arr-grn" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+            <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#4ade80"/>
+          </marker>
+          <linearGradient id="jackGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#1e293b"/>
+            <stop offset="45%" stop-color="#475569"/>
+            <stop offset="100%" stop-color="#0f172a"/>
+          </linearGradient>
+        </defs>
+
+        <!-- Subtle CAD Grid -->
+        <line x1="${cx}" y1="25" x2="${cx}" y2="305" stroke="#475569" stroke-opacity="0.4" stroke-dasharray="4,4"/>
+        <line x1="20" y1="${yFloor}" x2="360" y2="${yFloor}" stroke="#64748b" stroke-width="1"/>
+
+        <!-- Bottle Jack Body (Ø4" cylinder, 4"x4.25" base rotated 45°, 25" total height) -->
+        <!-- Ram / Piston (top 4") -->
+        <rect x="${cx - 0.85 * sc}" y="${yJackTop}" width="${1.7 * sc}" height="${4.0 * sc}" fill="#cbd5e1" stroke="#94a3b8" stroke-width="1"/>
+        <!-- Cylinder Body (Ø4") -->
+        <rect x="${cx - rJack}" y="${yBodyTop}" width="${2 * rJack}" height="${21.0 * sc}" rx="3" fill="url(#jackGrad)" stroke="#94a3b8" stroke-width="1.4"/>
+        <!-- Jack Base (4"x4.25" rotated 45° to C-channel arms -> corners sit on arms at ±2.92") -->
+        <polygon points="${cx - rBaseDiag},${yBaseTop} ${cx - rJack - 2},${yBaseTop - 1.2 * sc} ${cx + rJack + 2},${yBaseTop - 1.2 * sc} ${cx + rBaseDiag},${yBaseTop}"
+          fill="#0f172a" stroke="#38bdf8" stroke-width="1.4"/>
+        <line x1="${cx}" y1="${yBaseTop - 1.2 * sc}" x2="${cx}" y2="${yBaseTop}" stroke="#38bdf8" stroke-width="1.2"/>
+
+        <!-- Collar Ring at 22" height -->
+        <rect x="${cx - rJack - 3}" y="${yAttach}" width="${2 * rJack + 6}" height="${2.02 * sc}" rx="2" fill="#f59e0b" fill-opacity="0.35" stroke="#f59e0b" stroke-width="1.5"/>
+
+        <!-- Left & Right 1"x1" Diagonal Support Struts -->
+        <polygon points="${xStrutROuter},${yBaseTop} ${cx + rJack},${yAttach} ${cx + rJack},${yAttachBot} ${xStrutRInner},${yBaseTop}"
+          fill="#f59e0b" fill-opacity="0.35" stroke="#f59e0b" stroke-width="1.6"/>
+        <polygon points="${xStrutLOuter},${yBaseTop} ${cx - rJack},${yAttach} ${cx - rJack},${yAttachBot} ${xStrutLInner},${yBaseTop}"
+          fill="#f59e0b" fill-opacity="0.35" stroke="#f59e0b" stroke-width="1.6"/>
+
+        <!-- C-Channel Base (31" long x 1.375" tall, 0.145" web thickness) -->
+        <rect x="${xLeftEnd}" y="${yBaseTop}" width="${2 * halfSpan}" height="${cHeight}" fill="#334155" stroke="#cbd5e1" stroke-width="1.5"/>
+        <!-- Hidden inner web dashed line (0.145" thick top web, 1.375" flanges pointing down) -->
+        <line x1="${xLeftEnd + 2}" y1="${yBaseTop + 2.2}" x2="${xRightEnd - 2}" y2="${yBaseTop + 2.2}" stroke="#94a3b8" stroke-dasharray="3,2" stroke-width="0.9"/>
+
+        <!-- DIMENSION: 25.0" Jack Total Height (Left Side) -->
+        <line x1="${cx - rJack}" y1="${yJackTop}" x2="28" y2="${yJackTop}" stroke="#38bdf8" stroke-opacity="0.5" stroke-dasharray="2,2"/>
+        <line x1="${xLeftEnd}" y1="${yBaseTop}" x2="28" y2="${yBaseTop}" stroke="#38bdf8" stroke-opacity="0.5" stroke-dasharray="2,2"/>
+        <line x1="34" y1="${yJackTop}" x2="34" y2="${yBaseTop}" stroke="#38bdf8" stroke-width="1.4" marker-start="url(#arr-sky)" marker-end="url(#arr-sky)"/>
+        <g transform="translate(22, ${(yJackTop + yBaseTop)/2}) rotate(-90)">
+          <rect x="-36" y="-8" width="72" height="14" rx="2" fill="#0b1220"/>
+          <text x="0" y="2" text-anchor="middle" fill="#38bdf8" font-size="9.5" font-weight="bold" font-family="monospace">25.0&quot; JACK</text>
+        </g>
+
+        <!-- DIMENSION: 22.0" Strut Attachment Height -->
+        <line x1="${cx - rJack}" y1="${yAttach}" x2="66" y2="${yAttach}" stroke="#4ade80" stroke-opacity="0.6" stroke-dasharray="2,2"/>
+        <line x1="70" y1="${yAttach}" x2="70" y2="${yBaseTop}" stroke="#4ade80" stroke-width="1.4" marker-start="url(#arr-grn)" marker-end="url(#arr-grn)"/>
+        <g transform="translate(58, ${(yAttach + yBaseTop)/2}) rotate(-90)">
+          <rect x="-34" y="-8" width="68" height="14" rx="2" fill="#0b1220"/>
+          <text x="0" y="2" text-anchor="middle" fill="#4ade80" font-size="9" font-weight="bold" font-family="monospace">22.0&quot; UP</text>
+        </g>
+
+        <!-- DIMENSION: Strut Hypotenuse Length = 25.30" (25-5/16") on Right Side -->
+        <line x1="${cx + rJack + 16}" y1="${yAttach - 9}" x2="${xStrutROuter + 16}" y2="${yBaseTop - 9}"
+          stroke="#f59e0b" stroke-width="1.5" marker-start="url(#arr-amb)" marker-end="url(#arr-amb)"/>
+        <g transform="translate(${(cx + rJack + xStrutROuter)/2 + 24}, ${(yAttach + yBaseTop)/2 - 12}) rotate(60.4)">
+          <rect x="-54" y="-8" width="108" height="14" rx="2" fill="#0b1220"/>
+          <text x="0" y="2" text-anchor="middle" fill="#f59e0b" font-size="9.5" font-weight="bold" font-family="monospace">25.30&quot; (25-5/16&quot;)</text>
+        </g>
+
+        <!-- Miter Angle Callouts: 60.4° at base, 29.6° at jack -->
+        <text x="${xStrutRInner - 28}" y="${yBaseTop - 6}" fill="#fbbf24" font-size="8.5" font-weight="bold" font-family="monospace">60.4°</text>
+        <text x="${cx + rJack + 5}" y="${yAttachBot + 14}" fill="#fbbf24" font-size="8.5" font-weight="bold" font-family="monospace">29.6°</text>
+
+        <!-- DIMENSION: 1.0" Inset from Arm Tip -->
+        <line x1="${xStrutROuter}" y1="${yBaseTop}" x2="${xStrutROuter}" y2="${yBaseTop - 25}" stroke="#f59e0b" stroke-opacity="0.7" stroke-dasharray="2,2"/>
+        <line x1="${xRightEnd}" y1="${yBaseTop}" x2="${xRightEnd}" y2="${yBaseTop - 25}" stroke="#f59e0b" stroke-opacity="0.7" stroke-dasharray="2,2"/>
+        <text x="${(xStrutROuter + xRightEnd)/2 + 8}" y="${yBaseTop - 16}" text-anchor="middle" fill="#fbbf24" font-size="8.5" font-weight="bold" font-family="monospace">1.0&quot; INSET</text>
+
+        <!-- DIMENSION: 1.375" C-Channel Height -->
+        <text x="${xRightEnd + 6}" y="${yFloor - 3}" fill="#94a3b8" font-size="8.5" font-family="monospace">1.375&quot;H</text>
+
+        <!-- DIMENSION: Ø4.0" Cylinder -->
+        <line x1="${cx - rJack}" y1="${yBaseTop - 11 * sc}" x2="${cx + rJack}" y2="${yBaseTop - 11 * sc}" stroke="#e2e8f0" stroke-width="1.2" marker-start="url(#arr-sky)" marker-end="url(#arr-sky)"/>
+        <rect x="${cx - 16}" y="${yBaseTop - 11 * sc - 7}" width="32" height="12" rx="2" fill="#0f172a"/>
+        <text x="${cx}" y="${yBaseTop - 11 * sc + 2}" text-anchor="middle" fill="#38bdf8" font-size="8.5" font-weight="bold" font-family="monospace">Ø4&quot;</text>
+
+        <!-- DIMENSION: 12.5" Horizontal Run & 31.0" Full Span at Bottom -->
+        <line x1="${cx + rJack}" y1="${yBaseTop}" x2="${cx + rJack}" y2="306" stroke="#4ade80" stroke-opacity="0.5" stroke-dasharray="2,2"/>
+        <line x1="${xStrutROuter}" y1="${yBaseTop}" x2="${xStrutROuter}" y2="306" stroke="#4ade80" stroke-opacity="0.5" stroke-dasharray="2,2"/>
+        <line x1="${cx + rJack}" y1="302" x2="${xStrutROuter}" y2="302" stroke="#4ade80" stroke-width="1.3" marker-start="url(#arr-grn)" marker-end="url(#arr-grn)"/>
+        <text x="${(cx + rJack + xStrutROuter)/2}" y="299" text-anchor="middle" fill="#4ade80" font-size="8.5" font-weight="bold" font-family="monospace">12.50&quot; RUN</text>
+
+        <line x1="${xLeftEnd}" y1="${yFloor}" x2="${xLeftEnd}" y2="326" stroke="#38bdf8" stroke-opacity="0.5" stroke-dasharray="2,2"/>
+        <line x1="${xRightEnd}" y1="${yFloor}" x2="${xRightEnd}" y2="326" stroke="#38bdf8" stroke-opacity="0.5" stroke-dasharray="2,2"/>
+        <line x1="${xLeftEnd}" y1="322" x2="${xRightEnd}" y2="322" stroke="#38bdf8" stroke-width="1.4" marker-start="url(#arr-sky)" marker-end="url(#arr-sky)"/>
+        <rect x="${cx - 56}" y="314" width="112" height="14" rx="2" fill="#0b1220"/>
+        <text x="${cx}" y="324" text-anchor="middle" fill="#38bdf8" font-size="9.5" font-weight="bold" font-family="monospace">31.0&quot; ARM SPAN</text>
+      `;
+    }
+
+    // =========================================================================
+    // 2. TOP PLAN VIEW (45° Rotated C-Channel X Base + Jack + 4 Struts)
+    // =========================================================================
+    function rot2d(cx, cy, u, v, deg) {
+      const r = deg * Math.PI / 180;
+      return [cx + u * Math.cos(r) - v * Math.sin(r), cy + u * Math.sin(r) + v * Math.cos(r)];
+    }
+    function ptsStr(arr) {
+      return arr.map(p => `${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ');
+    }
+
+    function drawTopView() {
+      const svg = document.getElementById('svg-top');
+      const cx = 190, cy = 165;
+      const sc = 7.4; // 1 inch = 7.4 px
+
+      const L = 31 * sc;  // 31" continuous bar
+      const W = 3 * sc;   // 3" width
+      const S = 14 * sc;  // 14" short bars (1.5" + 14" = 15.5" from center!)
+
+      // Continuous bar at +45 deg
+      const cont = [
+        rot2d(cx, cy, -L/2, -W/2, 45),
+        rot2d(cx, cy,  L/2, -W/2, 45),
+        rot2d(cx, cy,  L/2,  W/2, 45),
+        rot2d(cx, cy, -L/2,  W/2, 45)
+      ];
+      // Short bars at -45 deg
+      const shortTR = [
+        rot2d(cx, cy, W/2,     -W/2, -45),
+        rot2d(cx, cy, W/2 + S, -W/2, -45),
+        rot2d(cx, cy, W/2 + S,  W/2, -45),
+        rot2d(cx, cy, W/2,      W/2, -45)
+      ];
+      const shortBL = [
+        rot2d(cx, cy, -W/2 - S, -W/2, -45),
+        rot2d(cx, cy, -W/2,     -W/2, -45),
+        rot2d(cx, cy, -W/2,      W/2, -45),
+        rot2d(cx, cy, -W/2 - S,  W/2, -45)
+      ];
+
+      // 4 Struts in Top View (1" wide bars along each of the 4 arms from r=2.0" to r=14.5")
+      const strutAngles = [45, 135, 225, 315];
+      const strutPolys = strutAngles.map(ang => {
+        const p = [
+          rot2d(cx, cy, 2.0 * sc,  -0.5 * sc, ang),
+          rot2d(cx, cy, 14.5 * sc, -0.5 * sc, ang),
+          rot2d(cx, cy, 14.5 * sc,  0.5 * sc, ang),
+          rot2d(cx, cy, 2.0 * sc,   0.5 * sc, ang)
+        ];
+        return `<polygon points="${ptsStr(p)}" fill="#f59e0b" fill-opacity="0.45" stroke="#f59e0b" stroke-width="1.3"/>`;
+      }).join('');
+
+      // Bottle Jack Base: 4.0" x 4.25" centered at (cx, cy)
+      const jbW = 4.25 * sc;
+      const jbH = 4.00 * sc;
+
+      svg.innerHTML = `
+        <defs>
+          <marker id="t-sky" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+            <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#38bdf8"/>
+          </marker>
+          <marker id="t-amb" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+            <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#f59e0b"/>
+          </marker>
+        </defs>
+
+        <!-- Short Bars (2x 14") -->
+        <polygon points="${ptsStr(shortTR)}" fill="#1e293b" stroke="#94a3b8" stroke-width="1.5"/>
+        <polygon points="${ptsStr(shortBL)}" fill="#1e293b" stroke="#94a3b8" stroke-width="1.5"/>
+
+        <!-- Continuous Bar (1x 31") -->
+        <polygon points="${ptsStr(cont)}" fill="#334155" stroke="#cbd5e1" stroke-width="1.5"/>
+
+        <!-- Bottle Jack 4.00" x 4.25" Rectangular Base (Rotated 45° relative to the ±45° C-channel arms!) -->
+        <!-- Spans the 4.243" X-waist horizontally/vertically, placing all 4 corners squarely down the middle of the 4 C-channel arms! -->
+        <rect x="${cx - jbW/2}" y="${cy - jbH/2}" width="${jbW}" height="${jbH}" rx="1.5"
+          fill="#0f172a" fill-opacity="0.92" stroke="#38bdf8" stroke-width="1.8"/>
+        <!-- Corner support indicator dots (showing all 4 corners resting on the 4 C-channel webs) -->
+        <circle cx="${cx - jbW/2 + 2.5}" cy="${cy - jbH/2 + 2.5}" r="2" fill="#38bdf8"/>
+        <circle cx="${cx + jbW/2 - 2.5}" cy="${cy - jbH/2 + 2.5}" r="2" fill="#38bdf8"/>
+        <circle cx="${cx + jbW/2 - 2.5}" cy="${cy + jbH/2 - 2.5}" r="2" fill="#38bdf8"/>
+        <circle cx="${cx - jbW/2 + 2.5}" cy="${cy + jbH/2 - 2.5}" r="2" fill="#38bdf8"/>
+        <!-- Pump plunger / handle socket on the 4.25" extension end -->
+        <circle cx="${cx + jbW/2 - 5}" cy="${cy}" r="3.8" fill="#1e293b" stroke="#38bdf8" stroke-width="1.2"/>
+
+        <!-- 4x 1"x1" Diagonal Support Struts (Top Projection) -->
+        ${strutPolys}
+
+        <!-- Ø4.0" Circular Bottle Jack Cylinder Body -->
+        <circle cx="${cx}" cy="${cy}" r="${2.0 * sc}" fill="#1e293b" stroke="#e2e8f0" stroke-width="1.8"/>
+        <circle cx="${cx}" cy="${cy}" r="${0.8 * sc}" fill="#cbd5e1"/>
+
+        <!-- Callout for 4"x4.25" Jack Base Rotated 45° to C-Channels -->
+        <line x1="${cx}" y1="${cy - jbH/2}" x2="${cx}" y2="28" stroke="#38bdf8" stroke-opacity="0.7" stroke-dasharray="2,2"/>
+        <rect x="${cx - 96}" y="16" width="192" height="15" rx="3" fill="#0b1220" stroke="#38bdf8" stroke-width="0.9"/>
+        <text x="${cx}" y="27" text-anchor="middle" fill="#38bdf8" font-size="8.5" font-weight="bold" font-family="monospace">4&quot;×4.25&quot; JACK BASE (45° TO ARMS)</text>
+
+        <!-- Callout for 31" Continuous Bar -->
+        <g transform="translate(${cx - 58}, ${cy - 48}) rotate(45)">
+          <rect x="-34" y="-7" width="68" height="13" rx="2" fill="#0b1220" fill-opacity="0.9"/>
+          <text x="0" y="3" text-anchor="middle" fill="#38bdf8" font-size="8.5" font-weight="bold" font-family="monospace">31&quot; × 3&quot; BAR</text>
+        </g>
+
+        <!-- Callout for 14" Short Bars -->
+        <g transform="translate(${cx + 52}, ${cy - 52}) rotate(-45)">
+          <rect x="-28" y="-7" width="56" height="13" rx="2" fill="#0b1220" fill-opacity="0.9"/>
+          <text x="0" y="3" text-anchor="middle" fill="#f59e0b" font-size="8.5" font-weight="bold" font-family="monospace">14&quot; × 3&quot;</text>
+        </g>
+        <g transform="translate(${cx - 52}, ${cy + 52}) rotate(-45)">
+          <rect x="-28" y="-7" width="56" height="13" rx="2" fill="#0b1220" fill-opacity="0.9"/>
+          <text x="0" y="3" text-anchor="middle" fill="#f59e0b" font-size="8.5" font-weight="bold" font-family="monospace">14&quot; × 3&quot;</text>
+        </g>
+
+        <!-- Callout for 1" Inset at Tips -->
+        <text x="${cx + 85}" y="${cy + 95}" text-anchor="middle" fill="#fbbf24" font-size="8.5" font-weight="bold" font-family="monospace">1&quot; FROM TIP (4x)</text>
+
+        <!-- Bottom Summary Legend -->
+        <rect x="14" y="295" width="352" height="36" rx="4" fill="#0f172a" stroke="#334155"/>
+        <text x="190" y="310" text-anchor="middle" fill="#38bdf8" font-size="9" font-weight="bold" font-family="monospace">
+          Jack Base Rotated 45° to C-Channels: 100% Supported on Steel!
+        </text>
+        <text x="190" y="323" text-anchor="middle" fill="#cbd5e1" font-size="8.5" font-family="monospace">
+          Spans 4.243&quot; Waist &amp; All 4 Corners Rest on the 4 C-Channel Webs
+        </text>
+      `;
+    }
+
+    // =========================================================================
+    // 3. INTERACTIVE 3D ISOMETRIC VIEW (Matches User Sketch + Full Dimensions)
+    // =========================================================================
+    let yaw = 0.08;   // Slight yaw so X arms match user's sketch perspective
+    let pitch = 0.52; // ~30 deg isometric elevation
+    let isDragging = false;
+    let lastX = 0, lastY = 0;
+
+    function resetIso() {
+      yaw = 0.08;
+      pitch = 0.52;
+      drawIsoView();
+    }
+
+    // Project 3D world inches (x, y, z) -> 2D SVG (px, py)
+    function proj3d(x, y, z) {
+      const cx = 190, cy = 238;
+      const sc = 7.2;
+      // Rotate around Z by yaw
+      const x1 = x * Math.cos(yaw) - y * Math.sin(yaw);
+      const y1 = x * Math.sin(yaw) + y * Math.cos(yaw);
+      // Tilt by pitch
+      const sx = cx + x1 * sc;
+      const sy = cy + (y1 * Math.sin(pitch) - z * Math.cos(pitch)) * sc;
+      const depth = y1 * Math.cos(pitch) + z * Math.sin(pitch);
+      return [sx, sy, depth];
+    }
+
+    function poly3d(pts3d, fill, stroke, strokeW = 1.2, opacity = 1.0, layer = 1) {
+      const p2 = pts3d.map(p => proj3d(p[0], p[1], p[2]));
+      const avgDepth = p2.reduce((acc, p) => acc + p[2], 0) / p2.length;
+      const str = p2.map(p => `${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ');
+      return {
+        layer: layer,
+        depth: avgDepth,
+        svg: `<polygon points="${str}" fill="${fill}" fill-opacity="${opacity}" stroke="${stroke}" stroke-width="${strokeW}" stroke-linejoin="round"/>`
+      };
+    }
+
+    // Build a 3D C-Channel box along local axis angle `angDeg` from u1 to u2 (Layer 0 = Base)
+    function buildCChannelFaces(u1, u2, angDeg, fillTop, fillSide) {
+      const rad = angDeg * Math.PI / 180;
+      const c = Math.cos(rad), s = Math.sin(rad);
+      const w = 1.5;     // half of 3.0" width
+      const h = 1.375;   // C-channel height
+      function toW(u, v, z) {
+        return [u * c - v * s, u * s + v * c, z];
+      }
+      const faces = [];
+      // Side flanges (v = ±w, z from 0 to h) in Layer 0
+      faces.push(poly3d([toW(u1,-w,0), toW(u2,-w,0), toW(u2,-w,h), toW(u1,-w,h)], fillSide, '#94a3b8', 1.1, 1.0, 0));
+      faces.push(poly3d([toW(u1,w,0), toW(u2,w,0), toW(u2,w,h), toW(u1,w,h)], fillSide, '#94a3b8', 1.1, 1.0, 0));
+      // End caps (inverted U / channel profile) in Layer 0
+      [u1, u2].forEach(uEnd => {
+        faces.push(poly3d([
+          toW(uEnd, -w, 0), toW(uEnd, -w, h), toW(uEnd, w, h), toW(uEnd, w, 0),
+          toW(uEnd, w - 0.25, 0), toW(uEnd, w - 0.25, h - 0.2), toW(uEnd, -w + 0.25, h - 0.2), toW(uEnd, -w + 0.25, 0)
+        ], '#0f172a', '#e2e8f0', 1.2, 1.0, 0));
+      });
+      // Top flat web (z = h) in Layer 1 (top surface of base deck, still below Layer 2+ Jack & Struts)
+      faces.push(poly3d([toW(u1,-w,h), toW(u2,-w,h), toW(u2,w,h), toW(u1,w,h)], fillTop, '#cbd5e1', 1.2, 1.0, 1));
+      return faces;
+    }
+
+    function drawIsoView() {
+      const svg = document.getElementById('svg-iso');
+      const h = 1.375;
+      let renderQueue = [];
+
+      // 1. Continuous 31" C-Channel along +45 deg (u from -15.5 to +15.5) & two 14" Short C-Channels along -45 deg
+      renderQueue.push(...buildCChannelFaces(-15.5, 15.5, 45, '#334155', '#1e293b'));
+      renderQueue.push(...buildCChannelFaces(1.5, 15.5, -45, '#3b4c63', '#1e293b'));
+      renderQueue.push(...buildCChannelFaces(-15.5, -1.5, -45, '#3b4c63', '#1e293b'));
+
+      // 2. Bottle Jack 4.00" x 4.25" Base Plate rotated 45° relative to the ±45° C-channel arms (Layer 2: sits ON TOP of C-channel deck!)
+      const bx = 2.125, by = 2.00, bz = h + 1.2;
+      // 4 vertical side faces of the 4"x4.25" base casting
+      renderQueue.push(poly3d([[-bx,-by,h],[bx,-by,h],[bx,-by,bz],[-bx,-by,bz]], '#0f172a', '#38bdf8', 1.3, 1.0, 2));
+      renderQueue.push(poly3d([[bx,-by,h],[bx,by,h],[bx,by,bz],[bx,-by,bz]], '#0f172a', '#38bdf8', 1.3, 1.0, 2));
+      renderQueue.push(poly3d([[bx,by,h],[-bx,by,h],[-bx,by,bz],[bx,by,bz]], '#0f172a', '#38bdf8', 1.3, 1.0, 2));
+      renderQueue.push(poly3d([[-bx,by,h],[-bx,-by,h],[-bx,-by,bz],[-bx,by,bz]], '#0f172a', '#38bdf8', 1.3, 1.0, 2));
+      // Top face of 4"x4.25" base casting (Layer 2, slightly above side walls so cylinder sits on it)
+      renderQueue.push(poly3d([[-bx,-by,bz],[bx,-by,bz],[bx,by,bz],[-bx,by,bz]], '#1e293b', '#38bdf8', 1.6, 1.0, 2.1));
+
+      // 3. Bottle Jack Ø4" Cylinder (Layer 3: sits ON TOP of the 4"x4.25" base plate)
+      const segs = 16;
+      const rJ = 2.0;
+      for (let i = 0; i < segs; i++) {
+        const a1 = (i / segs) * Math.PI * 2;
+        const a2 = ((i + 1) / segs) * Math.PI * 2;
+        const p1 = [rJ * Math.cos(a1), rJ * Math.sin(a1), bz];
+        const p2 = [rJ * Math.cos(a2), rJ * Math.sin(a2), bz];
+        const p3 = [rJ * Math.cos(a2), rJ * Math.sin(a2), h + 21.5];
+        const p4 = [rJ * Math.cos(a1), rJ * Math.sin(a1), h + 21.5];
+        const shade = (Math.cos(a1 + yaw) > 0) ? '#334155' : '#1e293b';
+        renderQueue.push(poly3d([p1, p2, p3, p4], shade, '#475569', 0.6, 1.0, 3));
+      }
+      // Cylinder Top Cap & Collar at z = h + 22.0
+      const collarPts = [];
+      const ramTopPts = [];
+      for (let i = 0; i < segs; i++) {
+        const a = (i / segs) * Math.PI * 2;
+        collarPts.push([2.25 * Math.cos(a), 2.25 * Math.sin(a), h + 22.0]);
+        ramTopPts.push([0.85 * Math.cos(a), 0.85 * Math.sin(a), h + 25.0]);
+      }
+      renderQueue.push(poly3d(collarPts, '#f59e0b', '#fbbf24', 1.6, 0.55, 3));
+      // Ram piston (z from h+21.5 to h+25.0)
+      for (let i = 0; i < segs; i += 2) {
+        const a1 = (i / segs) * Math.PI * 2;
+        const a2 = ((i + 2) / segs) * Math.PI * 2;
+        renderQueue.push(poly3d([
+          [0.85*Math.cos(a1), 0.85*Math.sin(a1), h+21.5],
+          [0.85*Math.cos(a2), 0.85*Math.sin(a2), h+21.5],
+          [0.85*Math.cos(a2), 0.85*Math.sin(a2), h+25.0],
+          [0.85*Math.cos(a1), 0.85*Math.sin(a1), h+25.0]
+        ], '#cbd5e1', '#94a3b8', 0.8, 1.0, 3));
+      }
+      renderQueue.push(poly3d(ramTopPts, '#f8fafc', '#94a3b8', 1.2, 1.0, 3));
+
+      // 4. Four 1"x1" Diagonal Support Struts (Layer 3: sits ON TOP of C-channel deck, sorted in 3D with cylinder)
+      [45, 135, 225, 315].forEach(angDeg => {
+        const rad = angDeg * Math.PI / 180;
+        const c = Math.cos(rad), s = Math.sin(rad);
+        function toS(u, v, z) {
+          return [u * c - v * s, u * s + v * c, z];
+        }
+        const bOut = 14.5, bIn = 13.35;
+        const tOut = 2.0,  tIn = 2.0;
+        const zBot = h, zTop = h + 22.0, zTopIn = h + 20.0;
+        const hw = 0.5;
+        // Top-facing sloped face
+        renderQueue.push(poly3d([
+          toS(bOut, -hw, zBot), toS(bOut, hw, zBot),
+          toS(tOut, hw, zTop),  toS(tOut, -hw, zTop)
+        ], '#f59e0b', '#fde68a', 1.1, 0.88, 3));
+        // Side face 1
+        renderQueue.push(poly3d([
+          toS(bOut, hw, zBot), toS(bIn, hw, zBot),
+          toS(tIn, hw, zTopIn), toS(tOut, hw, zTop)
+        ], '#d97706', '#fbbf24', 1.0, 0.88, 3));
+        // Side face 2
+        renderQueue.push(poly3d([
+          toS(bOut, -hw, zBot), toS(bIn, -hw, zBot),
+          toS(tIn, -hw, zTopIn), toS(tOut, -hw, zTop)
+        ], '#b45309', '#fbbf24', 1.0, 0.88, 3));
+      });
+
+      // Layer-aware Painter's algorithm sort:
+      // Layer 0 (C-channel flanges) -> Layer 1 (C-channel top web) -> Layer 2 (Jack Base ON TOP of C-channel) -> Layer 3 (Cylinder & Struts)
+      renderQueue.sort((a, b) => (a.layer !== b.layer) ? (a.layer - b.layer) : (a.depth - b.depth));
+
+      // Dimension callout points in 3D matching user's hand-drawn sketch!
+      const tipBL = proj3d(-15.5 * Math.SQRT1_2,  15.5 * Math.SQRT1_2, 0);
+      const tipBR = proj3d( 15.5 * Math.SQRT1_2,  15.5 * Math.SQRT1_2, 0);
+      const tipTR = proj3d( 15.5 * Math.SQRT1_2, -15.5 * Math.SQRT1_2, 0);
+      const tipTL = proj3d(-15.5 * Math.SQRT1_2, -15.5 * Math.SQRT1_2, 0);
+      const topCollar = proj3d(2.2, 0, h + 22.0);
+      const strutMid  = proj3d(8.2 * Math.SQRT1_2, -8.2 * Math.SQRT1_2, h + 11.0);
+      const topRam    = proj3d(0, 0, h + 25.0);
+
+      svg.innerHTML = `
+        <!-- Isometric Reference Lines -->
+        <line x1="${tipBL[0]}" y1="${tipBL[1]}" x2="${tipBR[0]}" y2="${tipBR[1]}" stroke="#64748b" stroke-dasharray="3,3" stroke-width="1.1"/>
+        <line x1="${tipBR[0]}" y1="${tipBR[1]}" x2="${tipTR[0]}" y2="${tipTR[1]}" stroke="#64748b" stroke-dasharray="3,3" stroke-width="1.1"/>
+        <line x1="${tipTL[0]}" y1="${tipTL[1]}" x2="${tipBL[0]}" y2="${tipBL[1]}" stroke="#38bdf8" stroke-opacity="0.5" stroke-dasharray="3,3" stroke-width="1.1"/>
+
+        <!-- 3D Rendered Geometry -->
+        ${renderQueue.map(item => item.svg).join('\n')}
+
+        <!-- Isometric Sketch Dimension Labels -->
+        <!-- 31" Diagonal Span -->
+        <rect x="${(tipBL[0] + tipTR[0])/2 + 55}" y="${(tipBL[1] + tipTR[1])/2 + 52}" width="64" height="15" rx="3" fill="#0f172a" stroke="#38bdf8" stroke-width="1"/>
+        <text x="${(tipBL[0] + tipTR[0])/2 + 87}" y="${(tipBL[1] + tipTR[1])/2 + 63}" text-anchor="middle" fill="#38bdf8" font-size="9.5" font-weight="bold" font-family="monospace">31.0&quot; DIAG</text>
+
+        <!-- 25.30" (25-5/16") Strut Length -->
+        <rect x="${strutMid[0] + 6}" y="${strutMid[1] - 12}" width="96" height="15" rx="3" fill="#0f172a" stroke="#f59e0b" stroke-width="1"/>
+        <text x="${strutMid[0] + 54}" y="${strutMid[1] - 1}" text-anchor="middle" fill="#f59e0b" font-size="9" font-weight="bold" font-family="monospace">25.30&quot; (4x STRUTS)</text>
+
+        <!-- 22" Collar & 25" Jack Height -->
+        <text x="${topRam[0]}" y="${topRam[1] - 8}" text-anchor="middle" fill="#38bdf8" font-size="9" font-weight="bold" font-family="monospace">25&quot; JACK TOP</text>
+        <text x="${topCollar[0] - 45}" y="${topCollar[1] - 4}" text-anchor="end" fill="#fbbf24" font-size="8.5" font-weight="bold" font-family="monospace">22&quot; COLLAR</text>
+      `;
+    }
+
+    // Mouse / Touch drag to orbit 3D Isometric View
+    const isoSvg = document.getElementById('svg-iso');
+    isoSvg.addEventListener('pointerdown', e => {
+      isDragging = true;
+      lastX = e.clientX;
+      lastY = e.clientY;
+      isoSvg.setPointerCapture(e.pointerId);
+    });
+    isoSvg.addEventListener('pointermove', e => {
+      if (!isDragging) return;
+      const dx = e.clientX - lastX;
+      const dy = e.clientY - lastY;
+      lastX = e.clientX;
+      lastY = e.clientY;
+      yaw -= dx * 0.012;
+      pitch = Math.max(0.15, Math.min(1.25, pitch + dy * 0.01));
+      drawIsoView();
+    });
+    isoSvg.addEventListener('pointerup', () => { isDragging = false; });
+
+    drawSideView();
+    drawTopView();
+    drawIsoView();
+  </script>
+</body>
+</html>
