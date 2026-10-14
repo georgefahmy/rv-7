@@ -43,14 +43,6 @@ Backlog:
         ☐ Aviationwraps.com got back to me ~15k for full custom wrap + cost for travel + per diem during installation + transport so probably closer to 20k
         ☐ 35k for evoke (Plus ~ 3 year waiting) leave airplane there
 
-    @future Landing Height System (~$1100):
-        Landing Height System Lidar Altimeter
-        ☐ 1 amp (VPX J1.2 2A) circuit for power (unit uses <150mA of current)
-            ☐ two wire shielded for power
-            ☐ one wire shielded for audio - connect to non-muting audio input on SV-INT D25.17, ground one side
-            ☐ one wire shielded for gps rs232
-        ☐ Use Left wing access panel
-        ☐ Feed 3 wire harness through wing to access panel
 
     @future Dynon Heated Pitot (~$500):
         ☐ access panel mounting of the heater controller (on left wing)
@@ -63,17 +55,9 @@ Backlog:
         PMAG EI Controller - see advance angle on skyview
         ✔ Order PMAG EI Controller @done(26-02-25)
         ✔ Fabricate Tx/Rx harness for Left/Right PMAG to D15 connector @done(26-04-01)
-        ☐ Power VPX J1.1 (2amp max),
-        ☐ Ground to ground-tab on Firewall
-        ☐ EMS GPIO1, GPIO5, GPIO7, GPIO8 available (after changing Trim to VPX) Left/Right advance and temperature monitor
-        ☐ change trim position to as follows on VPX J1
-            ☐ J1.3 roll trim 2.5v ref
-            ☐ J1.4 roll trim ground
-            ☐ J1.5 roll trim position
-            ☐ J1.8 pitch trim 2.5v ref
-            ☐ J1.9 pitch trim ground
-            ☐ J1.10 pitch trim position
-            ☐ Set VPX Endpoints to 1 - do calibration on Skyview for Trim motors
+        ✔ Power VPX J1.1 (2amp max), @done(26-10-05)
+        ✔ Ground to ground-tab on Firewall @done(26-10-05)
+        ☐ add adv angle to EFIS
 
     @future O2 Sensor:
         ✔ Wire harness routing @done(26-01-08)
@@ -97,8 +81,8 @@ Backlog:
             ☐ Secure with wormgear hose clamp
             ✔ Cut out notch for brake line @done(26-05-07)
         Wheel Pants:
-            ☐ Smooth out interface between forward and aft halves
-            ☐ Open lower hole for wheel clearance
+            ✔ Smooth out interface between forward and aft halves @done(26-10-05)
+            ✔ Open lower hole for wheel clearance @done(26-10-05)
             ☐ Secure outer wheel pant bracket
             ☐ Align with offset centerline
             ☐ Align vertically forward aft

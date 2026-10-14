@@ -2,13 +2,13 @@ import math
 import textwrap
 import time
 import webbrowser
+from random import shuffle
 from urllib.parse import quote
 
 import airportsdata
 import networkx as nx
 import requests
 from bs4 import BeautifulSoup
-from random import shuffle
 
 
 def haversine_distance(lat1, lon1, lat2, lon2):
@@ -313,7 +313,7 @@ if __name__ == "__main__":
         max_leg=600.0,
         altitude_penalty_factor=0,
         max_radius_from_start=None,
-        skip_airports=3,
+        skip_airports=0,
     )
 
     # session = requests.Session()
